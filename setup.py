@@ -5,6 +5,9 @@ import lz
 
 project_base_url = 'https://github.com/lycantropos/lz/'
 
+install_requires = [
+    'typing_extensions>=3.6.5',
+]
 setup_requires = [
     'pytest-runner>=3.0'
 ]
@@ -25,5 +28,6 @@ setup(name='lz',
       author_email='azatibrakov@gmail.com',
       url=project_base_url,
       download_url=project_base_url + 'archive/master.zip',
+      install_requires=install_requires,
       setup_requires=setup_requires,
       tests_require=tests_require)
