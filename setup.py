@@ -1,7 +1,7 @@
-import lz
-from lz.config import PROJECT_NAME
 from setuptools import (find_packages,
                         setup)
+
+import lz
 
 project_base_url = 'https://github.com/lycantropos/lz/'
 
@@ -15,7 +15,7 @@ tests_require = [
     'hypothesis>=3.38.5',
 ]
 
-setup(name=PROJECT_NAME,
+setup(name='lz',
       packages=find_packages(exclude=('tests',)),
       version=lz.__version__,
       description=lz.__doc__,
