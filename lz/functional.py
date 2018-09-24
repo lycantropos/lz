@@ -2,6 +2,7 @@ import functools
 import operator
 from typing import (Any,
                     Callable,
+                    Iterable,
                     Tuple,
                     TypeVar)
 
@@ -42,6 +43,14 @@ def combine(*maps: Map) -> Map[Tuple[Domain, ...],
                      for map_, argument in zip(maps, arguments))
 
     return combined
+
+
+def unpack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
+    @functools.wraps(function)
+    def unpacked(iterable: Iterable[Domain]) -> Range:
+        return function(*iterable)
+
+    return unpacked
 
 
 def to_constant(object_: Domain) -> Callable[..., Domain]:
