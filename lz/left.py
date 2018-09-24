@@ -3,10 +3,10 @@ import itertools
 from typing import (Callable,
                     Iterable)
 
-from .base import expand
 from .hints import (Domain,
                     Map,
                     Range)
+from .iterating import expand
 
 
 def accumulator(function: Callable[[Range, Domain], Range],

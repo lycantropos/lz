@@ -3,13 +3,13 @@ from typing import (Callable,
                     Iterable)
 
 from . import left
-from .base import (expand,
-                   reverse)
 from .functional import (compose,
                          flip)
 from .hints import (Domain,
                     Map,
                     Range)
+from .iterating import (expand,
+                        reverse)
 
 
 def accumulator(function: Callable[[Domain, Range], Range],
