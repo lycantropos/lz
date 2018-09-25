@@ -1,9 +1,10 @@
 import functools
+import itertools
 import operator
 from typing import (Any,
                     Callable,
+                    Collection,
                     Iterable,
-                    Tuple,
                     TypeVar)
 
 from .hints import (Domain,
@@ -30,17 +31,20 @@ def compose(*maps: Map) -> Map[Domain, Any]:
     return functools.reduce(binary_compose, maps)
 
 
-def combine(*maps: Map) -> Map[Tuple[Domain, ...],
-                               Tuple[Range, ...]]:
-    def combined(arguments: Tuple[Domain, ...]) -> Tuple[Range, ...]:
+def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
+    def chop(arguments: Iterable[Domain]) -> Collection[Domain]:
+        return tuple(itertools.islice(arguments, len(maps)))
+
+    def combined(arguments: Iterable[Domain]) -> Iterable[Range]:
+        arguments = chop(arguments)
         if len(arguments) != len(maps):
             raise ValueError('There should be {count} arguments '
                              'for each of maps, '
                              'but found {actual_count}.'
                              .format(count=len(maps),
                                      actual_count=len(arguments)))
-        return tuple(map_(argument)
-                     for map_, argument in zip(maps, arguments))
+        yield from (map_(argument)
+                    for map_, argument in zip(maps, arguments))
 
     return combined
 
