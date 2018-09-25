@@ -73,6 +73,11 @@ def from_class_or_function(object_: Union[BuiltinMethodType, FunctionType,
     return factory(object_.__qualname__)
 
 
+@factory.register(ModuleType)
+def from_module(object_: ModuleType) -> Path:
+    return factory(object_.__name__)
+
+
 @factory.register(pathlib.Path)
 def from_relative_file_path(path: pathlib.Path) -> Path:
     if path.is_absolute():
