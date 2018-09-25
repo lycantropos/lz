@@ -103,11 +103,12 @@ class BaseNodeTransformer(ast.NodeTransformer):
         return node
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
+        module_path = catalog.factory(node.module)
         paths = map(self.visit, node.names)
         for path in paths:
+            if not namespace_contains(self.namespace, path):
+                self.namespace.update(namespaces.factory(module_path))
             self.nodes[path] = node
-        module_path = catalog.factory(node.module)
-        self.namespace.update(namespaces.factory(module_path))
         return node
 
     def visit_If(self, node: ast.If) -> Any:
