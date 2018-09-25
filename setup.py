@@ -6,7 +6,8 @@ import lz
 project_base_url = 'https://github.com/lycantropos/lz/'
 
 install_requires = [
-    'typing_extensions>=3.6.5',
+    'typeshed>=0.0.1',
+    'typing_extensions>=3.6.5'
 ]
 setup_requires = [
     'pytest-runner>=3.0'
