@@ -35,13 +35,13 @@ def factory(module: ModuleType) -> Path:
 
 
 @factory.register(catalog.Path)
-def from_module_path(path: catalog.Path) -> Path:
+def from_module_path(module_path: catalog.Path) -> Path:
     try:
-        result = cache[path]
+        result = cache[module_path]
     except KeyError:
-        module = importlib.import_module(str(path))
+        module = importlib.import_module(str(module_path))
         result = factory(module)
-        cache[path] = result
+        cache[module_path] = result
     return result
 
 
