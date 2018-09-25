@@ -5,7 +5,8 @@ from collections import namedtuple
 from functools import singledispatch
 from pathlib import Path
 from types import ModuleType
-from typing import (Iterable,
+from typing import (Any,
+                    Iterable,
                     Tuple)
 
 import typeshed
@@ -27,21 +28,24 @@ STUB_EXTENSION = '.pyi'
 
 
 @singledispatch
-def factory(module: ModuleType) -> Path:
-    result = Path(inspect.getfile(module))
-    if result.with_suffix('').name == INIT_MODULE_NAME:
-        result = result.parent
-    return result
+def factory(object_: Any) -> Path:
+    raise TypeError('Unsupported object type: {type}.'
+                    .format(type=type(object_)))
+
+
+@factory.register(ModuleType)
+def from_module(object_: ModuleType) -> Path:
+    return Path(inspect.getfile(object_))
 
 
 @factory.register(catalog.Path)
-def from_module_path(module_path: catalog.Path) -> Path:
+def from_module_path(object_: catalog.Path) -> Path:
     try:
-        result = cache[module_path]
+        result = cache[object_]
     except KeyError:
-        module = importlib.import_module(str(module_path))
+        module = importlib.import_module(str(object_))
         result = factory(module)
-        cache[module_path] = result
+        cache[object_] = result
     return result
 
 
@@ -106,4 +110,11 @@ def is_stub(path: Path) -> bool:
     return path.suffixes == [STUB_EXTENSION]
 
 
-cache = dict(generate_stubs_cache_items(factory(typeshed) / 'stdlib'))
+def to_package_path(path: Path) -> Path:
+    if path.with_suffix('').name == INIT_MODULE_NAME:
+        path = path.parent
+    return path
+
+
+cache = dict(generate_stubs_cache_items(to_package_path(factory(typeshed))
+                                        / 'stdlib'))
