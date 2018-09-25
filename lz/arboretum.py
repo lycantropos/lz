@@ -123,6 +123,10 @@ class BaseNodeTransformer(ast.NodeTransformer):
             self.nodes[path] = value_node
         return node
 
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
+        self.nodes[self.visit(node.target)] = node.value
+        return node
+
     def visit_Name(self, node: ast.Name) -> Any:
         return catalog.factory(node.id)
 
