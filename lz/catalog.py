@@ -46,8 +46,12 @@ class Path:
     def __bool__(self) -> bool:
         return bool(self.parts)
 
-    def join(self, part: str) -> 'Path':
-        return Path(*self.parts, part)
+    def join(self, other: str) -> 'Path':
+        if isinstance(other, str):
+            return Path(*self.parts, other)
+        elif isinstance(other, Path):
+            return Path(*self.parts, *other.parts)
+        return NotImplemented
 
 
 Paths = Dict[Path, Any]
