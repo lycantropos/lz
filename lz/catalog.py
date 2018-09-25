@@ -1,24 +1,16 @@
-import importlib
 import inspect
 import pathlib
 from functools import singledispatch
-from operator import methodcaller
 from types import (BuiltinMethodType,
                    FunctionType,
                    MethodDescriptorType,
                    ModuleType)
 from typing import (Any,
-                    Dict,
                     Optional,
                     Union)
 
-from . import (dictionaries,
-               left,
-               right)
+from . import right
 from .file_system import INIT_MODULE_NAME
-from .functional import (compose,
-                         unpack)
-from .iterating import mapper
 
 
 class Path:
@@ -46,15 +38,16 @@ class Path:
     def __bool__(self) -> bool:
         return bool(self.parts)
 
-    def join(self, other: str) -> 'Path':
+    def join(self, other: Union[str, 'Path']) -> 'Path':
         if isinstance(other, str):
             return Path(*self.parts, other)
         elif isinstance(other, Path):
             return Path(*self.parts, *other.parts)
         return NotImplemented
 
-
-Paths = Dict[Path, Any]
+    @property
+    def parent(self) -> 'Path':
+        return Path(*self.parts[:-1])
 
 
 @singledispatch
@@ -126,37 +119,3 @@ def module_name_from_non_module(object_: Union[BuiltinMethodType,
 @module_name_factory.register(ModuleType)
 def module_name_from_module(object_: ModuleType) -> str:
     return object_.__name__
-
-
-@singledispatch
-def paths_factory(object_: Any,
-                  *,
-                  parent_path: Path) -> Paths:
-    return {parent_path: object_}
-
-
-@paths_factory.register(Path)
-def paths_from_module_path(object_: Path,
-                           *,
-                           parent_path: Path) -> Paths:
-    module = importlib.import_module(str(object_))
-    return paths_factory(module,
-                         parent_path=parent_path)
-
-
-@paths_factory.register(FunctionType)
-@paths_factory.register(ModuleType)
-@paths_factory.register(type)
-def paths_from_class_or_function(object_: Union[ModuleType, type],
-                                 *,
-                                 parent_path: Path) -> Paths:
-    def to_sub_paths(name: str, content: Any) -> Paths:
-        return paths_factory(content,
-                             parent_path=parent_path.join(name))
-
-    to_paths = compose(dictionaries.merge,
-                       left.attacher({parent_path: object_}),
-                       mapper(unpack(to_sub_paths)),
-                       methodcaller('items'),
-                       vars)
-    return to_paths(object_)

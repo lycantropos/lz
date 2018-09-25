@@ -1,4 +1,6 @@
-from typing import (Callable,
+from typing import (Any,
+                    Callable,
+                    Dict,
                     TypeVar)
 
 from typing_extensions import Protocol
@@ -13,3 +15,6 @@ Predicate = Map[Domain, bool]
 class Sortable(Protocol):
     def __lt__(self, other: 'Sortable') -> bool:
         pass
+
+
+Namespace = Dict[str, Any]
