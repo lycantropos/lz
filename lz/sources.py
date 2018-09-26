@@ -17,7 +17,7 @@ from .file_system import (INIT_MODULE_NAME,
 from .functional import (combine,
                          compose,
                          identity,
-                         unpack)
+                         pack)
 from .hints import Map
 from .iterating import (copier,
                         flatmapper,
@@ -93,7 +93,7 @@ def generate_stubs_cache_items(root: Path
     def to_directory_items(directory: Path
                            ) -> Iterable[Tuple[catalog.Path, Path]]:
         to_module_full_name = module_full_name_factory(directory)
-        finder = compose(unpack(zip),
+        finder = compose(pack(zip),
                          combine(mapper(to_module_full_name), identity),
                          copier(2),
                          sifter(is_stub),

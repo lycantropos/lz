@@ -17,7 +17,7 @@ from . import (arboretum,
                catalog)
 from .functional import (combine,
                          compose,
-                         unpack)
+                         pack)
 from .hints import Range
 from .iterating import (expand,
                         flatten,
@@ -98,7 +98,7 @@ def to_positional_parameters(signature_ast: ast.arguments
     parameters_with_defaults_ast = reversed(list(parameters_with_defaults_ast))
     parameter_factory = partial(to_parameter,
                                 kind=inspect._POSITIONAL_ONLY)
-    yield from mapper(unpack(parameter_factory))(parameters_with_defaults_ast)
+    yield from mapper(pack(parameter_factory))(parameters_with_defaults_ast)
 
 
 def to_keyword_parameters(signature_ast: ast.arguments
@@ -107,7 +107,7 @@ def to_keyword_parameters(signature_ast: ast.arguments
                                        signature_ast.kw_defaults)
     parameter_factory = partial(to_parameter,
                                 kind=inspect._KEYWORD_ONLY)
-    yield from mapper(unpack(parameter_factory))(parameters_with_defaults_ast)
+    yield from mapper(pack(parameter_factory))(parameters_with_defaults_ast)
 
 
 def to_variadic_positional_parameter(signature_ast: ast.arguments

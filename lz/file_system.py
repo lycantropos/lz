@@ -7,7 +7,7 @@ from typing import (Iterator,
                     List)
 
 from .functional import (compose,
-                         unpack)
+                         pack)
 from .iterating import (flatmapper,
                         mapper)
 
@@ -18,7 +18,7 @@ def find_files(directory: Path) -> Iterator[Path]:
     def to_paths(root: str, files: List[str]) -> Iterator[Path]:
         yield from map(truediv, repeat(Path(root)), files)
 
-    finder = compose(flatmapper(unpack(to_paths)),
+    finder = compose(flatmapper(pack(to_paths)),
                      mapper(itemgetter(0, 2)),
                      os.walk)
     yield from finder(directory)

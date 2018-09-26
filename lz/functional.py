@@ -49,12 +49,16 @@ def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     return combined
 
 
-def unpack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
+def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
+    """
+    Creates function that works with single iterable parameter
+    by propagating elements to a wrapped function.
+    """
     @functools.wraps(function)
-    def unpacked(iterable: Iterable[Domain]) -> Range:
+    def packed(iterable: Iterable[Domain]) -> Range:
         return function(*iterable)
 
-    return unpacked
+    return packed
 
 
 def to_constant(object_: Domain) -> Callable[..., Domain]:
