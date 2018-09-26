@@ -137,6 +137,13 @@ class BaseNodeTransformer(ast.NodeTransformer):
     def visit_Attribute(self, node: ast.Attribute) -> Any:
         return self.visit(node.value).join(node.attr)
 
+    def visit_Subscript(self, node: ast.Subscript) -> Any:
+        context = node.ctx
+        if not isinstance(context, ast.Load):
+            raise TypeError('Unsupported context type: {type}.'
+                            .format(type=type(context)))
+        return node
+
     def visit_Compare(self, node: ast.Compare) -> bool:
         nodes = {}
         transformer = type(self)(nodes=nodes,
