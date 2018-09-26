@@ -262,5 +262,5 @@ def evaluate_statement(node: ast.stmt,
 def evaluate_tree(node: ast.Module,
                   *,
                   namespace: Namespace) -> None:
-    code = compile(node, __file__, 'exec')
+    code = compile(node, '<ast>', 'exec')
     exec(code, namespace)
