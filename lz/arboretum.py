@@ -145,21 +145,12 @@ class BaseNodeTransformer(ast.NodeTransformer):
         return catalog.factory(result)
 
     def visit_Compare(self, node: ast.Compare) -> bool:
-        def to_nodes(node_or_list: Union[ast.AST, Iterable[ast.AST]]
-                     ) -> Iterable[ast.AST]:
-            if isinstance(node_or_list, collections.Iterable):
-                yield from node_or_list
-            else:
-                yield node_or_list
-
         nodes = {}
         transformer = BaseNodeTransformer(nodes=nodes,
                                           namespace=self.namespace,
                                           parent_path=self.parent_path)
-        for field_name in node._fields:
-            children = to_nodes(getattr(node, field_name))
-            for child in children:
-                transformer.visit(child)
+        for child in ast.iter_child_nodes(node):
+            transformer.visit(child)
         if nodes:
             for path, node in nodes.items():
                 if str(path) in self.namespace:
