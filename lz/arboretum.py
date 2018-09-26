@@ -220,9 +220,7 @@ def expression_to_assignment(node: ast.expr,
                              name: str) -> ast.Assign:
     name_node = ast.Name(name, ast.Store())
     result = ast.Assign([name_node], node)
-    for attribute in result._attributes:
-        setattr(result, attribute, getattr(node, attribute))
-        setattr(name_node, attribute, getattr(node, attribute))
+    result = ast.fix_missing_locations(result)
     return result
 
 
