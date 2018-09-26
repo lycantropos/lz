@@ -153,7 +153,7 @@ class BaseNodeTransformer(ast.NodeTransformer):
             transformer.visit(child)
         if nodes:
             for path, node in nodes.items():
-                if str(path) in self.namespace:
+                if namespace_contains(self.namespace, path):
                     continue
                 evaluate(node,
                          namespace=self.namespace)
