@@ -138,12 +138,6 @@ class BaseNodeTransformer(ast.NodeTransformer):
     def visit_Attribute(self, node: ast.Attribute) -> Any:
         return self.visit(node.value).join(node.attr)
 
-    def visit_alias(self, alias: ast.alias) -> catalog.Path:
-        result = alias.asname
-        if result is None:
-            result = alias.name
-        return catalog.factory(result)
-
     def visit_Compare(self, node: ast.Compare) -> bool:
         nodes = {}
         transformer = BaseNodeTransformer(nodes=nodes,
