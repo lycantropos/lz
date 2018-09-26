@@ -17,6 +17,8 @@ def explore_pytest_plugins(package_path: str) -> Iterator[str]:
         file_finder.path
         for file_finder, _, is_package in pkgutil.iter_modules(directories)
         if not is_package]
+    if not packages_paths:
+        return
     common_path = os.path.dirname(os.path.commonpath(packages_paths))
     for module_info in pkgutil.iter_modules(packages_paths):
         file_finder, module_name, is_package = module_info
