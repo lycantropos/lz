@@ -4,7 +4,7 @@ import sys
 from functools import partial
 from typing import Iterator
 
-from _pytest.config import Parser
+from _pytest.config.argparsing import Parser
 from _pytest.python import Metafunc
 
 base_directory_path = os.path.dirname(__file__)
