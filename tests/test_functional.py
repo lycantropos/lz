@@ -1,5 +1,12 @@
-from lz.functional import negate
+from typing import Any
+
+from lz.functional import (identity,
+                           negate)
 from lz.hints import Predicate
+
+
+def test_identity(object_: Any) -> None:
+    assert identity(object_) is object_
 
 
 def test_negate(false_predicate: Predicate,
