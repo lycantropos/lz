@@ -1,13 +1,13 @@
 import functools
 import itertools
-from collections import defaultdict
+from collections import (abc,
+                         defaultdict)
 from typing import (Hashable,
                     Iterable,
                     List,
                     Mapping,
                     Reversible,
-                    Tuple,
-                    Union)
+                    Tuple)
 
 from .functional import compose
 from .hints import (Domain,
@@ -89,13 +89,14 @@ def grouper(key: Map[Domain, Hashable]
     return group_by
 
 
-def reverse(iterable: Union[Reversible[Domain],
-                            Iterable[Domain]]) -> Iterable[Domain]:
-    try:
-        result = reversed(iterable)
-    except TypeError:
-        result = reversed(list(iterable))
-    yield from result
+@functools.singledispatch
+def reverse(iterable: Iterable[Domain]) -> Iterable[Domain]:
+    yield from reversed(list(iterable))
+
+
+@reverse.register(abc.Reversible)
+def reverse_reversible(iterable: Reversible[Domain]) -> Iterable[Domain]:
+    yield from reversed(iterable)
 
 
 def expand(object_: Domain) -> Iterable[Domain]:
