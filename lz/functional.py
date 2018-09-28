@@ -17,18 +17,20 @@ def identity(argument: Domain) -> Domain:
     return argument
 
 
-def compose(*maps: Map) -> Map[Domain, Any]:
+def compose(last_function: Map[Any, Range],
+            *front_functions: Callable[..., Any]) -> Callable[..., Range]:
     Intermediate = TypeVar('Intermediate')
 
-    def binary_compose(left_map: Map[Intermediate, Range],
-                       right_map: Callable[..., Intermediate]
+    def binary_compose(left_function: Map[Intermediate, Range],
+                       right_function: Callable[..., Intermediate]
                        ) -> Callable[..., Range]:
-        def composition(*args: Domain, **kwargs: Domain) -> Any:
-            return left_map(right_map(*args, **kwargs))
+        def composition(*args: Any, **kwargs: Any) -> Range:
+            return left_function(right_function(*args, **kwargs))
 
         return composition
 
-    return functools.reduce(binary_compose, maps)
+    functions = (last_function,) + front_functions
+    return functools.reduce(binary_compose, functions)
 
 
 def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
