@@ -52,8 +52,9 @@ def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
 def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
     """
     Creates function that works with single iterable parameter
-    by propagating elements to a wrapped function.
+    by unpacking elements to original function.
     """
+
     @functools.wraps(function)
     def packed(iterable: Iterable[Domain]) -> Range:
         return function(*iterable)
