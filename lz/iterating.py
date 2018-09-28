@@ -3,6 +3,8 @@ import itertools
 from collections import defaultdict
 from typing import (Hashable,
                     Iterable,
+                    List,
+                    Mapping,
                     Tuple)
 
 from .functional import compose
@@ -33,8 +35,8 @@ def cutter(slice_: slice) -> Map[Iterable[Domain], Iterable[Domain]]:
     return cut
 
 
-def chopper(size: int) -> Map[Iterable[Domain], Iterable[Domain]]:
-    def chop(iterable: Iterable[Domain]) -> Iterable[Domain]:
+def chopper(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
+    def chop(iterable: Iterable[Domain]) -> Iterable[Tuple[Domain, ...]]:
         iterator = iter(iterable)
         yield from zip(*itertools.repeat(iterator, size))
 
@@ -77,7 +79,7 @@ Group = Tuple[Hashable, Iterable[Domain]]
 def grouper(key: Map[Domain, Hashable]
             ) -> Map[Iterable[Domain], Iterable[Group]]:
     def group_by(iterable: Iterable[Domain]) -> Iterable[Group]:
-        groups = defaultdict(list)
+        groups = defaultdict(list)  # type: Mapping[Hashable, List[Domain]]
         for element in iterable:
             groups[key(element)].append(element)
         yield from groups.items()
