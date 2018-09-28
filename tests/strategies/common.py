@@ -1,24 +1,24 @@
 from hypothesis import strategies
 
+strings = strategies.text()
 scalars = (strategies.none()
            | strategies.booleans()
            | strategies.integers()
            | strategies.floats(allow_nan=True,
                                allow_infinity=True)
-           | strategies.text())
+           | strings)
 hashables = (scalars
              | strategies.frozensets(strategies.deferred(lambda: hashables))
              | strategies.lists(strategies.deferred(lambda: hashables))
              .map(tuple))
-dictionaries = strategies.dictionaries(hashables,
-                                       strategies.deferred(lambda: objects))
-iterables = strategies.iterables(strategies.deferred(lambda: objects))
-lists = strategies.lists(strategies.deferred(lambda: objects))
-sets = strategies.sets(hashables)
+deferred_objects = strategies.deferred(lambda: objects)
+lists = strategies.lists(deferred_objects)
 tuples = lists.map(tuple)
-objects = (dictionaries
-           | hashables
-           | iterables
+objects = (hashables
+           | strategies.dictionaries(hashables, deferred_objects)
+           | strategies.iterables(deferred_objects)
            | lists
-           | sets
+           | strategies.sets(hashables)
            | tuples)
+positionals_arguments = tuples
+keywords_arguments = strategies.dictionaries(strings, objects)

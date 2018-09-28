@@ -1,4 +1,6 @@
-from typing import Any
+from typing import (Any,
+                    Dict,
+                    Tuple)
 
 from lz.functional import (identity,
                            negate)
@@ -10,9 +12,13 @@ def test_identity(object_: Any) -> None:
 
 
 def test_negate(false_predicate: Predicate,
-                true_predicate: Predicate) -> None:
+                true_predicate: Predicate,
+                positional_arguments: Tuple,
+                keyword_arguments: Dict[str, Any]) -> None:
     negated_false_predicate = negate(false_predicate)
     negated_true_predicate = negate(true_predicate)
 
-    assert negated_false_predicate(None)
-    assert not negated_true_predicate(None)
+    assert negated_false_predicate(*positional_arguments,
+                                   **keyword_arguments)
+    assert not negated_true_predicate(*positional_arguments,
+                                      **keyword_arguments)
