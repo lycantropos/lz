@@ -20,16 +20,28 @@ def test_negate(false_predicate: Predicate,
                 keyword_arguments: Dict[str, Any]) -> None:
     non_false_predicate = negate(false_predicate)
     non_true_predicate = negate(true_predicate)
+    non_non_false_predicate = negate(non_false_predicate)
+    non_non_true_predicate = negate(non_true_predicate)
 
     non_false_predicate_result = non_false_predicate(*positional_arguments,
                                                      **keyword_arguments)
     non_true_predicate_result = non_true_predicate(*positional_arguments,
                                                    **keyword_arguments)
+    non_non_false_predicate_result = non_non_false_predicate(
+            *positional_arguments,
+            **keyword_arguments)
+    non_non_true_predicate_result = non_non_true_predicate(
+            *positional_arguments,
+            **keyword_arguments)
 
     assert isinstance(non_false_predicate_result, bool)
     assert isinstance(non_true_predicate_result, bool)
+    assert isinstance(non_non_false_predicate_result, bool)
+    assert isinstance(non_non_true_predicate_result, bool)
     assert non_false_predicate_result
     assert not non_true_predicate_result
+    assert not non_non_false_predicate_result
+    assert non_non_true_predicate_result
 
 
 def test_to_constant(object_: Any,
