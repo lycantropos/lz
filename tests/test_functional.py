@@ -3,7 +3,8 @@ from typing import (Any,
                     Tuple)
 
 from lz.functional import (identity,
-                           negate)
+                           negate,
+                           to_constant)
 from lz.hints import Predicate
 
 
@@ -29,3 +30,13 @@ def test_negate(false_predicate: Predicate,
     assert isinstance(non_true_predicate_result, bool)
     assert non_false_predicate_result
     assert not non_true_predicate_result
+
+
+def test_to_constant(object_: Any,
+                     positional_arguments: Tuple,
+                     keyword_arguments: Dict[str, Any]) -> None:
+    constant = to_constant(object_)
+
+    result = constant(*positional_arguments, **keyword_arguments)
+
+    assert result is object_
