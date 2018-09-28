@@ -21,10 +21,10 @@ def compose(*maps: Map) -> Map[Domain, Any]:
     Intermediate = TypeVar('Intermediate')
 
     def binary_compose(left_map: Map[Intermediate, Range],
-                       right_map: Map[Domain, Intermediate]
-                       ) -> Map[Domain, Range]:
-        def composition(argument: Domain) -> Any:
-            return left_map(right_map(argument))
+                       right_map: Callable[..., Intermediate]
+                       ) -> Callable[..., Range]:
+        def composition(*args: Domain, **kwargs: Domain) -> Any:
+            return left_map(right_map(*args, **kwargs))
 
         return composition
 
