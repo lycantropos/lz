@@ -24,6 +24,7 @@ from .iterating import (expand,
                         flatten,
                         grouper,
                         mapper,
+                        reverse,
                         sifter)
 
 
@@ -87,9 +88,9 @@ def from_ast(object_: ast.arguments) -> Signature:
 def to_positional_parameters(signature_ast: ast.arguments
                              ) -> Iterable[Parameter]:
     # double-reversing since parameters with default arguments go last
-    parameters_with_defaults_ast = zip_longest(reversed(signature_ast.args),
+    parameters_with_defaults_ast = zip_longest(reverse(signature_ast.args),
                                                signature_ast.defaults)
-    parameters_with_defaults_ast = reversed(list(parameters_with_defaults_ast))
+    parameters_with_defaults_ast = reverse(parameters_with_defaults_ast)
     parameter_factory = partial(to_parameter,
                                 kind=inspect._POSITIONAL_ONLY)
     yield from mapper(pack(parameter_factory))(parameters_with_defaults_ast)
