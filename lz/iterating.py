@@ -5,7 +5,9 @@ from typing import (Hashable,
                     Iterable,
                     List,
                     Mapping,
-                    Tuple)
+                    Reversible,
+                    Tuple,
+                    Union)
 
 from .functional import compose
 from .hints import (Domain,
@@ -87,8 +89,13 @@ def grouper(key: Map[Domain, Hashable]
     return group_by
 
 
-def reverse(iterable: Iterable[Domain]) -> Iterable[Domain]:
-    yield from reversed(list(iterable))
+def reverse(iterable: Union[Reversible[Domain],
+                            Iterable[Domain]]) -> Iterable[Domain]:
+    try:
+        result = reversed(iterable)
+    except TypeError:
+        result = reversed(list(iterable))
+    yield from result
 
 
 def expand(object_: Domain) -> Iterable[Domain]:
