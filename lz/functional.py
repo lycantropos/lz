@@ -3,8 +3,8 @@ import itertools
 import operator
 from typing import (Any,
                     Callable,
-                    Collection,
                     Iterable,
+                    Tuple,
                     TypeVar)
 
 from .hints import (Domain,
@@ -34,7 +34,7 @@ def compose(last_function: Map[Any, Range],
 
 
 def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
-    def chop(arguments: Iterable[Domain]) -> Collection[Domain]:
+    def chop(arguments: Iterable[Domain]) -> Tuple[Domain, ...]:
         return tuple(itertools.islice(arguments, len(maps)))
 
     def combined(arguments: Iterable[Domain]) -> Iterable[Range]:
