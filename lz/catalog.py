@@ -3,7 +3,6 @@ import pathlib
 from functools import singledispatch
 from types import (BuiltinMethodType,
                    FunctionType,
-                   MethodDescriptorType,
                    ModuleType)
 from typing import (Any,
                     Optional,
@@ -11,6 +10,7 @@ from typing import (Any,
 
 from . import right
 from .file_system import INIT_MODULE_NAME
+from .hints import MethodDescriptorType
 
 
 class Path:

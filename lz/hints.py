@@ -18,3 +18,8 @@ class Sortable(Protocol):
 
 
 Namespace = Dict[str, Any]
+
+try:
+    from types import MethodDescriptorType
+except ImportError:
+    MethodDescriptorType = type(list.append)
