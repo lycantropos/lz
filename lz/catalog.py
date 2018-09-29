@@ -104,16 +104,19 @@ def module_name_factory(object_: Any) -> str:
 
 @module_name_factory.register(BuiltinMethodType)
 @module_name_factory.register(FunctionType)
-@module_name_factory.register(MethodDescriptorType)
 @module_name_factory.register(type)
-def module_name_from_non_module(object_: Union[BuiltinMethodType,
-                                               FunctionType,
-                                               MethodDescriptorType, type]
-                                ) -> str:
+def module_name_from_class_or_function(object_: Union[BuiltinMethodType,
+                                                      FunctionType, type]
+                                       ) -> str:
     result = object_.__module__
     if result is None:
         result = object_.__self__.__class__.__module__
     return result
+
+
+@module_name_factory.register(MethodDescriptorType)
+def module_name_from_method_descriptor(object_: MethodDescriptorType) -> str:
+    return module_name_factory(object_.__objclass__)
 
 
 @module_name_factory.register(ModuleType)
