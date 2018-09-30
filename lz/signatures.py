@@ -11,14 +11,16 @@ from typing import (Callable,
                     Dict,
                     Iterable,
                     List,
-                    Optional)
+                    Optional,
+                    Union)
 
 from . import (arboretum,
                catalog)
 from .functional import (combine,
                          compose,
                          pack)
-from .hints import Range
+from .hints import (MethodDescriptorType,
+                    Range)
 from .iterating import (expand,
                         flatten,
                         grouper,
@@ -68,7 +70,10 @@ def factory(object_: Callable[..., Range]) -> Signature:
 
 
 @factory.register(BuiltinFunctionType)
-def from_built_in_function(object_: BuiltinFunctionType) -> Signature:
+@factory.register(MethodDescriptorType)
+def from_built_in_or_method_descriptor(object_: Union[BuiltinFunctionType,
+                                                      MethodDescriptorType]
+                                       ) -> Signature:
     module_path = catalog.factory(catalog.module_name_factory(object_))
     nodes = arboretum.module_path_to_nodes(module_path)
     object_path = catalog.factory(object_)
