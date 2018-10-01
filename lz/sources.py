@@ -43,9 +43,14 @@ def from_module_path(object_: catalog.Path) -> Path:
     try:
         result = cache[object_]
     except KeyError:
-        module = importlib.import_module(str(object_))
-        result = factory(module)
-        cache[object_] = result
+        try:
+            module_name_path = catalog.factory(object_.parts[-1].lstrip('_'))
+            module_path = object_.parent.join(module_name_path)
+            result = cache[module_path]
+        except KeyError:
+            module = importlib.import_module(str(object_))
+            result = factory(module)
+            cache[object_] = result
     return result
 
 
