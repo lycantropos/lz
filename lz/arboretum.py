@@ -1,7 +1,8 @@
 import ast
 import builtins
 import importlib
-from functools import singledispatch
+from functools import (lru_cache,
+                       singledispatch)
 from itertools import chain
 from pathlib import Path
 from typing import (Any,
@@ -26,6 +27,7 @@ def to_node(object_: Any) -> ast.AST:
     return nodes[object_path]
 
 
+@lru_cache(None)
 def to_nodes(module_path: catalog.Path) -> Nodes:
     nodes = module_path_to_nodes(module_path)
     nodes = dictionaries.merge([built_ins_nodes, nodes])
