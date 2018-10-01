@@ -41,7 +41,7 @@ class Path:
     def join(self, other: 'Path') -> 'Path':
         if not isinstance(other, Path):
             return NotImplemented
-        return Path(*self.parts, *other.parts)
+        return type(self)(*self.parts, *other.parts)
 
     @property
     def parent(self) -> 'Path':
