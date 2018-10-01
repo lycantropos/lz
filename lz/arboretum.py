@@ -285,12 +285,9 @@ class Reducer(Base):
                 if isinstance(target_node, (ast.Import, ast.ImportFrom)):
                     # handle chained imports
                     nodes = {}
-                    submodule_path = parent_module_path.join(
-                            catalog.factory(target_node.module))
-                    type(self)(nodes=nodes,
-                               namespace={},
-                               parent_path=parent_module_path,
-                               module_path=submodule_path).visit(target_node)
+                    (type(self)(nodes=nodes,
+                                parent_path=parent_module_path)
+                     .visit(target_node))
                     target_node = nodes[actual_path]
                 self.nodes[alias_path] = target_node
         return node
