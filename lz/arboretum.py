@@ -314,8 +314,8 @@ class Reducer(Base):
     def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
         return node
 
-    def visit_Call(self, node: ast.Call) -> ast.Call:
-        return node
+    def visit_Call(self, node: ast.Call) -> catalog.Path:
+        return self.visit(node.func)
 
     def visit_Attribute(self, node: ast.Attribute) -> catalog.Path:
         parent_path = self.visit(node.value)
