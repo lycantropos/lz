@@ -348,8 +348,9 @@ def to_parent_module_path(object_: ast.ImportFrom,
     import_is_relative = level > 0
     if not import_is_relative:
         return catalog.factory(object_.module)
+    depth = (1 - level) or None
     module_path_parts = filter(None,
-                               chain(parent_module_path.parts[:1 - level],
+                               chain(parent_module_path.parts[:depth],
                                      expand(object_.module)))
     return catalog.Path(*module_path_parts)
 
