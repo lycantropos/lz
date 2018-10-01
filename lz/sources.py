@@ -9,7 +9,7 @@ from typing import (Any,
                     Iterable,
                     Tuple)
 
-import typeshed
+import mypy
 
 from . import catalog
 from .file_system import (INIT_MODULE_NAME,
@@ -116,5 +116,5 @@ def to_package_path(path: Path) -> Path:
     return path
 
 
-cache = dict(generate_stubs_cache_items(to_package_path(factory(typeshed))
-                                        / 'stdlib'))
+cache = dict(generate_stubs_cache_items(to_package_path(factory(mypy))
+                                        / 'typeshed' / 'stdlib'))
