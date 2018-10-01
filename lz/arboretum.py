@@ -20,14 +20,16 @@ Nodes = Dict[catalog.Path, ast.AST]
 
 def to_node(object_: Any) -> ast.AST:
     module_path = catalog.factory(catalog.module_name_factory(object_))
-    nodes = module_path_to_nodes(module_path)
     object_path = catalog.factory(object_)
-    Reducer(nodes=nodes,
-            parent_path=catalog.Path()).visit(nodes[object_path])
+    nodes = to_nodes(module_path)
     return nodes[object_path]
 
 
-built_ins_namespace = namespaces.factory(builtins)
+def to_nodes(module_path: catalog.Path) -> Nodes:
+    nodes = module_path_to_nodes(module_path)
+    Reducer(nodes=nodes,
+            parent_path=catalog.Path()).visit(nodes[catalog.Path()])
+    return nodes
 
 
 def module_path_to_nodes(module_path: catalog.Path) -> Nodes:
@@ -179,6 +181,12 @@ class Registry(Base):
         super().__init__(parent_path=parent_path,
                          is_nested=is_nested)
         self.nodes = nodes
+
+    def visit_Module(self, node: ast.Module) -> ast.Module:
+        self.nodes[catalog.Path()] = node
+        for child in node.body:
+            self.visit(child)
+        return node
 
     def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
@@ -390,3 +398,6 @@ def evaluate_tree(node: ast.Module,
                   namespace: Namespace) -> None:
     code = compile(node, '<ast>', 'exec')
     exec(code, namespace)
+
+
+built_ins_namespace = namespaces.factory(builtins)
