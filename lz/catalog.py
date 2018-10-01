@@ -103,6 +103,15 @@ def module_name_factory(object_: Any) -> str:
                     .format(type=type(object_)))
 
 
+replacements = {'nt': 'os',
+                'posix': 'os'}
+
+
+@module_name_factory.register(str)
+def module_name_from_string(object_: str) -> str:
+    return replacements.get(object_, object_)
+
+
 @module_name_factory.register(BuiltinMethodType)
 @module_name_factory.register(FunctionType)
 @module_name_factory.register(type)
@@ -112,14 +121,14 @@ def module_name_from_class_or_function(object_: Union[BuiltinMethodType,
     result = object_.__module__
     if result is None:
         result = object_.__self__.__class__.__module__
-    return result
+    return module_name_factory(result)
 
 
 @module_name_factory.register(MethodDescriptorType)
 def module_name_from_method_descriptor(object_: MethodDescriptorType) -> str:
-    return module_name_factory(object_.__objclass__)
+    return module_name_factory(module_name_factory(object_.__objclass__))
 
 
 @module_name_factory.register(ModuleType)
 def module_name_from_module(object_: ModuleType) -> str:
-    return object_.__name__
+    return module_name_factory(object_.__name__)
