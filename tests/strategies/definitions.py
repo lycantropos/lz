@@ -1,7 +1,9 @@
 import _collections_abc
+import _ctypes
 import _hashlib
 import _io
 import _json
+import _string
 import _thread
 import codecs
 import collections
@@ -26,11 +28,19 @@ from hypothesis.searchstrategy import SearchStrategy
 from lz.hints import MethodDescriptorType
 
 # support for these stdlib modules in ``typeshed`` package is not found
-unsupported_modules = {ctypes,
+unsupported_modules = {_ctypes,
+                       _string,
+                       ctypes,
                        ctypes.test,
                        ctypes.util,
                        ctypes._endian,
                        faulthandler}
+try:
+    import six
+except ImportError:
+    pass
+else:
+    unsupported_modules.add(six)
 
 
 def is_module_supported(module: ModuleType) -> bool:
