@@ -285,9 +285,9 @@ class Reducer(Base):
                 if isinstance(target_node, (ast.Import, ast.ImportFrom)):
                     # handle chained imports
                     nodes = {}
-                    (type(self)(nodes=nodes,
-                                parent_path=parent_module_path)
-                     .visit(target_node))
+                    transformer = type(self)(nodes=nodes,
+                                             parent_path=parent_module_path)
+                    transformer.visit(target_node)
                     target_node = nodes[actual_path]
                 self.nodes[alias_path] = target_node
         return node
