@@ -120,7 +120,9 @@ class Flattener(Base):
         for name_alias in node.names:
             alias_path = self.resolve_path(to_alias_path(name_alias))
             actual_path = to_actual_path(name_alias)
-            if not namespace_contains(self.namespace, alias_path):
+            if actual_path == catalog.WILDCARD_IMPORT:
+                self.namespace.update(namespaces.factory(parent_module_path))
+            elif not namespace_contains(self.namespace, alias_path):
                 namespace = namespaces.factory(parent_module_path)
                 self.namespace[str(alias_path)] = search_by_path(namespace,
                                                                  actual_path)
