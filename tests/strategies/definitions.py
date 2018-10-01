@@ -14,6 +14,7 @@ import socket
 import struct
 import sys
 import types
+import zipimport
 from types import (BuiltinFunctionType,
                    ModuleType)
 from typing import (Any,
@@ -58,6 +59,7 @@ unsupported_classes = {_thread.LockType,
                        _collections_abc.mappingproxy,
                        _collections_abc.dict_keys,
                        _collections_abc.dict_items,
+                       _hashlib.HASH,
                        types.FrameType}
 
 
@@ -76,7 +78,10 @@ def is_method_descriptor(object_: Any) -> bool:
     return isinstance(object_, MethodDescriptorType)
 
 
-unsupported_methods_descriptors = {int.conjugate,
+unsupported_methods_descriptors = {dict.get,
+                                   int.conjugate,
+                                   float.conjugate,
+                                   zipimport.zipimporter.find_loader,
                                    _io.BufferedRWPair.peek,
                                    _collections_abc.generator.send,
                                    _collections_abc.generator.throw,
@@ -90,7 +95,11 @@ unsupported_methods_descriptors = {int.conjugate,
                                    collections.OrderedDict.clear,
                                    collections.OrderedDict.pop,
                                    collections.OrderedDict.update,
+                                   collections.OrderedDict.setdefault,
                                    struct.Struct.pack,
+                                   struct.Struct.unpack,
+                                   struct.Struct.unpack_from,
+                                   struct.Struct.iter_unpack,
                                    struct.Struct.pack_into,
                                    socket.socket.share}
 if sys.version_info >= (3, 7):
