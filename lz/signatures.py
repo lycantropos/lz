@@ -54,9 +54,12 @@ class Signature:
         return dict(grouper(attrgetter('kind'))(self.parameters))
 
 
-@singledispatch
 def factory(object_: Callable[..., Range]) -> Signature:
-    raw_signature = inspect.signature(object_)
+    try:
+        raw_signature = inspect.signature(object_)
+    except ValueError:
+        object_node = arboretum.to_node(object_)
+        return from_ast(object_node.args)
 
     def normalize_parameter(raw_parameter: inspect.Parameter) -> Parameter:
         has_default = raw_parameter.default is not inspect._empty
@@ -68,16 +71,6 @@ def factory(object_: Callable[..., Range]) -> Signature:
     return Signature(*parameters)
 
 
-@factory.register(BuiltinFunctionType)
-@factory.register(MethodDescriptorType)
-def from_built_in_or_method_descriptor(object_: Union[BuiltinFunctionType,
-                                                      MethodDescriptorType]
-                                       ) -> Signature:
-    object_node = arboretum.to_node(object_)
-    return factory(object_node.args)
-
-
-@factory.register(ast.arguments)
 def from_ast(object_: ast.arguments) -> Signature:
     to_parameters = compose(
             sifter(),
