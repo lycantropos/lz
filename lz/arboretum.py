@@ -240,11 +240,12 @@ def to_module_path(object_: Any,
 def to_parent_module_path(object_: ast.ImportFrom,
                           *,
                           parent_module_path: catalog.Path) -> catalog.Path:
-    import_is_relative = object_.level > 0
+    level = object_.level
+    import_is_relative = level > 0
     if not import_is_relative:
         return catalog.factory(object_.module)
     module_path_parts = filter(None,
-                               chain(parent_module_path.parts[:-object_.level],
+                               chain(parent_module_path.parts[:1 - level],
                                      expand(object_.module)))
     return catalog.Path(*module_path_parts)
 
