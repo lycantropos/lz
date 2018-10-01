@@ -38,12 +38,10 @@ class Path:
     def __bool__(self) -> bool:
         return bool(self.parts)
 
-    def join(self, other: Union[str, 'Path']) -> 'Path':
-        if isinstance(other, str):
-            return Path(*self.parts, *other.split(self.SEPARATOR))
-        elif isinstance(other, Path):
-            return Path(*self.parts, *other.parts)
-        return NotImplemented
+    def join(self, other: 'Path') -> 'Path':
+        if not isinstance(other, Path):
+            return NotImplemented
+        return Path(*self.parts, *other.parts)
 
     @property
     def parent(self) -> 'Path':
