@@ -307,7 +307,7 @@ class Reducer(Base):
         return node
 
     def visit_Name(self, node: ast.Name) -> catalog.Path:
-        path = catalog.factory(node.id)
+        path = self.resolve_path(catalog.factory(node.id))
         node = self.nodes[path]
         self.visit(node)
         return path
