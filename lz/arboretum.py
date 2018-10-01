@@ -6,7 +6,7 @@ from itertools import chain
 from pathlib import Path
 from typing import (Any,
                     Dict,
-                    Type)
+                    Iterable)
 
 from . import (catalog,
                left,
@@ -16,6 +16,32 @@ from .hints import Namespace
 from .iterating import expand
 
 Nodes = Dict[catalog.Path, ast.AST]
+
+
+def to_node(object_: Any) -> ast.AST:
+    module_path = catalog.factory(catalog.module_name_factory(object_))
+    nodes = module_path_to_nodes(module_path)
+    object_path = catalog.factory(object_)
+    Reducer(nodes=nodes,
+            parent_path=catalog.Path()).visit(nodes[object_path])
+    return nodes[object_path]
+
+
+built_ins_namespace = namespaces.factory(builtins)
+
+
+def module_path_to_nodes(module_path: catalog.Path) -> Nodes:
+    result = {}
+    source_path = sources.factory(module_path)
+    module_root = factory(source_path)
+    namespace = namespaces.factory(module_path)
+    namespace = namespaces.merge([built_ins_namespace, namespace])
+    Flattener(namespace=namespace,
+              module_path=module_path,
+              parent_path=catalog.Path()).visit(module_root)
+    Registry(nodes=result,
+             parent_path=catalog.Path()).visit(module_root)
+    return result
 
 
 @singledispatch
@@ -46,38 +72,59 @@ def from_node(node: ast.AST) -> ast.Module:
     return ast.Module([node])
 
 
-def search_by_path(namespace: Namespace, path: catalog.Path) -> Any:
-    return left.folder(getattr, namespace[path.parts[0]])(path.parts[1:])
-
-
-def namespace_contains(namespace: Namespace, path: catalog.Path) -> bool:
-    try:
-        search_by_path(namespace, path)
-    except (KeyError, AttributeError):
-        return False
-    else:
-        return True
-
-
-class BaseNodeTransformer(ast.NodeTransformer):
+class Base(ast.NodeTransformer):
     def __init__(self,
                  *,
-                 nodes: Nodes,
-                 namespace: Namespace,
                  parent_path: catalog.Path,
-                 module_path: catalog.Path,
                  is_nested: bool = False) -> None:
-        self.nodes = nodes
-        self.namespace = namespace
-        self.module_path = module_path
         self.parent_path = parent_path
         self.is_nested = is_nested
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> Any:
+    def resolve_path(self, path: catalog.Path) -> catalog.Path:
+        if self.is_nested:
+            return self.parent_path.join(path)
+        return path
+
+
+class Flattener(Base):
+    def __init__(self,
+                 *,
+                 namespace: Namespace,
+                 module_path: catalog.Path,
+                 parent_path: catalog.Path,
+                 is_nested: bool = False) -> None:
+        super().__init__(parent_path=parent_path,
+                         is_nested=is_nested)
+        self.namespace = namespace
+        self.module_path = module_path
+
+    def visit_Import(self, node: ast.Import) -> Iterable[ast.Import]:
+        for name_alias in node.names:
+            alias_path = self.resolve_path(to_alias_path(name_alias))
+            actual_path = to_actual_path(name_alias)
+            if not namespace_contains(self.namespace, alias_path):
+                parent_module_name = actual_path.parts[0]
+                module = importlib.import_module(parent_module_name)
+                self.namespace[parent_module_name] = module
+            yield ast.Import([name_alias])
+
+    def visit_ImportFrom(self, node: ast.ImportFrom
+                         ) -> Iterable[ast.ImportFrom]:
+        parent_module_path = to_parent_module_path(
+                node,
+                parent_module_path=self.module_path)
+        for name_alias in node.names:
+            alias_path = self.resolve_path(to_alias_path(name_alias))
+            actual_path = to_actual_path(name_alias)
+            if not namespace_contains(self.namespace, alias_path):
+                namespace = namespaces.factory(parent_module_path)
+                self.namespace[str(alias_path)] = search_by_path(namespace,
+                                                                 actual_path)
+            yield ast.ImportFrom(str(parent_module_path), [name_alias], 0)
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
-        self.nodes[path] = node
-        transformer = type(self)(nodes=self.nodes,
-                                 namespace=self.namespace,
+        transformer = type(self)(namespace=self.namespace,
                                  parent_path=path,
                                  module_path=self.module_path,
                                  is_nested=True)
@@ -85,74 +132,18 @@ class BaseNodeTransformer(ast.NodeTransformer):
             transformer.visit(child)
         return node
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> Any:
-        path = self.resolve_path(catalog.factory(node.name))
-        self.nodes[path] = node
-        return node
-
-    def visit_Import(self, node: ast.Import) -> Any:
-        for child in node.names:
-            alias_path = self.resolve_path(to_alias_path(child))
-            actual_path = to_actual_path(child)
-            if not namespace_contains(self.namespace, alias_path):
-                parent_module_name = actual_path.parts[0]
-                module = importlib.import_module(parent_module_name)
-                self.namespace[parent_module_name] = module
-            self.nodes[alias_path] = node
-        return node
-
-    def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
-        parent_module_path = to_parent_module_path(
-                node,
-                parent_module_path=self.module_path)
-        for child in node.names:
-            alias_path = self.resolve_path(to_alias_path(child))
-            actual_path = to_actual_path(child)
-            if not namespace_contains(self.namespace, alias_path):
-                namespace = namespaces.factory(parent_module_path)
-                self.namespace[str(alias_path)] = search_by_path(namespace,
-                                                                 actual_path)
-            self.nodes[alias_path] = node
-        return node
-
-    def visit_If(self, node: ast.If) -> Any:
+    def visit_If(self, node: ast.If) -> Iterable[ast.AST]:
         if self.visit(node.test):
             children = node.body
         else:
             children = node.orelse
         for child in children:
             self.visit(child)
-        return node
-
-    def visit_Assign(self, node: ast.Assign) -> Any:
-        paths = map(self.visit, node.targets)
-        value_node = node.value
-        for path in paths:
-            self.nodes[path] = value_node
-        return node
-
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
-        path = self.resolve_path(self.visit(node.target))
-        self.nodes[path] = node.value
-        return node
-
-    def visit_Name(self, node: ast.Name) -> Any:
-        return self.resolve_path(catalog.factory(node.id))
-
-    def visit_Attribute(self, node: ast.Attribute) -> Any:
-        return self.visit(node.value).join(node.attr)
-
-    def visit_Subscript(self, node: ast.Subscript) -> Any:
-        context = node.ctx
-        if not isinstance(context, ast.Load):
-            raise TypeError('Unsupported context type: {type}.'
-                            .format(type=type(context)))
-        return node
+        yield from children
 
     def visit_Compare(self, node: ast.Compare) -> bool:
         nodes = {}
-        transformer = type(self)(nodes=nodes,
-                                 namespace=self.namespace,
+        transformer = type(self)(namespace=self.namespace,
                                  module_path=self.module_path,
                                  parent_path=self.parent_path)
         for child in ast.iter_child_nodes(node):
@@ -163,7 +154,6 @@ class BaseNodeTransformer(ast.NodeTransformer):
                     continue
                 evaluate(node,
                          namespace=self.namespace)
-            self.nodes.update(nodes)
         # to avoid name conflicts
         # we're using name that won't be present
         # because it'll lead to ``SyntaxError`` otherwise
@@ -175,35 +165,110 @@ class BaseNodeTransformer(ast.NodeTransformer):
                  namespace=self.namespace)
         return self.namespace.pop(temporary_name)
 
-    def resolve_path(self, path: catalog.Path) -> catalog.Path:
-        if self.is_nested:
-            return self.parent_path.join(path)
-        return path
 
+class Registry(Base):
+    def __init__(self,
+                 *,
+                 nodes: Nodes,
+                 parent_path: catalog.Path,
+                 is_nested: bool = False) -> None:
+        super().__init__(parent_path=parent_path,
+                         is_nested=is_nested)
+        self.nodes = nodes
 
-class NodeTransformer(BaseNodeTransformer):
-    def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
-        parent_module_path = to_parent_module_path(
-                node,
-                parent_module_path=self.module_path)
+    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
+        path = self.resolve_path(catalog.factory(node.name))
+        self.nodes[path] = node
+        transformer = type(self)(nodes=self.nodes,
+                                 parent_path=path,
+                                 is_nested=True)
+        for child in node.body:
+            transformer.visit(child)
+        return node
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+        path = self.resolve_path(catalog.factory(node.name))
+        self.nodes[path] = node
+        return node
+
+    def visit_Import(self, node: ast.Import) -> ast.Import:
         for child in node.names:
             alias_path = self.resolve_path(to_alias_path(child))
+            self.nodes[alias_path] = node
+        return node
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> ast.ImportFrom:
+        for child in node.names:
+            alias_path = self.resolve_path(to_alias_path(child))
+            self.nodes[alias_path] = node
+        return node
+
+    def visit_Assign(self, node: ast.Assign) -> ast.Assign:
+        paths = map(self.visit, node.targets)
+        value_node = node.value
+        for path in paths:
+            self.nodes[path] = value_node
+        return node
+
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
+        path = self.visit(node.target)
+        self.nodes[path] = node.value
+        return node
+
+    def visit_Name(self, node: ast.Name) -> catalog.Path:
+        name_path = catalog.factory(node.id)
+        if isinstance(node.ctx, ast.Load):
+            return name_path
+        elif isinstance(node.ctx, ast.Store):
+            return self.resolve_path(name_path)
+
+    def visit_Attribute(self, node: ast.Attribute) -> catalog.Path:
+        parent_path = self.visit(node.value)
+        attribute_path = catalog.factory(node.attr)
+        return parent_path.join(attribute_path)
+
+    def visit_Subscript(self, node: ast.Subscript) -> ast.Subscript:
+        context = node.ctx
+        if not isinstance(context, ast.Load):
+            raise TypeError('Unsupported context type: {type}.'
+                            .format(type=type(context)))
+        return node
+
+
+class Reducer(Base):
+    def __init__(self,
+                 *,
+                 nodes: Nodes,
+                 parent_path: catalog.Path,
+                 is_nested: bool = False) -> None:
+        super().__init__(parent_path=parent_path,
+                         is_nested=is_nested)
+        self.nodes = nodes
+
+    def visit_Import(self, node: ast.Import) -> ast.Import:
+        for child in node.names:
+            alias_path = to_alias_path(child)
             actual_path = to_actual_path(child)
+            nodes = module_path_to_nodes(actual_path)
+            self.nodes.update(dict(zip(map(alias_path.join, nodes.keys()),
+                                       nodes.values())))
+        return node
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> ast.ImportFrom:
+        parent_module_path = catalog.factory(node.module)
+        for name_alias in node.names:
+            alias_path = self.resolve_path(to_alias_path(name_alias))
+            actual_path = to_actual_path(name_alias)
             if actual_path == catalog.WILDCARD_IMPORT:
-                nodes = module_path_to_nodes(parent_module_path,
-                                             cls=BaseNodeTransformer)
+                nodes = module_path_to_nodes(parent_module_path)
                 self.nodes.update(nodes)
                 continue
             object_path = parent_module_path.join(actual_path)
             if is_module_path(object_path):
-                self.nodes[alias_path] = factory(object_path)
+                module_root = factory(object_path)
+                self.nodes[alias_path] = module_root
             else:
-                if not namespace_contains(self.namespace, alias_path):
-                    namespace = namespaces.factory(parent_module_path)
-                    self.namespace[str(alias_path)] = search_by_path(
-                            namespace, actual_path)
-                nodes = module_path_to_nodes(parent_module_path,
-                                             cls=BaseNodeTransformer)
+                nodes = module_path_to_nodes(parent_module_path)
                 target_node = nodes[actual_path]
                 if isinstance(target_node, (ast.Import, ast.ImportFrom)):
                     # handle chained imports
@@ -218,6 +283,44 @@ class NodeTransformer(BaseNodeTransformer):
                 self.nodes[alias_path] = target_node
         return node
 
+    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
+        path = self.resolve_path(catalog.factory(node.name))
+        transformer = type(self)(nodes=self.nodes,
+                                 parent_path=path,
+                                 is_nested=True)
+        for child in node.body:
+            transformer.visit(child)
+        return node
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+        return node
+
+    def visit_Attribute(self, node: ast.Attribute) -> ast.Attribute:
+        parent_path = self.visit(node.value)
+        attribute_path = catalog.factory(node.attr)
+        object_path = parent_path.join(attribute_path)
+        self.nodes[attribute_path] = self.nodes[object_path]
+        return node
+
+    def visit_Name(self, node: ast.Name) -> catalog.Path:
+        path = catalog.factory(node.id)
+        node = self.nodes[path]
+        self.visit(node)
+        return path
+
+
+def search_by_path(namespace: Namespace, path: catalog.Path) -> Any:
+    return left.folder(getattr, namespace[path.parts[0]])(path.parts[1:])
+
+
+def namespace_contains(namespace: Namespace, path: catalog.Path) -> bool:
+    try:
+        search_by_path(namespace, path)
+    except (KeyError, AttributeError):
+        return False
+    else:
+        return True
+
 
 def is_module_path(object_path: catalog.Path) -> bool:
     try:
@@ -226,25 +329,6 @@ def is_module_path(object_path: catalog.Path) -> bool:
         return False
     else:
         return True
-
-
-built_ins_namespace = namespaces.factory(builtins)
-
-
-def module_path_to_nodes(module_path: catalog.Path,
-                         *,
-                         cls: Type[BaseNodeTransformer] = NodeTransformer
-                         ) -> Nodes:
-    result = {}
-    source_path = sources.factory(module_path)
-    module_root = factory(source_path)
-    namespace = namespaces.factory(module_path)
-    namespace = namespaces.merge([built_ins_namespace, namespace])
-    cls(nodes=result,
-        namespace=namespace,
-        module_path=module_path,
-        parent_path=catalog.Path()).visit(module_root)
-    return result
 
 
 def to_parent_module_path(object_: ast.ImportFrom,

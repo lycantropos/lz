@@ -14,8 +14,7 @@ from typing import (Callable,
                     Optional,
                     Union)
 
-from . import (arboretum,
-               catalog)
+from . import arboretum
 from .functional import (combine,
                          compose,
                          pack)
@@ -74,10 +73,7 @@ def factory(object_: Callable[..., Range]) -> Signature:
 def from_built_in_or_method_descriptor(object_: Union[BuiltinFunctionType,
                                                       MethodDescriptorType]
                                        ) -> Signature:
-    module_path = catalog.factory(catalog.module_name_factory(object_))
-    nodes = arboretum.module_path_to_nodes(module_path)
-    object_path = catalog.factory(object_)
-    object_node = nodes[object_path]
+    object_node = arboretum.to_node(object_)
     return factory(object_node.args)
 
 
