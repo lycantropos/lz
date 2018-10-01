@@ -1,6 +1,7 @@
 import importlib
 import importlib.abc
 import importlib.machinery
+import sys
 import types
 from functools import singledispatch
 from types import ModuleType
@@ -18,6 +19,8 @@ def factory(object_: Any) -> Namespace:
 
 
 replacements = {'_importlib_modulespec': 'types'}
+if sys.platform == 'win32':
+    replacements['posix'] = 'nt'
 
 
 @factory.register(catalog.Path)
