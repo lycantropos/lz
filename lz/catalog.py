@@ -50,6 +50,9 @@ class Path:
         return Path(*self.parts[:-1])
 
 
+WILDCARD_IMPORT = Path('*')
+
+
 @singledispatch
 def factory(object_: Any) -> Path:
     raise TypeError('Unsupported object type: {type}.'

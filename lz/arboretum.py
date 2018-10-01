@@ -189,6 +189,11 @@ class NodeTransformer(BaseNodeTransformer):
         for child in node.names:
             alias_path = self.resolve_path(to_alias_path(child))
             actual_path = to_actual_path(child)
+            if actual_path == catalog.WILDCARD_IMPORT:
+                nodes = module_path_to_nodes(parent_module_path,
+                                             cls=BaseNodeTransformer)
+                self.nodes.update(nodes)
+                continue
             module_path = parent_module_path.join(actual_path)
             try:
                 importlib.import_module(str(module_path))
