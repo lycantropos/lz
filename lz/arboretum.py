@@ -141,7 +141,13 @@ class Flattener(Base):
             self.visit(child)
         yield from children
 
+    def visit_BoolOp(self, node: ast.BoolOp) -> bool:
+        return self.evaluate_condition(node)
+
     def visit_Compare(self, node: ast.Compare) -> bool:
+        return self.evaluate_condition(node)
+
+    def evaluate_condition(self, node):
         nodes = {}
         transformer = type(self)(namespace=self.namespace,
                                  module_path=self.module_path,
