@@ -84,17 +84,15 @@ unsupported_methods_descriptors = {int.conjugate,
                                    _collections_abc.coroutine.send,
                                    _collections_abc.coroutine.throw,
                                    _collections_abc.coroutine.close,
+                                   _collections_abc.async_generator.asend,
+                                   _collections_abc.async_generator.athrow,
+                                   _collections_abc.async_generator.aclose,
                                    collections.OrderedDict.clear,
                                    collections.OrderedDict.pop,
                                    collections.OrderedDict.update,
                                    struct.Struct.pack,
                                    struct.Struct.pack_into,
                                    socket.socket.share}
-if sys.version_info >= (3, 6):
-    unsupported_methods_descriptors.update(
-            {_collections_abc.async_generator.asend,
-             _collections_abc.async_generator.athrow,
-             _collections_abc.async_generator.aclose})
 if sys.version_info >= (3, 7):
     unsupported_methods_descriptors.update({bytearray.isascii,
                                             bytes.isascii,
