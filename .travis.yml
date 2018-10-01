@@ -4,9 +4,9 @@ distro: trusty
 language: python
 
 python:
-  - "3.5"
-  - "3.6"
-
+  - 3.5
+  - 3.6
+  - 3.7-dev
 
 install:
   - python3 -m pip install codecov>=2.0.9
