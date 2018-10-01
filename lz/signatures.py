@@ -1,25 +1,21 @@
 import ast
 import inspect
 from functools import (lru_cache,
-                       partial,
-                       singledispatch)
+                       partial)
 from itertools import (repeat,
                        zip_longest)
 from operator import attrgetter
-from types import BuiltinFunctionType
 from typing import (Callable,
                     Dict,
                     Iterable,
                     List,
-                    Optional,
-                    Union)
+                    Optional)
 
 from . import arboretum
 from .functional import (combine,
                          compose,
                          pack)
-from .hints import (MethodDescriptorType,
-                    Range)
+from .hints import Range
 from .iterating import (expand,
                         flatten,
                         grouper,
