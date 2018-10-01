@@ -7,6 +7,7 @@ project_base_url = 'https://github.com/lycantropos/lz/'
 
 install_requires = [
     'mypy>=0.630',
+    'typing_extensions>=3.6.5',
 ]
 setup_requires = [
     'pytest-runner>=4.2'
