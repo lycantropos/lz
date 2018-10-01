@@ -36,15 +36,7 @@ def is_module_supported(module: ModuleType) -> bool:
     return module not in unsupported_modules
 
 
-def is_not_private(object_: Union[BuiltinFunctionType,
-                                  MethodDescriptorType,
-                                  ModuleType,
-                                  type]) -> bool:
-    return not object_.__name__.startswith('_')
-
-
 modules = (strategies.sampled_from(list(sys.modules.values()))
-           .filter(is_not_private)
            .filter(is_module_supported))
 
 
@@ -53,6 +45,13 @@ def flatten(object_: Union[ModuleType, type]) -> SearchStrategy:
 
 
 objects = modules.flatmap(flatten)
+
+
+def is_not_private(object_: Union[BuiltinFunctionType,
+                                  MethodDescriptorType,
+                                  type]) -> bool:
+    return not object_.__name__.startswith('_')
+
 
 unsupported_classes = {_thread.LockType,
                        _thread.RLock,
