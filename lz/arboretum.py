@@ -194,10 +194,10 @@ class NodeTransformer(BaseNodeTransformer):
                                              cls=BaseNodeTransformer)
                 self.nodes.update(nodes)
                 continue
-            module_path = parent_module_path.join(actual_path)
-            try:
-                importlib.import_module(str(module_path))
-            except ImportError:
+            object_path = parent_module_path.join(actual_path)
+            if is_module_path(object_path):
+                self.nodes[alias_path] = factory(object_path)
+            else:
                 if not namespace_contains(self.namespace, alias_path):
                     namespace = namespaces.factory(parent_module_path)
                     self.namespace[str(alias_path)] = search_by_path(
@@ -216,9 +216,16 @@ class NodeTransformer(BaseNodeTransformer):
                                module_path=submodule_path).visit(target_node)
                     target_node = nodes[actual_path]
                 self.nodes[alias_path] = target_node
-            else:
-                self.nodes[alias_path] = factory(module_path)
         return node
+
+
+def is_module_path(object_path: catalog.Path) -> bool:
+    try:
+        importlib.import_module(str(object_path))
+    except ImportError:
+        return False
+    else:
+        return True
 
 
 built_ins_namespace = namespaces.factory(builtins)
