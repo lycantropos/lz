@@ -110,13 +110,14 @@ unsupported_methods_descriptors = {dict.get,
                                    struct.Struct.unpack,
                                    struct.Struct.unpack_from,
                                    struct.Struct.iter_unpack,
-                                   struct.Struct.pack_into,
-                                   socket.socket.share}
+                                   struct.Struct.pack_into}
 if sys.version_info >= (3, 7):
     unsupported_methods_descriptors.update({bytearray.isascii,
                                             bytes.isascii,
                                             str.isascii,
                                             socket.socket.getblocking})
+if sys.platform == 'win32':
+    unsupported_methods_descriptors.add(socket.socket.share)
 
 
 def is_method_descriptor_supported(method_descriptor: MethodDescriptorType
