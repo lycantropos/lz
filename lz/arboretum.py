@@ -52,9 +52,7 @@ def factory(object_: Any) -> ast.Module:
 
 @factory.register(Path)
 def from_source_path(path: Path) -> ast.Module:
-    with open(path) as module_file:
-        module_source = module_file.read()
-    return ast.parse(module_source)
+    return ast.parse(path.read_text())
 
 
 @factory.register(catalog.Path)
