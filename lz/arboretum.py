@@ -9,6 +9,7 @@ from typing import (Any,
                     Iterable)
 
 from . import (catalog,
+               dictionaries,
                left,
                namespaces,
                sources)
@@ -37,7 +38,7 @@ def module_path_to_nodes(module_path: catalog.Path) -> Nodes:
     source_path = sources.factory(module_path)
     module_root = factory(source_path)
     namespace = namespaces.factory(module_path)
-    namespace = namespaces.merge([built_ins_namespace, namespace])
+    namespace = dictionaries.merge([built_ins_namespace, namespace])
     Flattener(namespace=namespace,
               module_path=module_path,
               parent_path=catalog.Path()).visit(module_root)
