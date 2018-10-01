@@ -104,7 +104,7 @@ def expand(object_: Domain) -> Iterable[Domain]:
 
 
 def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
-    return itertools.chain.from_iterable(iterable)
+    yield from itertools.chain.from_iterable(iterable)
 
 
 def flatmapper(map_: Map[Domain, Iterable[Range]]
