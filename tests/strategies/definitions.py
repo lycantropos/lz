@@ -143,14 +143,15 @@ unsupported_built_in_functions = {_hashlib.openssl_sha1,
                                   sys.getallocatedblocks,
                                   sys.set_coroutine_wrapper,
                                   sys.get_coroutine_wrapper,
+                                  sys.getfilesystemencodeerrors,
+                                  sys.set_asyncgen_hooks,
+                                  sys.get_asyncgen_hooks,
                                   _thread.start_new_thread,
                                   _thread.allocate,
                                   _thread.exit_thread,
                                   _thread.interrupt_main,
                                   _thread.stack_size,
-                                  os.get_handle_inheritable,
                                   os.get_inheritable,
-                                  os.set_handle_inheritable,
                                   os.set_inheritable,
                                   # FIXME: next functions meta-info
                                   # seems to be broken
@@ -160,10 +161,9 @@ unsupported_built_in_functions = {_hashlib.openssl_sha1,
                                   codecs.xmlcharrefreplace_errors,
                                   codecs.backslashreplace_errors,
                                   codecs.namereplace_errors}
-if sys.version_info >= (3, 6):
-    unsupported_built_in_functions.update({sys.getfilesystemencodeerrors,
-                                           sys.set_asyncgen_hooks,
-                                           sys.get_asyncgen_hooks})
+if sys.platform == 'win32':
+    unsupported_built_in_functions.update({os.get_handle_inheritable,
+                                           os.set_handle_inheritable})
 
 
 def is_function_supported(function: BuiltinFunctionType) -> bool:
