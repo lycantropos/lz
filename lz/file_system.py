@@ -20,5 +20,6 @@ def find_files(directory: Path) -> Iterator[Path]:
 
     finder = compose(flatmapper(pack(to_paths)),
                      mapper(itemgetter(0, 2)),
-                     os.walk)
+                     os.walk,
+                     str)
     yield from finder(directory)

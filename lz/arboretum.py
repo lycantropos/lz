@@ -1,6 +1,7 @@
 import ast
 import builtins
 import importlib
+import sys
 from functools import (lru_cache,
                        singledispatch)
 from itertools import chain
@@ -226,10 +227,11 @@ class Registry(Base):
             self.nodes[path] = value_node
         return node
 
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
-        path = self.visit(node.target)
-        self.nodes[path] = node.value
-        return node
+    if sys.version_info >= (3, 6):
+        def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
+            path = self.visit(node.target)
+            self.nodes[path] = node.value
+            return node
 
     def visit_Name(self, node: ast.Name) -> catalog.Path:
         name_path = catalog.factory(node.id)
@@ -311,8 +313,9 @@ class Reducer(Base):
     def visit_Assign(self, node: ast.Assign) -> ast.Assign:
         return node
 
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
-        return node
+    if sys.version_info >= (3, 6):
+        def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
+            return node
 
     def visit_Call(self, node: ast.Call) -> ast.Call:
         return node

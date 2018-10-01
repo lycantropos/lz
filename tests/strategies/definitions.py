@@ -76,10 +76,7 @@ def is_method_descriptor(object_: Any) -> bool:
     return isinstance(object_, MethodDescriptorType)
 
 
-unsupported_methods_descriptors = {bytearray.isascii,
-                                   bytes.isascii,
-                                   str.isascii,
-                                   int.conjugate,
+unsupported_methods_descriptors = {int.conjugate,
                                    _io.BufferedRWPair.peek,
                                    _collections_abc.generator.send,
                                    _collections_abc.generator.throw,
@@ -87,16 +84,22 @@ unsupported_methods_descriptors = {bytearray.isascii,
                                    _collections_abc.coroutine.send,
                                    _collections_abc.coroutine.throw,
                                    _collections_abc.coroutine.close,
-                                   _collections_abc.async_generator.asend,
-                                   _collections_abc.async_generator.athrow,
-                                   _collections_abc.async_generator.aclose,
                                    collections.OrderedDict.clear,
                                    collections.OrderedDict.pop,
                                    collections.OrderedDict.update,
                                    struct.Struct.pack,
                                    struct.Struct.pack_into,
-                                   socket.socket.share,
-                                   socket.socket.getblocking}
+                                   socket.socket.share}
+if sys.version_info >= (3, 6):
+    unsupported_methods_descriptors.update(
+            {_collections_abc.async_generator.asend,
+             _collections_abc.async_generator.athrow,
+             _collections_abc.async_generator.aclose})
+if sys.version_info >= (3, 7):
+    unsupported_methods_descriptors.update({bytearray.isascii,
+                                            bytes.isascii,
+                                            str.isascii,
+                                            socket.socket.getblocking})
 
 
 def is_method_descriptor_supported(method_descriptor: MethodDescriptorType
@@ -120,11 +123,8 @@ unsupported_built_in_functions = {_hashlib.openssl_sha1,
                                   socket.dup,
                                   sys.callstats,
                                   sys.getallocatedblocks,
-                                  sys.getfilesystemencodeerrors,
                                   sys.set_coroutine_wrapper,
                                   sys.get_coroutine_wrapper,
-                                  sys.set_asyncgen_hooks,
-                                  sys.get_asyncgen_hooks,
                                   _thread.start_new_thread,
                                   _thread.allocate,
                                   _thread.exit_thread,
@@ -142,6 +142,10 @@ unsupported_built_in_functions = {_hashlib.openssl_sha1,
                                   codecs.xmlcharrefreplace_errors,
                                   codecs.backslashreplace_errors,
                                   codecs.namereplace_errors}
+if sys.version_info >= (3, 6):
+    unsupported_built_in_functions.update({sys.getfilesystemencodeerrors,
+                                           sys.set_asyncgen_hooks,
+                                           sys.get_asyncgen_hooks})
 
 
 def is_function_supported(function: BuiltinFunctionType) -> bool:
