@@ -200,8 +200,8 @@ class NodeTransformer(BaseNodeTransformer):
             except ImportError:
                 if not namespace_contains(self.namespace, alias_path):
                     namespace = namespaces.factory(parent_module_path)
-                    self.namespace[str(alias_path)] = search_by_path(namespace,
-                                                                     actual_path)
+                    self.namespace[str(alias_path)] = search_by_path(
+                            namespace, actual_path)
                 nodes = module_path_to_nodes(parent_module_path,
                                              cls=BaseNodeTransformer)
                 target_node = nodes[actual_path]
