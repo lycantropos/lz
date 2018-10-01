@@ -40,7 +40,7 @@ class Path:
 
     def join(self, other: Union[str, 'Path']) -> 'Path':
         if isinstance(other, str):
-            return Path(*self.parts, other)
+            return Path(*self.parts, *other.split(self.SEPARATOR))
         elif isinstance(other, Path):
             return Path(*self.parts, *other.parts)
         return NotImplemented
