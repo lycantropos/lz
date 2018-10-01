@@ -44,8 +44,21 @@ class Path:
         return type(self)(*self.parts, *other.parts)
 
     @property
+    def name(self) -> str:
+        return self.parts[-1]
+
+    @property
     def parent(self) -> 'Path':
-        return Path(*self.parts[:-1])
+        return type(self)(*self.parts[:-1])
+
+    def with_name(self, name: str) -> 'Path':
+        return type(self)(*self.parts[:-1], name)
+
+    def with_parent(self, parent: 'Path') -> 'Path':
+        return type(self)(*parent.parts, *self.parts[len(parent.parts):])
+
+    def is_child_of(self, parent: 'Path') -> bool:
+        return self.parts[:len(parent.parts)] == parent.parts
 
 
 WILDCARD_IMPORT = Path('*')
@@ -92,9 +105,14 @@ def from_relative_file_path(path: pathlib.Path) -> Path:
     return Path(*parts)
 
 
+names_replacements = {'Protocol': '_Protocol'}
+
+
 @factory.register(str)
 def from_string(string: str) -> Path:
-    return Path(*string.split(Path.SEPARATOR))
+    parts = string.split(Path.SEPARATOR)
+    parts = map(names_replacements.get, parts, parts)
+    return Path(*parts)
 
 
 @singledispatch

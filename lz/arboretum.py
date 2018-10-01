@@ -28,6 +28,7 @@ def to_node(object_: Any) -> ast.AST:
 
 def to_nodes(module_path: catalog.Path) -> Nodes:
     nodes = module_path_to_nodes(module_path)
+    nodes = dictionaries.merge([built_ins_nodes, nodes])
     Reducer(nodes=nodes,
             parent_path=catalog.Path()).visit(nodes[catalog.Path()])
     return nodes
@@ -240,13 +241,6 @@ class Registry(Base):
         attribute_path = catalog.factory(node.attr)
         return parent_path.join(attribute_path)
 
-    def visit_Subscript(self, node: ast.Subscript) -> ast.Subscript:
-        context = node.ctx
-        if not isinstance(context, ast.Load):
-            raise TypeError('Unsupported context type: {type}.'
-                            .format(type=type(context)))
-        return node
-
 
 class Reducer(Base):
     def __init__(self,
@@ -282,19 +276,26 @@ class Reducer(Base):
                 self.nodes[alias_path] = module_root
             else:
                 nodes = module_path_to_nodes(parent_module_path)
-                target_node = nodes[actual_path]
+                target_node = nodes.pop(actual_path)
                 if isinstance(target_node, (ast.Import, ast.ImportFrom)):
                     # handle chained imports
                     nodes = {}
                     transformer = type(self)(nodes=nodes,
                                              parent_path=parent_module_path)
                     transformer.visit(target_node)
-                    target_node = nodes[actual_path]
+                    target_node = nodes.pop(actual_path)
                 self.nodes[alias_path] = target_node
+                # hack to be able to visit "imported" nodes
+                self.nodes.update(nodes)
         return node
 
     def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
+        for base_path in map(self.visit, node.bases):
+            self.nodes.update({object_path.with_parent(path): node
+                               for object_path, node in self.nodes.items()
+                               if object_path.is_child_of(base_path)
+                               and object_path != base_path})
         transformer = type(self)(nodes=self.nodes,
                                  parent_path=path,
                                  is_nested=True)
@@ -305,18 +306,31 @@ class Reducer(Base):
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
         return node
 
-    def visit_Attribute(self, node: ast.Attribute) -> ast.Attribute:
+    def visit_Assign(self, node: ast.Assign) -> ast.Assign:
+        return node
+
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
+        return node
+
+    def visit_Call(self, node: ast.Call) -> ast.Call:
+        return node
+
+    def visit_Attribute(self, node: ast.Attribute) -> catalog.Path:
         parent_path = self.visit(node.value)
         attribute_path = catalog.factory(node.attr)
         object_path = parent_path.join(attribute_path)
         self.nodes[attribute_path] = self.nodes[object_path]
-        return node
+        return object_path
 
     def visit_Name(self, node: ast.Name) -> catalog.Path:
-        path = self.resolve_path(catalog.factory(node.id))
-        node = self.nodes[path]
-        self.visit(node)
-        return path
+        return self.resolve_path(catalog.factory(node.id))
+
+    def visit_Subscript(self, node: ast.Subscript) -> catalog.Path:
+        context = node.ctx
+        if not isinstance(context, ast.Load):
+            raise TypeError('Unsupported context type: {type}.'
+                            .format(type=type(context)))
+        return self.visit(node.value)
 
 
 def search_by_path(namespace: Namespace, path: catalog.Path) -> Any:
@@ -400,3 +414,4 @@ def evaluate_tree(node: ast.Module,
 
 
 built_ins_namespace = namespaces.factory(builtins)
+built_ins_nodes = module_path_to_nodes(catalog.factory(builtins))
