@@ -1,12 +1,12 @@
 import functools
 import itertools
+import sys
 from collections import (abc,
                          defaultdict)
 from typing import (Hashable,
                     Iterable,
                     List,
                     Mapping,
-                    Reversible,
                     Tuple)
 
 from .functional import compose
@@ -94,9 +94,13 @@ def reverse(iterable: Iterable[Domain]) -> Iterable[Domain]:
     yield from reversed(list(iterable))
 
 
-@reverse.register(abc.Reversible)
-def reverse_reversible(iterable: Reversible[Domain]) -> Iterable[Domain]:
-    yield from reversed(iterable)
+if sys.version_info >= (3, 6):
+    from typing import Reversible
+
+
+    @reverse.register(abc.Reversible)
+    def reverse_reversible(iterable: Reversible[Domain]) -> Iterable[Domain]:
+        yield from reversed(iterable)
 
 
 def expand(object_: Domain) -> Iterable[Domain]:

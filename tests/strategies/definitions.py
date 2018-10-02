@@ -117,9 +117,6 @@ unsupported_methods_descriptors = {dict.get,
                                    _collections_abc.coroutine.send,
                                    _collections_abc.coroutine.throw,
                                    _collections_abc.coroutine.close,
-                                   _collections_abc.async_generator.asend,
-                                   _collections_abc.async_generator.athrow,
-                                   _collections_abc.async_generator.aclose,
                                    collections.OrderedDict.clear,
                                    collections.OrderedDict.pop,
                                    collections.OrderedDict.update,
@@ -129,6 +126,11 @@ unsupported_methods_descriptors = {dict.get,
                                    struct.Struct.unpack_from,
                                    struct.Struct.iter_unpack,
                                    struct.Struct.pack_into}
+if sys.version_info >= (3, 6):
+    unsupported_methods_descriptors.update(
+            {_collections_abc.async_generator.asend,
+             _collections_abc.async_generator.athrow,
+             _collections_abc.async_generator.aclose})
 if sys.version_info >= (3, 7):
     unsupported_methods_descriptors.update({bytearray.isascii,
                                             bytes.isascii,
@@ -163,9 +165,6 @@ unsupported_built_in_functions = {_hashlib.openssl_sha1,
                                   sys.getallocatedblocks,
                                   sys.set_coroutine_wrapper,
                                   sys.get_coroutine_wrapper,
-                                  sys.getfilesystemencodeerrors,
-                                  sys.set_asyncgen_hooks,
-                                  sys.get_asyncgen_hooks,
                                   _thread.start_new_thread,
                                   _thread.allocate,
                                   _thread.exit_thread,
@@ -181,6 +180,10 @@ unsupported_built_in_functions = {_hashlib.openssl_sha1,
                                   codecs.xmlcharrefreplace_errors,
                                   codecs.backslashreplace_errors,
                                   codecs.namereplace_errors}
+if sys.version_info >= (3, 6):
+    unsupported_built_in_functions.update({sys.getfilesystemencodeerrors,
+                                           sys.set_asyncgen_hooks,
+                                           sys.get_asyncgen_hooks})
 if sys.platform == 'win32':
     unsupported_built_in_functions.update({os.get_handle_inheritable,
                                            os.set_handle_inheritable})

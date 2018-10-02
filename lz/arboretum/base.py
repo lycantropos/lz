@@ -1,4 +1,3 @@
-import ast
 import builtins
 import importlib
 from functools import (lru_cache,
@@ -9,18 +8,21 @@ from typing import (Any,
                     Dict,
                     Iterable)
 
-from . import (catalog,
-               dictionaries,
-               left,
-               namespaces,
-               sources)
-from .hints import Namespace
-from .iterating import expand
+from typed_ast import ast3
 
-Nodes = Dict[catalog.Path, ast.AST]
+from lz import (catalog,
+                dictionaries,
+                left,
+                namespaces,
+                sources)
+from lz.hints import Namespace
+from lz.iterating import expand
+from .conversion import TypedToPlain
+
+Nodes = Dict[catalog.Path, ast3.AST]
 
 
-def to_node(object_: Any) -> ast.AST:
+def to_node(object_: Any) -> ast3.AST:
     module_path = catalog.factory(catalog.module_name_factory(object_))
     object_path = catalog.factory(object_)
     nodes = to_nodes(module_path)
@@ -51,32 +53,32 @@ def module_path_to_nodes(module_path: catalog.Path) -> Nodes:
 
 
 @singledispatch
-def factory(object_: Any) -> ast.Module:
+def factory(object_: Any) -> ast3.Module:
     raise TypeError('Unsupported object type: {type}.'
                     .format(type=type(object_)))
 
 
 @factory.register(Path)
-def from_source_path(path: Path) -> ast.Module:
-    return ast.parse(path.read_text())
+def from_source_path(path: Path) -> ast3.Module:
+    return ast3.parse(path.read_text())
 
 
 @factory.register(catalog.Path)
-def from_module_path(path: catalog.Path) -> ast.Module:
+def from_module_path(path: catalog.Path) -> ast3.Module:
     return factory(sources.factory(path))
 
 
-@factory.register(ast.Module)
-def from_root_node(node: ast.Module) -> ast.Module:
+@factory.register(ast3.Module)
+def from_root_node(node: ast3.Module) -> ast3.Module:
     return node
 
 
-@factory.register(ast.AST)
-def from_node(node: ast.AST) -> ast.Module:
-    return ast.Module([node])
+@factory.register(ast3.AST)
+def from_node(node: ast3.AST) -> ast3.Module:
+    return ast3.Module([node], [])
 
 
-class Base(ast.NodeTransformer):
+class Base(ast3.NodeTransformer):
     def __init__(self,
                  *,
                  parent_path: catalog.Path,
@@ -102,7 +104,7 @@ class Flattener(Base):
         self.namespace = namespace
         self.module_path = module_path
 
-    def visit_Import(self, node: ast.Import) -> Iterable[ast.Import]:
+    def visit_Import(self, node: ast3.Import) -> Iterable[ast3.Import]:
         for name_alias in node.names:
             alias_path = self.resolve_path(to_alias_path(name_alias))
             actual_path = to_actual_path(name_alias)
@@ -110,10 +112,10 @@ class Flattener(Base):
                 parent_module_name = actual_path.parts[0]
                 module = importlib.import_module(parent_module_name)
                 self.namespace[parent_module_name] = module
-            yield ast.Import([name_alias])
+            yield ast3.Import([name_alias])
 
-    def visit_ImportFrom(self, node: ast.ImportFrom
-                         ) -> Iterable[ast.ImportFrom]:
+    def visit_ImportFrom(self, node: ast3.ImportFrom
+                         ) -> Iterable[ast3.ImportFrom]:
         parent_module_path = to_parent_module_path(
                 node,
                 parent_module_path=self.module_path)
@@ -126,9 +128,9 @@ class Flattener(Base):
                 namespace = namespaces.factory(parent_module_path)
                 self.namespace[str(alias_path)] = search_by_path(namespace,
                                                                  actual_path)
-            yield ast.ImportFrom(str(parent_module_path), [name_alias], 0)
+            yield ast3.ImportFrom(str(parent_module_path), [name_alias], 0)
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
+    def visit_ClassDef(self, node: ast3.ClassDef) -> ast3.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
         transformer = type(self)(namespace=self.namespace,
                                  parent_path=path,
@@ -138,7 +140,7 @@ class Flattener(Base):
             transformer.visit(child)
         return node
 
-    def visit_If(self, node: ast.If) -> Iterable[ast.AST]:
+    def visit_If(self, node: ast3.If) -> Iterable[ast3.AST]:
         if self.visit(node.test):
             children = node.body
         else:
@@ -147,18 +149,18 @@ class Flattener(Base):
             self.visit(child)
         yield from children
 
-    def visit_BoolOp(self, node: ast.BoolOp) -> bool:
+    def visit_BoolOp(self, node: ast3.BoolOp) -> bool:
         return self.evaluate_expression(node)
 
-    def visit_Compare(self, node: ast.Compare) -> bool:
+    def visit_Compare(self, node: ast3.Compare) -> bool:
         return self.evaluate_expression(node)
 
-    def evaluate_expression(self, node: ast.expr) -> Any:
+    def evaluate_expression(self, node: ast3.expr) -> Any:
         nodes = {}
         transformer = type(self)(namespace=self.namespace,
                                  module_path=self.module_path,
                                  parent_path=self.parent_path)
-        for child in ast.iter_child_nodes(node):
+        for child in ast3.iter_child_nodes(node):
             transformer.visit(child)
         if nodes:
             for path, node in nodes.items():
@@ -188,13 +190,13 @@ class Registry(Base):
                          is_nested=is_nested)
         self.nodes = nodes
 
-    def visit_Module(self, node: ast.Module) -> ast.Module:
+    def visit_Module(self, node: ast3.Module) -> ast3.Module:
         self.nodes[catalog.Path()] = node
         for child in node.body:
             self.visit(child)
         return node
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
+    def visit_ClassDef(self, node: ast3.ClassDef) -> ast3.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
         self.nodes[path] = node
         transformer = type(self)(nodes=self.nodes,
@@ -204,43 +206,43 @@ class Registry(Base):
             transformer.visit(child)
         return node
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+    def visit_FunctionDef(self, node: ast3.FunctionDef) -> ast3.FunctionDef:
         path = self.resolve_path(catalog.factory(node.name))
         self.nodes[path] = node
         return node
 
-    def visit_Import(self, node: ast.Import) -> ast.Import:
+    def visit_Import(self, node: ast3.Import) -> ast3.Import:
         for child in node.names:
             alias_path = self.resolve_path(to_alias_path(child))
             self.nodes[alias_path] = node
         return node
 
-    def visit_ImportFrom(self, node: ast.ImportFrom) -> ast.ImportFrom:
+    def visit_ImportFrom(self, node: ast3.ImportFrom) -> ast3.ImportFrom:
         for child in node.names:
             alias_path = self.resolve_path(to_alias_path(child))
             self.nodes[alias_path] = node
         return node
 
-    def visit_Assign(self, node: ast.Assign) -> ast.Assign:
+    def visit_Assign(self, node: ast3.Assign) -> ast3.Assign:
         paths = map(self.visit, node.targets)
         value_node = node.value
         for path in paths:
             self.nodes[path] = value_node
         return node
 
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
+    def visit_AnnAssign(self, node: ast3.AnnAssign) -> ast3.AnnAssign:
         path = self.visit(node.target)
         self.nodes[path] = node.value
         return node
 
-    def visit_Name(self, node: ast.Name) -> catalog.Path:
+    def visit_Name(self, node: ast3.Name) -> catalog.Path:
         name_path = catalog.factory(node.id)
-        if isinstance(node.ctx, ast.Load):
+        if isinstance(node.ctx, ast3.Load):
             return name_path
-        elif isinstance(node.ctx, ast.Store):
+        elif isinstance(node.ctx, ast3.Store):
             return self.resolve_path(name_path)
 
-    def visit_Attribute(self, node: ast.Attribute) -> catalog.Path:
+    def visit_Attribute(self, node: ast3.Attribute) -> catalog.Path:
         parent_path = self.visit(node.value)
         attribute_path = catalog.factory(node.attr)
         return parent_path.join(attribute_path)
@@ -256,7 +258,7 @@ class Reducer(Base):
                          is_nested=is_nested)
         self.nodes = nodes
 
-    def visit_Import(self, node: ast.Import) -> ast.Import:
+    def visit_Import(self, node: ast3.Import) -> ast3.Import:
         for child in node.names:
             alias_path = to_alias_path(child)
             actual_path = to_actual_path(child)
@@ -265,7 +267,7 @@ class Reducer(Base):
                                        nodes.values())))
         return node
 
-    def visit_ImportFrom(self, node: ast.ImportFrom) -> ast.ImportFrom:
+    def visit_ImportFrom(self, node: ast3.ImportFrom) -> ast3.ImportFrom:
         parent_module_path = catalog.factory(node.module)
         for name_alias in node.names:
             alias_path = self.resolve_path(to_alias_path(name_alias))
@@ -281,7 +283,7 @@ class Reducer(Base):
             else:
                 nodes = module_path_to_nodes(parent_module_path)
                 target_node = nodes.pop(actual_path)
-                if isinstance(target_node, (ast.Import, ast.ImportFrom)):
+                if isinstance(target_node, (ast3.Import, ast3.ImportFrom)):
                     # handle chained imports
                     nodes = {}
                     transformer = type(self)(nodes=nodes,
@@ -293,7 +295,7 @@ class Reducer(Base):
                 self.nodes.update(nodes)
         return node
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
+    def visit_ClassDef(self, node: ast3.ClassDef) -> ast3.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
         for base_path in map(self.visit, node.bases):
             self.nodes.update({object_path.with_parent(path): node
@@ -307,31 +309,31 @@ class Reducer(Base):
             transformer.visit(child)
         return node
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+    def visit_FunctionDef(self, node: ast3.FunctionDef) -> ast3.FunctionDef:
         return node
 
-    def visit_Assign(self, node: ast.Assign) -> ast.Assign:
+    def visit_Assign(self, node: ast3.Assign) -> ast3.Assign:
         return node
 
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:
+    def visit_AnnAssign(self, node: ast3.AnnAssign) -> ast3.AnnAssign:
         return node
 
-    def visit_Call(self, node: ast.Call) -> catalog.Path:
+    def visit_Call(self, node: ast3.Call) -> catalog.Path:
         return self.visit(node.func)
 
-    def visit_Attribute(self, node: ast.Attribute) -> catalog.Path:
+    def visit_Attribute(self, node: ast3.Attribute) -> catalog.Path:
         parent_path = self.visit(node.value)
         attribute_path = catalog.factory(node.attr)
         object_path = parent_path.join(attribute_path)
         self.nodes[attribute_path] = self.nodes[object_path]
         return object_path
 
-    def visit_Name(self, node: ast.Name) -> catalog.Path:
+    def visit_Name(self, node: ast3.Name) -> catalog.Path:
         return self.resolve_path(catalog.factory(node.id))
 
-    def visit_Subscript(self, node: ast.Subscript) -> catalog.Path:
+    def visit_Subscript(self, node: ast3.Subscript) -> catalog.Path:
         context = node.ctx
-        if not isinstance(context, ast.Load):
+        if not isinstance(context, ast3.Load):
             raise TypeError('Unsupported context type: {type}.'
                             .format(type=type(context)))
         return self.visit(node.value)
@@ -359,7 +361,7 @@ def is_module_path(object_path: catalog.Path) -> bool:
         return True
 
 
-def to_parent_module_path(object_: ast.ImportFrom,
+def to_parent_module_path(object_: ast3.ImportFrom,
                           *,
                           parent_module_path: catalog.Path) -> catalog.Path:
     level = object_.level
@@ -373,47 +375,48 @@ def to_parent_module_path(object_: ast.ImportFrom,
     return catalog.Path(*module_path_parts)
 
 
-def to_alias_path(node: ast.alias) -> catalog.Path:
+def to_alias_path(node: ast3.alias) -> catalog.Path:
     result = node.asname
     if result is None:
         result = node.name
     return catalog.factory(result)
 
 
-def to_actual_path(node: ast.alias) -> catalog.Path:
+def to_actual_path(node: ast3.alias) -> catalog.Path:
     return catalog.factory(node.name)
 
 
-def expression_to_assignment(node: ast.expr,
+def expression_to_assignment(node: ast3.expr,
                              *,
-                             name: str) -> ast.Assign:
-    name_node = ast.Name(name, ast.Store())
-    result = ast.Assign([name_node], node)
-    result = ast.fix_missing_locations(result)
+                             name: str) -> ast3.Assign:
+    name_node = ast3.Name(name, ast3.Store())
+    result = ast3.Assign([name_node], node, None)
+    result = ast3.fix_missing_locations(result)
     return result
 
 
 @singledispatch
-def evaluate(node: ast.AST,
+def evaluate(node: ast3.AST,
              *,
              namespace: Namespace) -> None:
     raise TypeError('Unsupported node type: {type}.'
                     .format(type=type(node)))
 
 
-@evaluate.register(ast.stmt)
-def evaluate_statement(node: ast.stmt,
+@evaluate.register(ast3.stmt)
+def evaluate_statement(node: ast3.stmt,
                        *,
                        namespace: Namespace) -> None:
     evaluate_tree(factory(node),
                   namespace=namespace)
 
 
-@evaluate.register(ast.Module)
-def evaluate_tree(node: ast.Module,
+@evaluate.register(ast3.Module)
+def evaluate_tree(node: ast3.Module,
                   *,
                   namespace: Namespace) -> None:
-    code = compile(node, '<ast>', 'exec')
+    node = TypedToPlain().visit(node)
+    code = compile(node, '<unknown>', 'exec')
     exec(code, namespace)
 
 
