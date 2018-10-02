@@ -8,7 +8,7 @@ from typing import (Any,
                     Optional,
                     Union)
 
-from . import right
+from lz import right
 from .file_system import INIT_MODULE_NAME
 from .hints import MethodDescriptorType
 

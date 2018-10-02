@@ -4,7 +4,7 @@ from types import (BuiltinFunctionType,
 
 import pytest
 
-from lz.hints import MethodDescriptorType
+from lz.signatures.hints import MethodDescriptorType
 from tests import strategies
 from tests.utils import find
 

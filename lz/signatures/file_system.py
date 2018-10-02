@@ -6,10 +6,10 @@ from pathlib import Path
 from typing import (Iterator,
                     List)
 
-from .functional import (compose,
-                         pack)
-from .iterating import (flatmapper,
-                        mapper)
+from lz.functional import (compose,
+                           pack)
+from lz.iterating import (flatmapper,
+                          mapper)
 
 INIT_MODULE_NAME = '__init__'
 

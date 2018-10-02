@@ -1,7 +1,8 @@
 import ast
 import inspect
 from functools import (lru_cache,
-                       partial)
+                       partial,
+                       wraps)
 from itertools import (repeat,
                        zip_longest)
 from operator import attrgetter
@@ -11,17 +12,18 @@ from typing import (Callable,
                     List,
                     Optional)
 
+from lz.functional import (combine,
+                           compose,
+                           pack)
+from lz.hints import (Map,
+                      Range)
+from lz.iterating import (expand,
+                          flatten,
+                          grouper,
+                          mapper,
+                          reverse,
+                          sifter)
 from . import arboretum
-from .functional import (combine,
-                         compose,
-                         pack)
-from .hints import Range
-from .iterating import (expand,
-                        flatten,
-                        grouper,
-                        mapper,
-                        reverse,
-                        sifter)
 
 
 class Parameter:

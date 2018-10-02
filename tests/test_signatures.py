@@ -3,7 +3,7 @@ from types import (BuiltinFunctionType,
                    MethodType)
 
 from lz import signatures
-from lz.hints import MethodDescriptorType
+from lz.signatures.hints import MethodDescriptorType
 
 
 def test_factory(function: FunctionType,

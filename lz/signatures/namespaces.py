@@ -1,4 +1,3 @@
-import importlib
 import importlib.abc
 import importlib.machinery
 import sys
@@ -7,9 +6,9 @@ from functools import singledispatch
 from types import ModuleType
 from typing import Any
 
+from lz.functional import compose
 from . import (catalog,
                dictionaries)
-from .functional import compose
 from .hints import Namespace
 
 

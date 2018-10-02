@@ -1,6 +1,4 @@
-from typing import (Any,
-                    Callable,
-                    Dict,
+from typing import (Callable,
                     TypeVar)
 
 from typing_extensions import Protocol
@@ -15,11 +13,3 @@ Predicate = Map[Domain, bool]
 class Sortable(Protocol):
     def __lt__(self, other: 'Sortable') -> bool:
         pass
-
-
-Namespace = Dict[str, Any]
-
-try:
-    from types import MethodDescriptorType
-except ImportError:
-    MethodDescriptorType = type(list.append)

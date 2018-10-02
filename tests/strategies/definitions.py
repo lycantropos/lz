@@ -26,7 +26,7 @@ from typing import (Any,
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
-from lz.hints import MethodDescriptorType
+from lz.signatures.hints import MethodDescriptorType
 
 
 def find_stdlib_modules_names(directory_path: Path = Path(os.__file__).parent,

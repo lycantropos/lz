@@ -10,18 +10,18 @@ from typing import (Any,
 
 import mypy
 
+from lz.functional import (combine,
+                           compose,
+                           identity,
+                           pack)
+from lz.hints import Map
+from lz.iterating import (copier,
+                          flatmapper,
+                          mapper,
+                          sifter)
 from . import catalog
 from .file_system import (INIT_MODULE_NAME,
                           find_files)
-from .functional import (combine,
-                         compose,
-                         identity,
-                         pack)
-from .hints import Map
-from .iterating import (copier,
-                        flatmapper,
-                        mapper,
-                        sifter)
 
 STUB_EXTENSION = '.pyi'
 

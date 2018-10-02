@@ -1,7 +1,7 @@
 from operator import methodcaller
 
-from .functional import compose
-from .iterating import flatmapper
+from lz.functional import compose
+from lz.iterating import flatmapper
 
 merge = compose(dict,
                 flatmapper(methodcaller('items')))

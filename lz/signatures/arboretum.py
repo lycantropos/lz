@@ -10,14 +10,14 @@ from typing import (Any,
 
 from typed_ast import ast3
 
-from lz import (catalog,
-                dictionaries,
-                left,
-                namespaces,
-                sources)
-from lz.hints import Namespace
+from lz import left
 from lz.iterating import expand
+from . import (catalog,
+               dictionaries,
+               namespaces,
+               sources)
 from .conversion import TypedToPlain
+from .hints import Namespace
 
 Nodes = Dict[catalog.Path, ast3.AST]
 
