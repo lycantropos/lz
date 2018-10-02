@@ -1,5 +1,4 @@
 import _collections_abc
-import _ctypes
 import _hashlib
 import _io
 import _json
@@ -7,7 +6,6 @@ import _string
 import _thread
 import codecs
 import collections
-import ctypes.test
 import ctypes.util
 import faulthandler
 import inspect
@@ -17,9 +15,12 @@ import struct
 import sys
 import types
 import zipimport
+from operator import methodcaller
+from pathlib import Path
 from types import (BuiltinFunctionType,
                    ModuleType)
 from typing import (Any,
+                    Iterable,
                     Union)
 
 from hypothesis import strategies
@@ -27,38 +28,49 @@ from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import MethodDescriptorType
 
-# support for these stdlib modules in ``typeshed`` package is not found
-unsupported_modules = {_ctypes,
-                       _string,
-                       ctypes,
-                       ctypes.test,
-                       ctypes.util,
-                       ctypes._endian,
-                       faulthandler}
-try:
-    import six
-except ImportError:
-    pass
-else:
-    unsupported_modules.add(six)
-try:
-    import coverage
-except ImportError:
-    pass
-else:
-    unsupported_modules.add(coverage)
+
+def find_stdlib_modules_names(directory_path: Path = Path(os.__file__).parent,
+                              ) -> Iterable[str]:
+    yield from sys.builtin_module_names
+
+    def is_stdlib_module_path(path: Path) -> bool:
+        file_name = path.name
+        # skips '__pycache__', 'site-packages', etc.
+        return not (file_name.startswith('__') and file_name.endswith('__')
+                    or '-' in file_name)
+
+    sources_paths = filter(is_stdlib_module_path, directory_path.iterdir())
+    sources_relative_paths = map(methodcaller(Path.relative_to.__name__,
+                                              directory_path),
+                                 sources_paths)
+    yield from map(str, map(methodcaller(Path.with_suffix.__name__, ''),
+                            sources_relative_paths))
 
 
-def is_module_supported(module: ModuleType) -> bool:
-    return module not in unsupported_modules
+stdlib_modules_names = frozenset(find_stdlib_modules_names())
+stdlib_modules = {module
+                  for module_name, module in sys.modules.items()
+                  if module_name in stdlib_modules_names}
+supported_modules = (stdlib_modules
+                     # support for these stdlib modules is not found
+                     # in ``typeshed`` package
+                     - {_string,
+                        ctypes,
+                        faulthandler})
 
+is_module_supported = supported_modules.__contains__
 
-modules = (strategies.sampled_from(list(sys.modules.values()))
+modules = (strategies.sampled_from(list(stdlib_modules))
            .filter(is_module_supported))
 
 
 def flatten(object_: Union[ModuleType, type]) -> SearchStrategy:
     return strategies.sampled_from(list(vars(object_).values()))
+
+
+def is_object_supported(object_: Any) -> bool:
+    return (not isinstance(object_, ModuleType)
+            or is_module_supported(object_))
 
 
 objects = modules.flatmap(flatten)
