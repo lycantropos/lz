@@ -41,6 +41,12 @@ except ImportError:
     pass
 else:
     unsupported_modules.add(six)
+try:
+    import coverage
+except ImportError:
+    pass
+else:
+    unsupported_modules.add(coverage)
 
 
 def is_module_supported(module: ModuleType) -> bool:
