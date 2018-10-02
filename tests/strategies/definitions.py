@@ -124,6 +124,8 @@ if sys.version_info >= (3, 7):
                                             socket.socket.getblocking})
 if sys.platform == 'win32':
     unsupported_methods_descriptors.add(socket.socket.share)
+elif sys.platform == 'linux':
+    unsupported_methods_descriptors.add(socket.socket.sendmsg_afalg)
 
 
 def is_method_descriptor_supported(method_descriptor: MethodDescriptorType
