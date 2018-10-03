@@ -8,10 +8,8 @@ lz
 [![](https://badge.fury.io/py/lz.svg)](https://badge.fury.io/py/lz "PyPI")
 
 In what follows 
-
 - `python` is an alias for `python3.5` or any later
-version (`python3.6` and so on).
-
+version (`python3.6` and so on),
 - `pypy` is an alias for `pypy3.5` or any later
 version (`pypy3.6` and so on).
 
