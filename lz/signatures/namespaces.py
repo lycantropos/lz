@@ -7,6 +7,9 @@ from types import ModuleType
 from typing import Any
 
 from lz.functional import compose
+from lz.iterating import (flatten,
+                          mapper,
+                          sifter)
 from . import (catalog,
                dictionaries)
 from .hints import Namespace
@@ -17,22 +20,27 @@ def factory(object_: Any) -> Namespace:
     return object_
 
 
-replacements = {'_importlib_modulespec': 'types'}
+replacing_modules_names = {
+    '_importlib_modulespec': [types.__name__,
+                              importlib.abc.__name__,
+                              importlib.machinery.__name__]}
 if sys.platform == 'win32':
-    replacements['posix'] = 'nt'
+    import nt
+
+    replacing_modules_names['posix'] = [nt]
+to_replacing_modules_names = compose(flatten,
+                                     sifter(),
+                                     mapper(replacing_modules_names.get))
 
 
 @factory.register(catalog.Path)
 def from_module_path(object_: catalog.Path) -> Namespace:
-    parts = map(replacements.get, object_.parts, object_.parts)
-    new_path = catalog.Path(*parts)
-    if new_path != object_:
+    modules_names = list(to_replacing_modules_names(object_.parts))
+    if modules_names:
         return dictionaries.merge(map(compose(factory,
                                               importlib.import_module),
-                                      [types.__name__,
-                                       importlib.abc.__name__,
-                                       importlib.machinery.__name__]))
-    return factory(importlib.import_module(str(new_path)))
+                                      modules_names))
+    return factory(importlib.import_module(str(object_)))
 
 
 @factory.register(ModuleType)
