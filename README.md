@@ -1,5 +1,5 @@
 lz
-===========
+==
 
 [![](https://travis-ci.org/lycantropos/lz.svg?branch=master)](https://travis-ci.org/lycantropos/lz "Travis CI")
 [![](https://ci.appveyor.com/api/projects/status/github/lycantropos/lz?branch=master&svg=true)](https://ci.appveyor.com/project/lycantropos/lz "AppVeyor")
@@ -7,35 +7,62 @@ lz
 [![](https://img.shields.io/github/license/lycantropos/lz.svg)](https://github.com/lycantropos/lz/blob/master/LICENSE "License")
 [![](https://badge.fury.io/py/lz.svg)](https://badge.fury.io/py/lz "PyPI")
 
-In what follows `python3` is an alias for `python3.5` or any later
+In what follows 
+
+- `python` is an alias for `python3.5` or any later
 version (`python3.6` and so on).
+
+- `pypy` is an alias for `pypy3.5` or any later
+version (`pypy3.6` and so on).
+
 
 Installation
 ------------
 
-Install the latest `pip` & `setuptools` packages versions
+Install the latest `pip` & `setuptools` packages versions:
 
-```bash
-python3 -m pip install --upgrade pip setuptools
-```
+- with `CPython`
+  ```bash
+  python -m pip install --upgrade pip setuptools
+  ```
+- with `PyPy`
+  ```bash
+  pypy -m pip install --upgrade pip setuptools
+  ```
 
 ### Release
 
-Download and install the latest stable version from `PyPI` repository
+Download and install the latest stable version from `PyPI` repository:
 
-```bash
-python3 -m pip install --upgrade lz
-```
+- with `CPython`
+  ```bash
+  python -m pip install --upgrade lz
+  ```
+- with `PyPy`
+  ```bash
+  pypy -m pip install --upgrade lz
+  ```
 
 ### Developer
 
-Download and install the latest version from `GitHub` repository
-
+Download the latest version from `GitHub` repository
 ```bash
 git clone https://github.com/lycantropos/lz.git
 cd lz
-python3 setup.py install
 ```
+
+Install:
+- with `CPython`
+  ```bash
+  python setup.py install
+  ```
+- with `PyPy`
+  ```bash
+  pypy setup.py install
+  ```
+
+Development
+-----------
 
 ### Bumping version
 
@@ -88,29 +115,54 @@ To avoid inconsistency between branches and pull requests,
 bumping version should be merged into `master` branch as separate pull
 request.
 
-Running tests
--------------
+### Running tests
 
-Plain
+Plain:
+- with `CPython`
+  ```bash
+  python setup.py test
+  ```
+- with `PyPy`
+  ```bash
+  pypy setup.py test
+  ```
 
-```bash
-python3 setup.py test
-```
+Inside `Docker` container:
+- with `CPython`
+  ```bash
+  docker-compose --file docker-compose.cpython.yml up
+  ```
+- with `PyPy`
+  ```bash
+  docker-compose --file docker-compose.pypy.yml up
+  ```
 
-Inside `Docker` container
+`Bash` script (e.g. can be used in `Git` hooks):
+- with `CPython`
+  ```bash
+  ./run-tests.sh
+  ```
+  or
+  ```bash
+  ./run-tests.sh cpython
+  ```
 
-```bash
-docker-compose up
-```
+- with `PyPy`
+  ```bash
+  ./run-tests.sh pypy
+  ```
 
-`Bash` script (e.g. can be used in `Git` hooks)
 
-```bash
-./run-tests.sh
-```
-
-`PowerShell` script (e.g. can be used in `Git` hooks)
-
-```powershell
-.\run-tests.ps1
-```
+`PowerShell` script (e.g. can be used in `Git` hooks):
+- with `CPython`
+  ```powershell
+  .\run-tests.ps1
+  ```
+  or
+  ```powershell
+  .\run-tests.ps1 cpython
+  ```
+- with `PyPy`
+  ```powershell
+  .\run-tests.ps1 pypy
+  ```
