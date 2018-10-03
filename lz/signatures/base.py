@@ -1,25 +1,18 @@
 import ast
 import inspect
-from functools import (lru_cache,
-                       partial,
-                       wraps)
+from functools import partial
 from itertools import (repeat,
                        zip_longest)
-from operator import attrgetter
 from typing import (Callable,
-                    Dict,
                     Iterable,
-                    List,
                     Optional)
 
 from lz.functional import (combine,
                            compose,
                            pack)
-from lz.hints import (Map,
-                      Range)
+from lz.hints import Range
 from lz.iterating import (expand,
                           flatten,
-                          grouper,
                           mapper,
                           reverse,
                           sifter)
@@ -48,17 +41,6 @@ class Parameter:
 class Signature:
     def __init__(self, *parameters: Parameter) -> None:
         self.parameters = parameters
-
-    @property
-    @lru_cache(None)
-    def by_names(self) -> Dict[str, Parameter]:
-        return {parameter.name: parameter
-                for parameter in self.parameters}
-
-    @property
-    @lru_cache(None)
-    def by_kinds(self) -> Dict[str, List[Parameter]]:
-        return dict(grouper(attrgetter('kind'))(self.parameters))
 
     def __repr__(self) -> str:
         return '(' + ', '.join(map(repr, self.parameters)) + ')'
