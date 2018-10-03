@@ -12,10 +12,10 @@ matrix:
       sudo: true
 
 install:
-  - python3 -m pip install codecov>=2.0.9
+  - python -m pip install codecov>=2.0.9
 
 script:
-  - python3 setup.py test
+  - python setup.py test
 
 after_success:
   - codecov
