@@ -1,6 +1,8 @@
 from types import (BuiltinFunctionType,
                    FunctionType,
                    MethodType)
+from typing import (Any,
+                    Callable)
 
 import pytest
 
@@ -10,13 +12,18 @@ from tests.utils import find
 
 
 @pytest.fixture(scope='function')
-def function() -> FunctionType:
-    return find(strategies.functions)
+def built_in_function() -> BuiltinFunctionType:
+    return find(strategies.built_in_functions)
 
 
 @pytest.fixture(scope='function')
-def built_in_function() -> BuiltinFunctionType:
-    return find(strategies.built_in_functions)
+def callable_() -> Callable[..., Any]:
+    return find(strategies.callables)
+
+
+@pytest.fixture(scope='function')
+def function() -> FunctionType:
+    return find(strategies.functions)
 
 
 @pytest.fixture(scope='function')
