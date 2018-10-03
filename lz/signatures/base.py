@@ -48,25 +48,6 @@ class Signature:
         return '(' + ', '.join(map(repr, self.parameters)) + ')'
 
 
-def with_typeshed(function: Map[Callable[..., Range], Signature]
-                  ) -> Map[Callable[..., Range], Signature]:
-    @wraps(function)
-    def wrapped(object_: Callable[..., Range]) -> Signature:
-        try:
-            return function(object_)
-        except ValueError:
-            if platform.python_implementation() == 'PyPy':
-                raise
-
-            from . import arboretum
-
-            object_node = arboretum.to_node(object_)
-            return from_ast(object_node.args)
-
-    return wrapped
-
-
-@with_typeshed
 def factory(object_: Callable[..., Range]) -> Signature:
     raw_signature = inspect.signature(object_)
 
@@ -78,6 +59,28 @@ def factory(object_: Callable[..., Range]) -> Signature:
 
     parameters = map(normalize_parameter, raw_signature.parameters.values())
     return Signature(*parameters)
+
+
+if platform.python_implementation() != 'PyPy':
+    from . import arboretum
+
+
+    def with_typeshed(function: Map[Callable[..., Range], Signature]
+                      ) -> Map[Callable[..., Range], Signature]:
+        @wraps(function)
+        def wrapped(object_: Callable[..., Range]) -> Signature:
+            try:
+                return function(object_)
+            except ValueError:
+                from . import arboretum
+
+                object_node = arboretum.to_node(object_)
+                return from_ast(object_node.args)
+
+        return wrapped
+
+
+    factory = with_typeshed(factory)
 
 
 def from_ast(object_: ast.arguments) -> Signature:
