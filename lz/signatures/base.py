@@ -1,6 +1,7 @@
 import ast
 import inspect
-from functools import partial
+from functools import (partial,
+                       wraps)
 from itertools import (repeat,
                        zip_longest)
 from typing import (Callable,
@@ -10,7 +11,8 @@ from typing import (Callable,
 from lz.functional import (combine,
                            compose,
                            pack)
-from lz.hints import Range
+from lz.hints import (Map,
+                      Range)
 from lz.iterating import (expand,
                           flatten,
                           mapper,
@@ -46,12 +48,22 @@ class Signature:
         return '(' + ', '.join(map(repr, self.parameters)) + ')'
 
 
+def with_typeshed(function: Map[Callable[..., Range], Signature]
+                  ) -> Map[Callable[..., Range], Signature]:
+    @wraps(function)
+    def wrapped(object_: Callable[..., Range]) -> Signature:
+        try:
+            return function(object_)
+        except ValueError:
+            object_node = arboretum.to_node(object_)
+            return from_ast(object_node.args)
+
+    return wrapped
+
+
+@with_typeshed
 def factory(object_: Callable[..., Range]) -> Signature:
-    try:
-        raw_signature = inspect.signature(object_)
-    except ValueError:
-        object_node = arboretum.to_node(object_)
-        return from_ast(object_node.args)
+    raw_signature = inspect.signature(object_)
 
     def normalize_parameter(raw_parameter: inspect.Parameter) -> Parameter:
         has_default = raw_parameter.default is not inspect._empty
