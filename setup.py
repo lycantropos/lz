@@ -1,3 +1,5 @@
+import platform
+
 from setuptools import (find_packages,
                         setup)
 
@@ -6,9 +8,10 @@ import lz
 project_base_url = 'https://github.com/lycantropos/lz/'
 
 install_requires = [
-    'mypy>=0.630',
     'typing_extensions>=3.6.5',
 ]
+if platform.python_implementation() != 'PyPy':
+    install_requires.append('mypy>=0.630')
 setup_requires = [
     'pytest-runner>=4.2'
 ]

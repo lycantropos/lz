@@ -24,7 +24,7 @@ def compose(last_function: Map[Any, Range],
     def binary_compose(left_function: Map[Intermediate, Range],
                        right_function: Callable[..., Intermediate]
                        ) -> Callable[..., Range]:
-        def composition(*args: Any, **kwargs: Any) -> Range:
+        def composition(*args, **kwargs):
             return left_function(right_function(*args, **kwargs))
 
         return composition

@@ -1,5 +1,6 @@
 import ast
 import inspect
+import platform
 from functools import (partial,
                        wraps)
 from itertools import (repeat,
@@ -18,7 +19,6 @@ from lz.iterating import (expand,
                           mapper,
                           reverse,
                           sifter)
-from . import arboretum
 
 
 class Parameter:
@@ -55,6 +55,11 @@ def with_typeshed(function: Map[Callable[..., Range], Signature]
         try:
             return function(object_)
         except ValueError:
+            if platform.python_implementation() == 'PyPy':
+                raise
+
+            from . import arboretum
+
             object_node = arboretum.to_node(object_)
             return from_ast(object_node.args)
 

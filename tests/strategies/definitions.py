@@ -1,7 +1,6 @@
 import _collections_abc
 import _hashlib
 import _io
-import _json
 import _string
 import _thread
 import codecs
@@ -10,6 +9,7 @@ import ctypes.util
 import faulthandler
 import inspect
 import os
+import platform
 import socket
 import struct
 import sys
@@ -87,8 +87,9 @@ unsupported_classes = {_thread.LockType,
                        _collections_abc.mappingproxy,
                        _collections_abc.dict_keys,
                        _collections_abc.dict_items,
-                       _hashlib.HASH,
                        types.FrameType}
+if platform.python_implementation() != 'PyPy':
+    unsupported_classes.add(_hashlib.HASH)
 
 
 def is_class_supported(class_: type) -> bool:
@@ -138,7 +139,7 @@ if sys.version_info >= (3, 7):
                                             bytes.isascii,
                                             str.isascii,
                                             socket.socket.getblocking})
-if sys.platform == 'win32':
+if sys.platform == 'win32' and platform.python_implementation() != 'PyPy':
     unsupported_methods_descriptors.add(socket.socket.share)
 
 
@@ -159,10 +160,8 @@ unsupported_built_in_functions = {_hashlib.openssl_sha1,
                                   _hashlib.openssl_sha384,
                                   _hashlib.openssl_sha512,
                                   _hashlib.openssl_md5,
-                                  _json.encode_basestring,
                                   socket.dup,
                                   sys.callstats,
-                                  sys.getallocatedblocks,
                                   sys.set_coroutine_wrapper,
                                   sys.get_coroutine_wrapper,
                                   _thread.start_new_thread,
@@ -184,9 +183,14 @@ if sys.version_info >= (3, 6):
     unsupported_built_in_functions.update({sys.getfilesystemencodeerrors,
                                            sys.set_asyncgen_hooks,
                                            sys.get_asyncgen_hooks})
-if sys.platform == 'win32':
+if sys.platform == 'win32' and platform.python_implementation() != 'PyPy':
     unsupported_built_in_functions.update({os.get_handle_inheritable,
                                            os.set_handle_inheritable})
+if platform.python_implementation() != 'PyPy':
+    import _json
+
+    unsupported_built_in_functions.update({sys.getallocatedblocks,
+                                           _json.encode_basestring})
 
 
 def is_function_supported(function: BuiltinFunctionType) -> bool:
