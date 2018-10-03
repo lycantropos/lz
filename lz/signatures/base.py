@@ -1,4 +1,3 @@
-import ast
 import inspect
 import platform
 from functools import (partial,
@@ -62,6 +61,8 @@ def factory(object_: Callable[..., Range]) -> Signature:
 
 
 if platform.python_implementation() != 'PyPy':
+    from typed_ast import ast3
+
     from . import arboretum
 
 
@@ -83,63 +84,65 @@ if platform.python_implementation() != 'PyPy':
     factory = with_typeshed(factory)
 
 
-def from_ast(object_: ast.arguments) -> Signature:
-    to_parameters = compose(
-            sifter(),
-            flatten,
-            combine(to_positional_parameters,
-                    compose(expand, to_variadic_positional_parameter),
-                    to_keyword_parameters,
-                    compose(expand, to_variadic_keyword_parameter)),
-            repeat)
-    parameters = to_parameters(object_)
-    return Signature(*parameters)
+    def from_ast(object_: ast3.arguments) -> Signature:
+        to_parameters = compose(
+                sifter(),
+                flatten,
+                combine(to_positional_parameters,
+                        compose(expand, to_variadic_positional_parameter),
+                        to_keyword_parameters,
+                        compose(expand, to_variadic_keyword_parameter)),
+                repeat)
+        parameters = to_parameters(object_)
+        return Signature(*parameters)
 
 
-def to_positional_parameters(signature_ast: ast.arguments
-                             ) -> Iterable[Parameter]:
-    # double-reversing since parameters with default arguments go last
-    parameters_with_defaults_ast = zip_longest(reverse(signature_ast.args),
-                                               signature_ast.defaults)
-    parameters_with_defaults_ast = reverse(parameters_with_defaults_ast)
-    parameter_factory = partial(to_parameter,
-                                kind=inspect._POSITIONAL_ONLY)
-    yield from mapper(pack(parameter_factory))(parameters_with_defaults_ast)
+    def to_positional_parameters(signature_ast: ast3.arguments
+                                 ) -> Iterable[Parameter]:
+        # double-reversing since parameters with default arguments go last
+        parameters_with_defaults_ast = zip_longest(reverse(signature_ast.args),
+                                                   signature_ast.defaults)
+        parameters_with_defaults_ast = reverse(parameters_with_defaults_ast)
+        parameter_factory = partial(to_parameter,
+                                    kind=inspect._POSITIONAL_ONLY)
+        yield from mapper(pack(parameter_factory))(
+                parameters_with_defaults_ast)
 
 
-def to_keyword_parameters(signature_ast: ast.arguments
-                          ) -> Iterable[Parameter]:
-    parameters_with_defaults_ast = zip(signature_ast.kwonlyargs,
-                                       signature_ast.kw_defaults)
-    parameter_factory = partial(to_parameter,
-                                kind=inspect._KEYWORD_ONLY)
-    yield from mapper(pack(parameter_factory))(parameters_with_defaults_ast)
+    def to_keyword_parameters(signature_ast: ast3.arguments
+                              ) -> Iterable[Parameter]:
+        parameters_with_defaults_ast = zip(signature_ast.kwonlyargs,
+                                           signature_ast.kw_defaults)
+        parameter_factory = partial(to_parameter,
+                                    kind=inspect._KEYWORD_ONLY)
+        yield from mapper(pack(parameter_factory))(
+                parameters_with_defaults_ast)
 
 
-def to_variadic_positional_parameter(signature_ast: ast.arguments
-                                     ) -> Optional[Parameter]:
-    parameter_ast = signature_ast.vararg
-    if parameter_ast is None:
-        return None
-    return Parameter(name=parameter_ast.arg,
-                     kind=inspect._VAR_POSITIONAL,
-                     has_default=False)
+    def to_variadic_positional_parameter(signature_ast: ast3.arguments
+                                         ) -> Optional[Parameter]:
+        parameter_ast = signature_ast.vararg
+        if parameter_ast is None:
+            return None
+        return Parameter(name=parameter_ast.arg,
+                         kind=inspect._VAR_POSITIONAL,
+                         has_default=False)
 
 
-def to_variadic_keyword_parameter(signature_ast: ast.arguments
-                                  ) -> Optional[Parameter]:
-    parameter_ast = signature_ast.kwarg
-    if parameter_ast is None:
-        return None
-    return Parameter(name=parameter_ast.arg,
-                     kind=inspect._VAR_KEYWORD,
-                     has_default=False)
+    def to_variadic_keyword_parameter(signature_ast: ast3.arguments
+                                      ) -> Optional[Parameter]:
+        parameter_ast = signature_ast.kwarg
+        if parameter_ast is None:
+            return None
+        return Parameter(name=parameter_ast.arg,
+                         kind=inspect._VAR_KEYWORD,
+                         has_default=False)
 
 
-def to_parameter(parameter_ast: ast.arg,
-                 default_ast: Optional[ast.expr],
-                 *,
-                 kind: inspect._ParameterKind) -> Parameter:
-    return Parameter(name=parameter_ast.arg,
-                     kind=kind,
-                     has_default=default_ast is not None)
+    def to_parameter(parameter_ast: ast3.arg,
+                     default_ast: Optional[ast3.expr],
+                     *,
+                     kind: inspect._ParameterKind) -> Parameter:
+        return Parameter(name=parameter_ast.arg,
+                         kind=kind,
+                         has_default=default_ast is not None)
