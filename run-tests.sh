@@ -2,16 +2,19 @@
 
 set -e
 
-docker-compose up --build --exit-code-from lz
+IMPLEMENTATION=${1:-cpython}
+COMPOSE_FILE_NAME=docker-compose.${IMPLEMENTATION}.yml
+
+docker-compose --file ${COMPOSE_FILE_NAME} up --build --exit-code-from lz-${IMPLEMENTATION}
 
 STATUS=$?
 
-docker-compose down --remove-orphans
+docker-compose --file ${COMPOSE_FILE_NAME} down --remove-orphans
 
 if [ "$STATUS" -eq "0" ]; then
-	echo "Tests passed";
+	echo "${IMPLEMENTATION} tests passed";
 else
-	echo "Tests failed to pass"
+	echo "${IMPLEMENTATION} tests failed to pass"
 fi
 
 exit ${STATUS}
