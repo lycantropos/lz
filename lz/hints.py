@@ -4,6 +4,7 @@ from typing import (Callable,
 from typing_extensions import Protocol
 
 Domain = TypeVar('Domain')
+Intermediate = TypeVar('Intermediate')
 Range = TypeVar('Range')
 Map = Callable[[Domain], Range]
 Operator = Map[Domain, Domain]

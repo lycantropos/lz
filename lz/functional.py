@@ -4,10 +4,10 @@ import operator
 from typing import (Any,
                     Callable,
                     Iterable,
-                    Tuple,
-                    TypeVar)
+                    Tuple)
 
 from .hints import (Domain,
+                    Intermediate,
                     Map,
                     Predicate,
                     Range)
@@ -19,8 +19,6 @@ def identity(argument: Domain) -> Domain:
 
 def compose(last_function: Map[Any, Range],
             *front_functions: Callable[..., Any]) -> Callable[..., Range]:
-    Intermediate = TypeVar('Intermediate')
-
     def binary_compose(left_function: Map[Intermediate, Range],
                        right_function: Callable[..., Intermediate]
                        ) -> Callable[..., Range]:
