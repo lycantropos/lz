@@ -27,6 +27,9 @@ from . import arboretum
 
 
 class Parameter:
+    kinds_prefixes = {inspect._VAR_POSITIONAL: '*',
+                      inspect._VAR_KEYWORD: '**'}
+
     def __init__(self,
                  *,
                  name: str,
@@ -35,6 +38,11 @@ class Parameter:
         self.name = name
         self.kind = kind
         self.has_default = has_default
+
+    def __repr__(self) -> str:
+        return ''.join([self.kinds_prefixes.get(self.kind, ''),
+                        self.name,
+                        '=...' if self.has_default else ''])
 
 
 class Signature:
@@ -51,6 +59,9 @@ class Signature:
     @lru_cache(None)
     def by_kinds(self) -> Dict[str, List[Parameter]]:
         return dict(grouper(attrgetter('kind'))(self.parameters))
+
+    def __repr__(self) -> str:
+        return '(' + ', '.join(map(repr, self.parameters)) + ')'
 
 
 def factory(object_: Callable[..., Range]) -> Signature:
