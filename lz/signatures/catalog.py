@@ -142,8 +142,3 @@ def module_name_from_class_or_function(object_: Union[BuiltinMethodType,
 @module_name_factory.register(MethodDescriptorType)
 def module_name_from_method_descriptor(object_: MethodDescriptorType) -> str:
     return module_name_factory(module_name_factory(object_.__objclass__))
-
-
-@module_name_factory.register(ModuleType)
-def module_name_from_module(object_: ModuleType) -> str:
-    return module_name_factory(object_.__name__)
