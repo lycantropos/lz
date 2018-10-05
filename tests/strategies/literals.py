@@ -1,10 +1,12 @@
 from hypothesis import strategies
 
 strings = strategies.text()
-numbers = (strategies.booleans()
-           | strategies.integers()
-           | strategies.floats(allow_nan=True,
-                               allow_infinity=True)
+integers = (strategies.booleans()
+            | strategies.integers())
+real_numbers = (integers
+                | strategies.floats(allow_nan=True,
+                                    allow_infinity=True))
+numbers = (real_numbers
            | strategies.complex_numbers(allow_nan=True,
                                         allow_infinity=True))
 scalars = (strategies.none()
