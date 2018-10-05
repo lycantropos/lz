@@ -1,3 +1,7 @@
+from typing import (Callable,
+                    Dict,
+                    Tuple)
+
 import pytest
 
 from lz.hints import (Domain,
@@ -42,3 +46,19 @@ def next_map(map_: Map[Domain, Range]) -> Map[Range, Intermediate]:
 @pytest.fixture(scope='session')
 def last_map(next_map: Map[Range, Intermediate]) -> Map[Intermediate, Range]:
     return find(strategies.to_one_of_suitable_maps(next_map))
+
+
+@pytest.fixture(scope='session')
+def transparent_function() -> Callable[..., Range]:
+    return find(strategies.transparent_functions)
+
+
+@pytest.fixture(scope='session')
+def transparent_function_args(transparent_function) -> Tuple[Domain, ...]:
+    return find(strategies.to_transparent_functions_args(transparent_function))
+
+
+@pytest.fixture(scope='session')
+def transparent_function_kwargs(transparent_function) -> Dict[str, Domain]:
+    return find(strategies
+                .to_transparent_functions_kwargs(transparent_function))
