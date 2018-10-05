@@ -1,7 +1,7 @@
 from collections import abc
-from functools import singledispatch
 from itertools import (starmap,
                        zip_longest)
+from operator import eq
 from typing import (Any,
                     Iterable)
 
@@ -38,20 +38,12 @@ def find(strategy: SearchStrategy) -> Any:
             return result
 
 
-@singledispatch
-def are_similar(left_object: Any,
-                right_object: Any) -> bool:
-    return left_object == right_object
-
-
-@are_similar.register(abc.Iterable)
 def are_iterables_similar(left_iterable: Iterable[Any],
                           right_iterable: Iterable[Any]) -> bool:
     if not isinstance(right_iterable, abc.Iterable):
         return False
-    return all(starmap(are_similar,
-                       zip_longest(left_iterable, right_iterable,
-                                   # we're assuming that ``object()``
-                                   # will create some unique object
-                                   # not presented in any of arguments
-                                   fillvalue=object())))
+    return all(starmap(eq, zip_longest(left_iterable, right_iterable,
+                                       # we're assuming that ``object()``
+                                       # will create some unique object
+                                       # not presented in any of arguments
+                                       fillvalue=object())))
