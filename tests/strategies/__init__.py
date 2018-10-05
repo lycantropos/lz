@@ -4,11 +4,10 @@ from .definitions import (built_in_functions,
                           methods,
                           methods_descriptors)
 from .functional import (false_predicates,
-                         last_maps,
                          maps,
                          maps_arguments,
-                         next_maps,
                          predicates,
+                         to_one_of_suitable_maps,
                          true_predicates)
 from .literals import (keywords_arguments,
                        objects,

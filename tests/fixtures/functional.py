@@ -35,10 +35,10 @@ def map_argument() -> Domain:
 
 
 @pytest.fixture(scope='session')
-def next_map() -> Map[Range, Intermediate]:
-    return find(strategies.next_maps)
+def next_map(map_: Map[Domain, Range]) -> Map[Range, Intermediate]:
+    return find(strategies.to_one_of_suitable_maps(map_))
 
 
 @pytest.fixture(scope='session')
-def last_map() -> Map[Intermediate, Range]:
-    return find(strategies.last_maps)
+def last_map(next_map: Map[Range, Intermediate]) -> Map[Intermediate, Range]:
+    return find(strategies.to_one_of_suitable_maps(next_map))
