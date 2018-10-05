@@ -14,7 +14,6 @@ from .functional import (false_predicates,
                          true_predicates)
 from .iterating import groupers_keys
 from .literals import (hashables_iterables,
-                       iterables,
                        keywords_arguments,
                        objects,
                        positionals_arguments,

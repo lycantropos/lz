@@ -1,4 +1,5 @@
-from typing import Hashable
+from typing import (Any,
+                    Hashable)
 
 import pytest
 
@@ -8,7 +9,7 @@ from tests.utils import find
 
 
 @pytest.fixture(scope='function')
-def grouper_key() -> Map[Hashable, Hashable]:
+def grouper_key() -> Map[Any, Hashable]:
     return find(strategies.groupers_keys)
 
 

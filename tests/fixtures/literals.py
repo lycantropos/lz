@@ -1,6 +1,5 @@
 from typing import (Any,
                     Dict,
-                    Hashable,
                     Iterable,
                     Tuple)
 
@@ -27,9 +26,4 @@ def keyword_arguments() -> Dict[str, Any]:
 
 @pytest.fixture(scope='function')
 def iterable() -> Iterable[Any]:
-    return find(strategies.iterables)
-
-
-@pytest.fixture(scope='function')
-def hashables_iterable() -> Iterable[Hashable]:
     return find(strategies.hashables_iterables)
