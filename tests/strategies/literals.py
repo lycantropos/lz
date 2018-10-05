@@ -6,6 +6,8 @@ scalars = (strategies.none()
            | strategies.integers()
            | strategies.floats(allow_nan=True,
                                allow_infinity=True)
+           | strategies.complex_numbers(allow_nan=True,
+                                        allow_infinity=True)
            | strings)
 hashables = (scalars
              | strategies.frozensets(strategies.deferred(lambda: hashables))
