@@ -8,6 +8,9 @@ from hypothesis import strategies
 
 from lz.functional import (identity,
                            to_constant)
+from tests.strategies.factories import (to_iterables,
+                                        to_lists,
+                                        to_strings)
 from .literals import (integers,
                        json_serializable_objects,
                        numbers,
@@ -43,10 +46,10 @@ transparent_functions_args = {
     int: strategies.tuples(integers),
     json.dumps: strategies.tuples(json_serializable_objects),
     json.loads: strategies.tuples(json_serializable_objects.map(json.dumps)),
-    os.path.join: strategies.lists(strategies.text(os_path_name_characters),
-                                   min_size=1).map(tuple),
+    os.path.join: to_lists(to_strings(os_path_name_characters),
+                           min_size=1).map(tuple),
     str: strategies.tuples(objects),
-    sum: strategies.tuples(strategies.iterables(numbers)),
+    sum: strategies.tuples(to_iterables(numbers)),
 }
 empty_dictionaries = strategies.fixed_dictionaries({})
 transparent_functions_kwargs = {
