@@ -1,4 +1,5 @@
 import string
+import sys
 
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
@@ -23,7 +24,8 @@ hashables_iterables = strategies.iterables(hashables)
 deferred_objects = strategies.deferred(lambda: objects)
 lists = strategies.lists(deferred_objects)
 tuples = lists.map(tuple)
-slices_fields = strategies.none() | strategies.integers()
+indices = strategies.integers(0, sys.maxsize)
+slices_fields = strategies.none() | indices
 slices = strategies.builds(slice,
                            slices_fields,
                            slices_fields,
