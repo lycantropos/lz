@@ -12,7 +12,9 @@ from .functional import (false_predicates,
                          to_transparent_functions_kwargs,
                          transparent_functions,
                          true_predicates)
-from .literals import (iterables,
+from .iterating import groupers_keys
+from .literals import (hashables_iterables,
+                       iterables,
                        keywords_arguments,
                        objects,
                        positionals_arguments)
