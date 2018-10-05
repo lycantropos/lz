@@ -51,9 +51,6 @@ class Path:
     def parent(self) -> 'Path':
         return type(self)(*self.parts[:-1])
 
-    def with_name(self, name: str) -> 'Path':
-        return type(self)(*self.parts[:-1], name)
-
     def with_parent(self, parent: 'Path') -> 'Path':
         return type(self)(*parent.parts, *self.parts[len(parent.parts):])
 
