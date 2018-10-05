@@ -14,7 +14,7 @@ def object_() -> Any:
 
 
 @pytest.fixture(scope='function')
-def positional_arguments() -> Tuple:
+def positional_arguments() -> Tuple[Any, ...]:
     return find(strategies.positionals_arguments)
 
 
