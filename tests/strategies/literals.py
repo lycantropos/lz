@@ -24,7 +24,13 @@ deferred_objects = strategies.deferred(lambda: objects)
 lists = strategies.lists(deferred_objects)
 tuples = lists.map(tuple)
 iterables = strategies.iterables(deferred_objects)
+slices_fields = strategies.none() | strategies.integers()
+slices = strategies.builds(slice,
+                           slices_fields,
+                           slices_fields,
+                           slices_fields)
 objects = (hashables
+           | slices
            | strategies.dictionaries(hashables, deferred_objects)
            | iterables
            | lists

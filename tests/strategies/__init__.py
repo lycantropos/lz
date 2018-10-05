@@ -17,4 +17,5 @@ from .literals import (hashables_iterables,
                        iterables,
                        keywords_arguments,
                        objects,
-                       positionals_arguments)
+                       positionals_arguments,
+                       slices)
