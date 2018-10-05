@@ -17,5 +17,7 @@ def is_odd(number: int) -> bool:
     return bool(number & 1)
 
 
-groupers_keys = (strategies.just(identity)
-                 | strategies.integers(1).filter(is_odd).map(to_grouper_key))
+groupers_keys = (strategies.integers(1, 1000)
+                 .filter(is_odd)
+                 .map(to_grouper_key)
+                 | strategies.just(identity))
