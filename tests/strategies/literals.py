@@ -22,9 +22,10 @@ hashables = (scalars
 deferred_objects = strategies.deferred(lambda: objects)
 lists = strategies.lists(deferred_objects)
 tuples = lists.map(tuple)
+iterables = strategies.iterables(deferred_objects)
 objects = (hashables
            | strategies.dictionaries(hashables, deferred_objects)
-           | strategies.iterables(deferred_objects)
+           | iterables
            | lists
            | strategies.sets(hashables)
            | tuples)

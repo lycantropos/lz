@@ -1,5 +1,6 @@
 from typing import (Any,
                     Dict,
+                    Iterable,
                     Tuple)
 
 import pytest
@@ -21,3 +22,8 @@ def positional_arguments() -> Tuple[Any, ...]:
 @pytest.fixture(scope='function')
 def keyword_arguments() -> Dict[str, Any]:
     return find(strategies.keywords_arguments)
+
+
+@pytest.fixture(scope='function')
+def iterable() -> Iterable[Any]:
+    return find(strategies.iterables)

@@ -1,4 +1,8 @@
-from typing import Any
+from itertools import (starmap,
+                       zip_longest)
+from operator import eq
+from typing import (Any,
+                    Iterable)
 
 from hypothesis import (Phase,
                         core,
@@ -31,3 +35,12 @@ def find(strategy: SearchStrategy) -> Any:
             raise unpacking_error from search_error
         else:
             return result
+
+
+def has_same_elements(left_iterable: Iterable[Any],
+                      right_iterable: Iterable[Any]) -> bool:
+    return all(starmap(eq, zip_longest(left_iterable, right_iterable,
+                                       # we're assuming that ``object()``
+                                       # will create some unique object
+                                       # not presented in any of arguments
+                                       fillvalue=object())))

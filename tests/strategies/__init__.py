@@ -12,6 +12,7 @@ from .functional import (false_predicates,
                          to_transparent_functions_kwargs,
                          transparent_functions,
                          true_predicates)
-from .literals import (keywords_arguments,
+from .literals import (iterables,
+                       keywords_arguments,
                        objects,
                        positionals_arguments)
