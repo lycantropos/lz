@@ -4,11 +4,11 @@ strings = strategies.text()
 integers = (strategies.booleans()
             | strategies.integers())
 real_numbers = (integers
-                | strategies.floats(allow_nan=True,
-                                    allow_infinity=True))
+                | strategies.floats(allow_nan=False,
+                                    allow_infinity=False))
 numbers = (real_numbers
-           | strategies.complex_numbers(allow_nan=True,
-                                        allow_infinity=True))
+           | strategies.complex_numbers(allow_nan=False,
+                                        allow_infinity=False))
 scalars = (strategies.none()
            | numbers
            | strings)
