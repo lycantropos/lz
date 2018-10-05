@@ -1,13 +1,14 @@
 from hypothesis import strategies
 
 strings = strategies.text()
-scalars = (strategies.none()
-           | strategies.booleans()
+numbers = (strategies.booleans()
            | strategies.integers()
            | strategies.floats(allow_nan=True,
                                allow_infinity=True)
            | strategies.complex_numbers(allow_nan=True,
-                                        allow_infinity=True)
+                                        allow_infinity=True))
+scalars = (strategies.none()
+           | numbers
            | strings)
 hashables = (scalars
              | strategies.frozensets(strategies.deferred(lambda: hashables))
