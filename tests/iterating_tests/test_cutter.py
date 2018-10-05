@@ -3,7 +3,7 @@ from typing import (Any,
                     Iterable)
 
 from lz.iterating import cutter
-from tests.utils import has_same_elements
+from tests.utils import are_similar
 
 
 def test_basic(iterable: Iterable[Any],
@@ -14,4 +14,4 @@ def test_basic(iterable: Iterable[Any],
     result = cut(target)
     original_list = list(original)
 
-    assert has_same_elements(result, original_list[cutter_slice])
+    assert are_similar(result, original_list[cutter_slice])

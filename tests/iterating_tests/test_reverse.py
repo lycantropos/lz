@@ -3,7 +3,7 @@ from typing import (Any,
                     Iterable)
 
 from lz.iterating import reverse
-from tests.utils import has_same_elements
+from tests.utils import are_similar
 
 
 def test_basic(iterable: Iterable[Any]) -> None:
@@ -11,7 +11,7 @@ def test_basic(iterable: Iterable[Any]) -> None:
 
     result = reverse(target)
 
-    assert has_same_elements(result, list(original)[::-1])
+    assert are_similar(result, list(original)[::-1])
 
 
 def test_involution(iterable: Iterable[Any]) -> None:
@@ -19,4 +19,4 @@ def test_involution(iterable: Iterable[Any]) -> None:
 
     result = reverse(reverse(target))
 
-    assert has_same_elements(result, original)
+    assert are_similar(result, original)
