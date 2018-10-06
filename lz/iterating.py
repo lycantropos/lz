@@ -9,7 +9,8 @@ from typing import (Hashable,
                     Mapping,
                     Tuple)
 
-from .functional import compose
+from .functional import (combine,
+                         compose)
 from .hints import (Domain,
                     Map,
                     Operator,
@@ -50,11 +51,11 @@ def cutter(slice_: slice) -> Map[Iterable[Domain], Iterable[Domain]]:
 
 
 def chopper(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
-    def chop(iterable: Iterable[Domain]) -> Iterable[Tuple[Domain, ...]]:
-        iterator = iter(iterable)
-        yield from zip(*itertools.repeat(iterator, size))
-
-    return chop
+    cut = compose(tuple, cutter(slice(size)))
+    return compose(grabber(),
+                   combine(itertools.repeat(cut)),
+                   itertools.repeat,
+                   iter)
 
 
 def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
