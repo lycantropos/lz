@@ -1,10 +1,10 @@
 from itertools import (islice,
                        tee)
-from numbers import Real
 from typing import (Any,
                     Iterable)
 
 from lz.iterating import cutter
+from tests.configs import MAX_ITERABLES_SIZE
 from tests.utils import (are_iterables_similar,
                          capacity)
 
@@ -31,10 +31,6 @@ def test_elements(iterable: Iterable[Any],
                                         cutter_slice.step))
 
 
-def slice_to_size(slice_: slice) -> Real:
-    stop = slice_.stop
-    if stop is None:
-        return float('inf')
-    start = slice_.start or 0
-    step = slice_.step or 1
-    return (stop - start) / step
+def slice_to_size(slice_: slice) -> int:
+    start, stop, step = slice_.indices(MAX_ITERABLES_SIZE)
+    return max(1 + (stop - 1 - start) // step, 0)
