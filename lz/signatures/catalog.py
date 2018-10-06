@@ -22,11 +22,6 @@ class Path:
     def __repr__(self) -> str:
         return self.SEPARATOR.join(self.parts)
 
-    def __lt__(self, other: 'Path') -> bool:
-        if not isinstance(other, Path):
-            return NotImplemented
-        return self.parts < other.parts
-
     def __eq__(self, other: 'Path') -> bool:
         if not isinstance(other, Path):
             return NotImplemented
@@ -35,17 +30,10 @@ class Path:
     def __hash__(self) -> int:
         return hash(self.parts)
 
-    def __bool__(self) -> bool:
-        return bool(self.parts)
-
     def join(self, other: 'Path') -> 'Path':
         if not isinstance(other, Path):
             return NotImplemented
         return type(self)(*self.parts, *other.parts)
-
-    @property
-    def name(self) -> str:
-        return self.parts[-1]
 
     @property
     def parent(self) -> 'Path':
