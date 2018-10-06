@@ -47,3 +47,7 @@ def are_iterables_similar(left_iterable: Iterable[Any],
                                        # will create some unique object
                                        # not presented in any of arguments
                                        fillvalue=object())))
+
+
+def capacity(iterable: Iterable[Any]) -> int:
+    return sum(1 for _ in iterable)
