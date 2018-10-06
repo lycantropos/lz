@@ -27,7 +27,7 @@ replacing_modules_names = {
 if sys.platform == 'win32':
     import nt
 
-    replacing_modules_names['posix'] = [nt]
+    replacing_modules_names['posix'] = [nt.__name__]
 to_replacing_modules_names = compose(flatten,
                                      sifter(),
                                      mapper(replacing_modules_names.get))
