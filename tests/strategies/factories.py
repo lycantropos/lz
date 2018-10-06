@@ -2,7 +2,7 @@ from functools import partial
 
 from hypothesis import strategies
 
-from .configs import MAX_ITERABLES_SIZE
+from tests.configs import MAX_ITERABLES_SIZE
 
 limit_max_size = partial(partial,
                          max_size=MAX_ITERABLES_SIZE)

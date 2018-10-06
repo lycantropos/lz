@@ -3,7 +3,7 @@ import string
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
-from .configs import MAX_ITERABLES_SIZE
+from tests.configs import MAX_ITERABLES_SIZE
 from .factories import (to_dictionaries,
                         to_frozensets,
                         to_iterables,
