@@ -16,3 +16,8 @@ def grouper_key() -> Map[Any, Hashable]:
 @pytest.fixture(scope='function')
 def cutter_slice() -> slice:
     return find(strategies.slices)
+
+
+@pytest.fixture(scope='function')
+def chopper_size() -> int:
+    return find(strategies.indices)
