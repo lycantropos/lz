@@ -88,10 +88,10 @@ if platform.python_implementation() != 'PyPy':
         to_parameters = compose(
                 sifter(),
                 flatten,
-                combine(to_positional_parameters,
-                        compose(expand, to_variadic_positional_parameter),
-                        to_keyword_parameters,
-                        compose(expand, to_variadic_keyword_parameter)),
+                combine([to_positional_parameters,
+                         compose(expand, to_variadic_positional_parameter),
+                         to_keyword_parameters,
+                         compose(expand, to_variadic_keyword_parameter)]),
                 repeat)
         parameters = to_parameters(object_)
         return Signature(*parameters)

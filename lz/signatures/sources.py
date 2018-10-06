@@ -92,7 +92,7 @@ def generate_stubs_cache_items(root: Path
                            ) -> Iterable[Tuple[catalog.Path, Path]]:
         to_module_full_name = module_full_name_factory(directory)
         finder = compose(pack(zip),
-                         combine(mapper(to_module_full_name), identity),
+                         combine([mapper(to_module_full_name), identity]),
                          copier(2),
                          sifter(is_stub),
                          find_files)

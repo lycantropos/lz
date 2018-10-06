@@ -31,18 +31,8 @@ def compose(last_function: Map[Any, Range],
     return functools.reduce(binary_compose, functions)
 
 
-def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
-    def chop(arguments: Iterable[Domain]) -> Tuple[Domain, ...]:
-        return tuple(itertools.islice(arguments, len(maps)))
-
+def combine(maps: Iterable[Map]) -> Map[Iterable[Domain], Iterable[Range]]:
     def combined(arguments: Iterable[Domain]) -> Iterable[Range]:
-        arguments = chop(arguments)
-        if len(arguments) != len(maps):
-            raise ValueError('There should be {count} arguments '
-                             'for each of maps, '
-                             'but found {actual_count}.'
-                             .format(count=len(maps),
-                                     actual_count=len(arguments)))
         yield from (map_(argument)
                     for map_, argument in zip(maps, arguments))
 
