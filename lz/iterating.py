@@ -26,6 +26,18 @@ def sifter(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     return functools.partial(filter, predicate)
 
 
+def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
+    if predicate is None:
+        predicate = bool
+    return functools.partial(itertools.takewhile, predicate)
+
+
+def kicker(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
+    if predicate is None:
+        predicate = bool
+    return functools.partial(itertools.dropwhile, predicate)
+
+
 def cutter(slice_: slice) -> Map[Iterable[Domain], Iterable[Domain]]:
     start = slice_.start
     stop = slice_.stop
