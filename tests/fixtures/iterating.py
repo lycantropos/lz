@@ -21,3 +21,8 @@ def cutter_slice() -> slice:
 @pytest.fixture(scope='function')
 def chopper_size() -> int:
     return find(strategies.indices)
+
+
+@pytest.fixture(scope='function')
+def slider_size(min_iterables_size: int) -> int:
+    return find(strategies.to_integers(0, min_iterables_size))

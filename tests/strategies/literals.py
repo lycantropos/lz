@@ -27,7 +27,6 @@ hashables = (scalars
              | to_frozensets(strategies.deferred(lambda: hashables))
              | to_lists(strategies.deferred(lambda: hashables))
              .map(tuple))
-hashables_iterables = to_iterables(hashables)
 deferred_objects = strategies.deferred(lambda: objects)
 lists = to_lists(deferred_objects)
 tuples = lists.map(tuple)
