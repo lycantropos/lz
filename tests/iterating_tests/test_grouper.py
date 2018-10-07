@@ -11,7 +11,7 @@ def test_basic(iterable: Iterable[Any],
                grouper_key: Map[Any, Hashable]) -> None:
     original, target = tee(iterable)
 
-    groups = grouper(grouper_key)(original)
+    groups = grouper(grouper_key)(target)
     original_list = list(original)
 
     assert all(element in group
