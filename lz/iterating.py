@@ -2,7 +2,8 @@ import functools
 import itertools
 import sys
 from collections import (abc,
-                         defaultdict)
+                         defaultdict,
+                         deque)
 from typing import (Hashable,
                     Iterable,
                     List,
@@ -138,4 +139,7 @@ def copier(count: int) -> Map[Iterable[Domain], Iterable[Iterable[Domain]]]:
     return copy
 
 
-first = compose(next, iter)
+first = compose(next, iter)
+last = compose(deque.pop,
+               functools.partial(deque,
+                                 maxlen=1))
