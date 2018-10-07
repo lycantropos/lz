@@ -136,3 +136,6 @@ def copier(count: int) -> Map[Iterable[Domain], Iterable[Iterable[Domain]]]:
         yield from itertools.tee(iterable, count)
 
     return copy
+
+
+first = compose(next, iter)
