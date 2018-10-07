@@ -2,6 +2,7 @@ from typing import (Any,
                     Iterable)
 
 from lz import left
+from lz.iterating import first
 
 
 def test_basic(iterable: Iterable[Any],
@@ -9,6 +10,5 @@ def test_basic(iterable: Iterable[Any],
     attach = left.attacher(object_)
 
     result = attach(iterable)
-    result_iterator = iter(result)
 
-    assert next(result_iterator) is object_
+    assert first(result) is object_
