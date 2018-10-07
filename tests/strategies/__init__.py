@@ -20,4 +20,5 @@ from .literals import (hashables,
                        keywords_arguments,
                        objects,
                        positionals_arguments,
-                       slices)
+                       slices,
+                       sortable_iterables)

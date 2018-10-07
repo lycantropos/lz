@@ -36,12 +36,13 @@ slices = strategies.builds(slice,
                            slices_fields,
                            slices_fields,
                            slices_fields)
+sets = to_sets(hashables)
 objects = (hashables
            | slices
            | to_dictionaries(hashables, deferred_objects)
            | to_iterables(deferred_objects)
            | lists
-           | to_sets(hashables)
+           | sets
            | tuples)
 
 
@@ -58,3 +59,6 @@ json_serializable_objects = strategies.recursive(
         extend_json)
 positionals_arguments = tuples
 keywords_arguments = to_dictionaries(strings, objects)
+
+sortable_iterables = strategies.one_of(*map(to_iterables,
+                                            [real_numbers, strings, sets]))

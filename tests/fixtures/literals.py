@@ -33,3 +33,8 @@ def min_iterables_size() -> int:
 def iterable(min_iterables_size: int) -> Iterable[Any]:
     return find(strategies.to_iterables(strategies.hashables,
                                         min_size=min_iterables_size))
+
+
+@pytest.fixture(scope='function')
+def sortable_iterable() -> Iterable[Any]:
+    return find(strategies.sortable_iterables)
