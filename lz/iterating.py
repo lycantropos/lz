@@ -62,12 +62,6 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
     def slide(iterable: Iterable[Domain]) -> Iterable[Tuple[Domain, ...]]:
         iterator = iter(iterable)
         result = tuple(itertools.islice(iterator, size))
-        if len(result) < size:
-            raise ValueError('Iterable should have size '
-                             'not less than {min_size}, '
-                             'but found {actual_size}.'
-                             .format(min_size=size,
-                                     actual_size=len(result)))
 
         def shift(previous: Tuple[Domain, ...],
                   element: Domain) -> Tuple[Domain, ...]:

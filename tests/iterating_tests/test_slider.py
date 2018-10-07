@@ -6,7 +6,6 @@ from typing import (Any,
 import pytest
 
 from lz.iterating import slider
-from tests.configs import MAX_ITERABLES_SIZE
 
 
 def test_basic(iterable: Iterable[Any],
@@ -27,14 +26,4 @@ def test_basic(iterable: Iterable[Any],
         next(original)
 
     with pytest.raises(StopIteration):
-        next(result_iterator)
-
-
-def test_invalid_size(iterable: Iterable[Any]) -> None:
-    invalid_slide = slider(MAX_ITERABLES_SIZE + 1)
-
-    result = invalid_slide(iterable)
-    result_iterator = iter(result)
-
-    with pytest.raises(ValueError):
         next(result_iterator)
