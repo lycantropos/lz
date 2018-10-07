@@ -37,3 +37,14 @@ def test_capacity(sortable_iterable: Iterable[Domain]) -> None:
     result = sort(target)
 
     assert capacity(result) == capacity(original)
+
+
+def test_elements(sortable_iterable: Iterable[Domain]) -> None:
+    original, target = tee(sortable_iterable)
+    sort = sorter()
+
+    result = sort(target)
+    original_list = list(original)
+
+    assert all(element in original_list
+               for element in result)
