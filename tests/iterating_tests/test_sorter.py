@@ -4,7 +4,8 @@ from typing import Iterable
 from lz.hints import Domain
 from lz.iterating import (slider,
                           sorter)
-from tests.utils import capacity
+from tests.utils import (are_iterables_similar,
+                         capacity)
 
 
 def test_order(sortable_iterable: Iterable[Domain]) -> None:
@@ -48,3 +49,13 @@ def test_elements(sortable_iterable: Iterable[Domain]) -> None:
 
     assert all(element in original_list
                for element in result)
+
+
+def test_idempotence(sortable_iterable: Iterable[Domain]) -> None:
+    first_target, second_target = tee(sortable_iterable)
+    sort = sorter()
+
+    sorted_result = sort(first_target)
+    double_sorted_result = sort(sort(second_target))
+
+    assert are_iterables_similar(double_sorted_result, sorted_result)
