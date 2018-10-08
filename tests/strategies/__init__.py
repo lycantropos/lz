@@ -7,12 +7,16 @@ from .functional import (false_predicates,
                          maps,
                          maps_arguments,
                          predicates,
+                         projectors,
                          to_one_of_suitable_maps,
+                         to_projectors_domains,
+                         to_projectors_domains_initials,
                          to_transparent_functions_args,
                          to_transparent_functions_kwargs,
                          transparent_functions,
                          true_predicates)
 from .iterating import groupers_keys
+from .literals import empty
 from .literals.base import (hashables,
                             indices,
                             keywords_arguments,

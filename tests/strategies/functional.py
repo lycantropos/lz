@@ -3,16 +3,28 @@ import os
 import string
 from collections import OrderedDict
 from decimal import Decimal
+from operator import (add,
+                      and_,
+                      mul,
+                      or_,
+                      sub,
+                      xor)
 
 from hypothesis import strategies
 
 from lz.functional import (identity,
                            to_constant)
+from .literals import empty
 from .literals.base import (integers,
                             json_serializable_objects,
+                            lists,
                             numbers,
                             objects,
-                            real_numbers)
+                            real_numbers,
+                            sets,
+                            sortable_domains,
+                            strings,
+                            tuples)
 from .literals.factories import (to_iterables,
                                  to_lists,
                                  to_strings)
@@ -51,13 +63,12 @@ transparent_functions_args = {
     str: strategies.tuples(objects),
     sum: strategies.tuples(to_iterables(numbers)),
 }
-empty_dictionaries = strategies.fixed_dictionaries({})
 transparent_functions_kwargs = {
-    bool: empty_dictionaries,
-    complex: empty_dictionaries,
-    float: empty_dictionaries,
-    identity: empty_dictionaries,
-    int: empty_dictionaries,
+    bool: empty.dictionaries,
+    complex: empty.dictionaries,
+    float: empty.dictionaries,
+    identity: empty.dictionaries,
+    int: empty.dictionaries,
     json.dumps: strategies.fixed_dictionaries(
             {'indent': strategies.integers(0, 10),
              'sort_keys': strategies.booleans()}),
@@ -67,9 +78,44 @@ transparent_functions_kwargs = {
                                                                     Decimal]),
         'parse_int': strategies.none() | strategies.sampled_from([int,
                                                                   float])}),
-    os.path.join: empty_dictionaries,
-    str: empty_dictionaries,
-    sum: empty_dictionaries,
+    os.path.join: empty.dictionaries,
+    str: empty.dictionaries,
+    sum: empty.dictionaries,
 }
 to_transparent_functions_args = transparent_functions_args.__getitem__
 to_transparent_functions_kwargs = transparent_functions_kwargs.__getitem__
+projectors = strategies.sampled_from([add, and_, max, min, mul, or_,
+                                      os.path.join, sub, xor])
+projectors_domains = {add: [lists, numbers, strings, tuples],
+                      and_: [sets],
+                      max: sortable_domains,
+                      min: sortable_domains,
+                      mul: [numbers],
+                      or_: [sets],
+                      os.path.join: [paths_names_parts],
+                      sub: [numbers, sets],
+                      xor: [sets]}
+projectors_domains = dict(zip(projectors_domains.keys(),
+                              map(strategies.sampled_from,
+                                  projectors_domains.values())))
+projectors_domains_initials = {
+    (add, lists): empty.lists,
+    (add, numbers): strategies.just(0),
+    (and_, sets): sets,
+    (add, strings): empty.strings,
+    (add, tuples): empty.tuples,
+    (max, real_numbers): strategies.just(float('-inf')),
+    (max, sets): empty.sets,
+    (max, strings): empty.strings,
+    (min, real_numbers): strategies.just(float('inf')),
+    (min, sets): empty.sets,
+    (min, strings): empty.strings,
+    (mul, numbers): strategies.just(1),
+    (or_, sets): empty.sets,
+    (os.path.join, paths_names_parts): empty.strings,
+    (sub, numbers): strategies.just(0),
+    (sub, sets): empty.sets,
+    (xor, sets): empty.sets
+}
+to_projectors_domains = projectors_domains.__getitem__
+to_projectors_domains_initials = projectors_domains_initials.__getitem__
