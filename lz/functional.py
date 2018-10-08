@@ -1,10 +1,8 @@
 import functools
-import itertools
 import operator
 from typing import (Any,
                     Callable,
-                    Iterable,
-                    Tuple)
+                    Iterable)
 
 from .hints import (Domain,
                     Intermediate,
