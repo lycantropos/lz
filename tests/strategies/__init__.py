@@ -3,8 +3,6 @@ from .definitions import (built_in_functions,
                           functions,
                           methods,
                           methods_descriptors)
-from .factories import (to_integers,
-                        to_iterables)
 from .functional import (false_predicates,
                          maps,
                          maps_arguments,
@@ -15,10 +13,12 @@ from .functional import (false_predicates,
                          transparent_functions,
                          true_predicates)
 from .iterating import groupers_keys
-from .literals import (hashables,
-                       indices,
-                       keywords_arguments,
-                       objects,
-                       positionals_arguments,
-                       slices,
-                       sortable_iterables)
+from .literals.base import (hashables,
+                            indices,
+                            keywords_arguments,
+                            objects,
+                            positionals_arguments,
+                            slices,
+                            sortable_iterables)
+from .literals.factories import (to_integers,
+                                 to_iterables)

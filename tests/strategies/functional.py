@@ -8,14 +8,14 @@ from hypothesis import strategies
 
 from lz.functional import (identity,
                            to_constant)
-from tests.strategies.factories import (to_iterables,
-                                        to_lists,
-                                        to_strings)
-from .literals import (integers,
-                       json_serializable_objects,
-                       numbers,
-                       objects,
-                       real_numbers)
+from .literals.base import (integers,
+                            json_serializable_objects,
+                            numbers,
+                            objects,
+                            real_numbers)
+from .literals.factories import (to_iterables,
+                                 to_lists,
+                                 to_strings)
 
 false_predicates = strategies.just(to_constant(False))
 true_predicates = strategies.just(to_constant(True))

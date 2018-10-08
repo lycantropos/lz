@@ -60,5 +60,5 @@ json_serializable_objects = strategies.recursive(
 positionals_arguments = tuples
 keywords_arguments = to_dictionaries(strings, objects)
 
-sortable_iterables = strategies.one_of(*map(to_iterables,
-                                            [real_numbers, strings, sets]))
+sortable_domains = [real_numbers, sets, strings]
+sortable_iterables = strategies.one_of(*map(to_iterables, sortable_domains))
