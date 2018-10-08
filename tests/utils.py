@@ -1,4 +1,3 @@
-from collections import abc
 from itertools import (starmap,
                        zip_longest)
 from operator import eq
@@ -40,8 +39,6 @@ def find(strategy: SearchStrategy) -> Any:
 
 def are_iterables_similar(left_iterable: Iterable[Any],
                           right_iterable: Iterable[Any]) -> bool:
-    if not isinstance(right_iterable, abc.Iterable):
-        return False
     return all(starmap(eq, zip_longest(left_iterable, right_iterable,
                                        # we're assuming that ``object()``
                                        # will create some unique object
