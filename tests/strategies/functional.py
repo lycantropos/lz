@@ -37,7 +37,7 @@ maps_arguments = (strategies.integers()
 transparent_functions = strategies.sampled_from([bool, complex, float,
                                                  identity, int,
                                                  json.dumps, json.loads, str])
-os_path_name_characters = string.digits + string.ascii_letters + '_'
+paths_names_parts = to_strings(string.digits + string.ascii_letters + '_')
 transparent_functions_args = {
     bool: strategies.tuples(objects),
     complex: strategies.tuples(numbers),
@@ -46,7 +46,7 @@ transparent_functions_args = {
     int: strategies.tuples(integers),
     json.dumps: strategies.tuples(json_serializable_objects),
     json.loads: strategies.tuples(json_serializable_objects.map(json.dumps)),
-    os.path.join: to_lists(to_strings(os_path_name_characters),
+    os.path.join: to_lists(paths_names_parts,
                            min_size=1).map(tuple),
     str: strategies.tuples(objects),
     sum: strategies.tuples(to_iterables(numbers)),
