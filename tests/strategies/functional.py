@@ -84,13 +84,12 @@ transparent_functions_kwargs = {
 }
 to_transparent_functions_args = transparent_functions_args.__getitem__
 to_transparent_functions_kwargs = transparent_functions_kwargs.__getitem__
-projectors = strategies.sampled_from([add, and_, max, min, mul, or_,
+projectors = strategies.sampled_from([add, and_, max, min, or_,
                                       os.path.join, sub, xor])
 projectors_domains = {add: [lists, numbers, strings, tuples],
                       and_: [sets],
                       max: sortable_domains,
                       min: sortable_domains,
-                      mul: [numbers],
                       or_: [sets],
                       os.path.join: [paths_names_parts],
                       sub: [numbers, sets],
@@ -110,7 +109,6 @@ projectors_domains_initials = {
     (min, real_numbers): strategies.just(float('inf')),
     (min, sets): empty.sets,
     (min, strings): empty.strings,
-    (mul, numbers): strategies.just(1),
     (or_, sets): empty.sets,
     (os.path.join, paths_names_parts): empty.strings,
     (sub, numbers): strategies.just(0),

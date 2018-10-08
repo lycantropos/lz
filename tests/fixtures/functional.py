@@ -1,7 +1,3 @@
-import math
-from functools import reduce
-from numbers import Complex
-from operator import mul
 from typing import (Callable,
                     Dict,
                     Iterable,
@@ -94,21 +90,6 @@ def projector_initial(projector: Callable[[Domain, Domain], Domain],
 
 
 @pytest.fixture(scope='function')
-def projector_iterable(projector_domain: SearchStrategy,
-                       projector_domain_element: Domain,
-                       projector_initial: Range) -> Iterable[Domain]:
-    strategy = strategies.to_iterables(projector_domain,
-                                       min_size=1)
-    if isinstance(projector_domain_element, Complex):
-        def is_numbers_iterable_valid(iterable: Iterable[Domain]) -> bool:
-            return math.isfinite(reduce(mul, map(safe_abs, iterable),
-                                        abs(projector_initial)))
-
-        def safe_abs(number: Complex) -> float:
-            try:
-                return abs(number)
-            except OverflowError:
-                return float('inf')
-
-        strategy = strategy.filter(is_numbers_iterable_valid)
-    return find(strategy)
+def projector_iterable(projector_domain: SearchStrategy) -> Iterable[Domain]:
+    return find(strategies.to_iterables(projector_domain,
+                                        min_size=1))
