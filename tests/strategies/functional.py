@@ -5,7 +5,6 @@ from collections import OrderedDict
 from decimal import Decimal
 from operator import (add,
                       and_,
-                      mul,
                       or_,
                       sub,
                       xor)
