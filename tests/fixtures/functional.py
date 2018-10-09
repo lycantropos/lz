@@ -30,47 +30,47 @@ def true_predicate() -> Predicate:
     return find(strategies.true_predicates)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def map_() -> Map[Domain, Range]:
     return find(strategies.maps)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def map_argument() -> Domain:
     return find(strategies.maps_arguments)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def next_map(map_: Map[Domain, Range]) -> Map[Range, Intermediate]:
     return find(strategies.to_one_of_suitable_maps(map_))
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def last_map(next_map: Map[Range, Intermediate]) -> Map[Intermediate, Range]:
     return find(strategies.to_one_of_suitable_maps(next_map))
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def suitable_maps() -> Tuple[Map, ...]:
     return find(strategies.suitable_maps)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def next_suitable_map(suitable_maps: Tuple[Map, ...]) -> Map:
     return find(strategies.to_one_of_suitable_maps(suitable_maps[0]))
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def transparent_function() -> Callable[..., Range]:
     return find(strategies.transparent_functions)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def transparent_function_args(transparent_function) -> Tuple[Domain, ...]:
     return find(strategies.to_transparent_functions_args(transparent_function))
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def transparent_function_kwargs(transparent_function) -> Dict[str, Domain]:
     return find(strategies
                 .to_transparent_functions_kwargs(transparent_function))
