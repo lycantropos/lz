@@ -51,6 +51,16 @@ def last_map(next_map: Map[Range, Intermediate]) -> Map[Intermediate, Range]:
 
 
 @pytest.fixture(scope='session')
+def suitable_maps() -> Tuple[Map, ...]:
+    return find(strategies.suitable_maps)
+
+
+@pytest.fixture(scope='session')
+def next_suitable_map(suitable_maps: Tuple[Map, ...]) -> Map:
+    return find(strategies.to_one_of_suitable_maps(suitable_maps[0]))
+
+
+@pytest.fixture(scope='session')
 def transparent_function() -> Callable[..., Range]:
     return find(strategies.transparent_functions)
 

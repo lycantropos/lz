@@ -8,11 +8,15 @@ from operator import (add,
                       or_,
                       sub,
                       xor)
+from typing import (Any,
+                    Tuple)
 
 from hypothesis import strategies
+from hypothesis.searchstrategy import SearchStrategy
 
 from lz.functional import (identity,
                            to_constant)
+from lz.hints import Map
 from .literals import empty
 from .literals.base import (integers,
                             json_serializable_objects,
@@ -44,6 +48,18 @@ maps = strategies.sampled_from(starting_maps)
 maps_arguments = (strategies.integers()
                   | strategies.floats(allow_nan=False,
                                       allow_infinity=False))
+
+
+@strategies.composite
+def extend_suitable_maps(draw: Map[SearchStrategy, Any],
+                         maps_tuples: SearchStrategy) -> Tuple[Map, ...]:
+    maps_tuple = draw(maps_tuples)
+    last_map = draw(to_one_of_suitable_maps(maps_tuple[0]))
+    return (last_map,) + maps_tuple
+
+
+suitable_maps = strategies.recursive(strategies.tuples(maps),
+                                     extend_suitable_maps)
 # "transparent" is an abbr. of "referential transparent"
 transparent_functions = strategies.sampled_from([bool, complex, float,
                                                  identity, int,
