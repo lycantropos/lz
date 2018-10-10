@@ -85,14 +85,6 @@ if platform.python_implementation() != 'PyPy':
 
 
     def from_ast(object_: ast3.arguments) -> Signature:
-        to_parameters = compose(
-                sifter(),
-                flatten,
-                combine([to_positional_parameters,
-                         compose(expand, to_variadic_positional_parameter),
-                         to_keyword_parameters,
-                         compose(expand, to_variadic_keyword_parameter)]),
-                repeat)
         parameters = to_parameters(object_)
         return Signature(*parameters)
 
@@ -137,6 +129,16 @@ if platform.python_implementation() != 'PyPy':
         return Parameter(name=parameter_ast.arg,
                          kind=inspect._VAR_KEYWORD,
                          has_default=False)
+
+
+    to_parameters = compose(
+            sifter(),
+            flatten,
+            combine([to_positional_parameters,
+                     compose(expand, to_variadic_positional_parameter),
+                     to_keyword_parameters,
+                     compose(expand, to_variadic_keyword_parameter)]),
+            repeat)
 
 
     def to_parameter(parameter_ast: ast3.arg,
