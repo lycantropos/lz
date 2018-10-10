@@ -105,8 +105,8 @@ if platform.python_implementation() != 'PyPy':
         parameters_with_defaults_ast = reverse(parameters_with_defaults_ast)
         parameter_factory = partial(to_parameter,
                                     kind=inspect._POSITIONAL_ONLY)
-        yield from mapper(pack(parameter_factory))(
-                parameters_with_defaults_ast)
+        parameters_factory = mapper(pack(parameter_factory))
+        yield from parameters_factory(parameters_with_defaults_ast)
 
 
     def to_keyword_parameters(signature_ast: ast3.arguments
@@ -115,8 +115,8 @@ if platform.python_implementation() != 'PyPy':
                                            signature_ast.kw_defaults)
         parameter_factory = partial(to_parameter,
                                     kind=inspect._KEYWORD_ONLY)
-        yield from mapper(pack(parameter_factory))(
-                parameters_with_defaults_ast)
+        parameters_factory = mapper(pack(parameter_factory))
+        yield from parameters_factory(parameters_with_defaults_ast)
 
 
     def to_variadic_positional_parameter(signature_ast: ast3.arguments
