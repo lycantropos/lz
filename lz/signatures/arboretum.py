@@ -248,6 +248,10 @@ class Registry(Base):
         return parent_path.join(attribute_path)
 
 
+complete_new_style_class_bases = right.attacher(ast3.Name('object',
+                                                          ast3.Load()))
+
+
 class Reducer(Base):
     def __init__(self,
                  *,
@@ -297,7 +301,8 @@ class Reducer(Base):
 
     def visit_ClassDef(self, node: ast3.ClassDef) -> ast3.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
-        for base_path in map(self.visit, node.bases):
+        bases = complete_new_style_class_bases(node.bases)
+        for base_path in map(self.visit, bases):
             self.nodes.update({object_path.with_parent(path): node
                                for object_path, node in self.nodes.items()
                                if object_path.is_child_of(base_path)
