@@ -15,7 +15,7 @@ def test_factory(function: FunctionType,
     method_result = signatures.factory(method)
     method_descriptor_result = signatures.factory(method_descriptor)
 
-    assert isinstance(built_in_function_result, signatures.Signature)
-    assert isinstance(function_result, signatures.Signature)
-    assert isinstance(method_result, signatures.Signature)
-    assert isinstance(method_descriptor_result, signatures.Signature)
+    assert isinstance(built_in_function_result, signatures.Base)
+    assert isinstance(function_result, signatures.Base)
+    assert isinstance(method_result, signatures.Base)
+    assert isinstance(method_descriptor_result, signatures.Base)

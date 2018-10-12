@@ -5,11 +5,13 @@ from itertools import chain
 from pathlib import Path
 from typing import (Any,
                     Dict,
-                    Iterable)
+                    Iterable,
+                    List)
 
 from typed_ast import ast3
 
-from lz import left
+from lz import (left,
+                right)
 from lz.iterating import expand
 from . import (catalog,
                dictionaries,
@@ -20,20 +22,22 @@ from .hints import Namespace
 
 Nodes = Dict[catalog.Path, ast3.AST]
 
+TYPING_MODULE_PATH = catalog.factory('typing')
+OVERLOAD_DECORATORS_PATHS = {catalog.factory('typing.overload'),
+                             catalog.factory('overload')}
 
-def to_node(object_: Any) -> ast3.AST:
+
+def to_nodes(object_: Any) -> List[ast3.AST]:
     module_path = catalog.factory(catalog.module_name_factory(object_))
     object_path = catalog.factory(object_)
-    nodes = to_nodes(module_path)
-    return nodes[object_path]
-
-
-def to_nodes(module_path: catalog.Path) -> Nodes:
     nodes = module_path_to_nodes(module_path)
     nodes = dictionaries.merge([built_ins_nodes, nodes])
     Reducer(nodes=nodes,
             parent_path=catalog.Path()).visit(nodes[catalog.Path()])
-    return nodes
+    result = nodes[object_path]
+    if not isinstance(result, list):
+        result = [result]
+    return result
 
 
 def module_path_to_nodes(module_path: catalog.Path) -> Nodes:
@@ -206,8 +210,33 @@ class Registry(Base):
 
     def visit_FunctionDef(self, node: ast3.FunctionDef) -> ast3.FunctionDef:
         path = self.resolve_path(catalog.factory(node.name))
-        self.nodes[path] = node
+        if self.is_overloaded(node):
+            self.nodes.setdefault(path, []).append(node)
+        else:
+            self.nodes[path] = node
         return node
+
+    def is_overloaded(self, node: ast3.FunctionDef) -> bool:
+        decorators_paths = map(self.visit, node.decorator_list)
+        overload_decorators_paths = (OVERLOAD_DECORATORS_PATHS
+                                     & set(decorators_paths))
+        try:
+            overload_decorator_path, = overload_decorators_paths
+        except ValueError:
+            pass
+        else:
+            root_path = catalog.factory(overload_decorator_path.parts[0])
+            root_node = self.nodes[root_path]
+            if isinstance(root_node, ast3.Import):
+                imported_modules_paths = map(to_actual_path, root_node.names)
+                if any(module_path == TYPING_MODULE_PATH
+                       for module_path in imported_modules_paths):
+                    return True
+            elif isinstance(root_node, ast3.ImportFrom):
+                imported_from_module_path = catalog.factory(root_node.module)
+                if imported_from_module_path == TYPING_MODULE_PATH:
+                    return True
+        return False
 
     def visit_Import(self, node: ast3.Import) -> ast3.Import:
         for child in node.names:

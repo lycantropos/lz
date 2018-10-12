@@ -1,9 +1,12 @@
 import inspect
 import platform
+from abc import (ABC,
+                 abstractmethod)
 from functools import (partial,
                        wraps)
 from itertools import (repeat,
                        zip_longest)
+from operator import attrgetter
 from typing import (Callable,
                     Iterable,
                     Optional)
@@ -39,7 +42,13 @@ class Parameter:
                         '=...' if self.has_default else ''])
 
 
-class Signature:
+class Base(ABC):
+    @abstractmethod
+    def __repr__(self) -> str:
+        pass
+
+
+class Plain(Base):
     def __init__(self, *parameters: Parameter) -> None:
         self.parameters = parameters
 
@@ -47,7 +56,7 @@ class Signature:
         return '(' + ', '.join(map(repr, self.parameters)) + ')'
 
 
-def factory(object_: Callable[..., Range]) -> Signature:
+def factory(object_: Callable[..., Range]) -> Base:
     raw_signature = inspect.signature(object_)
 
     def normalize_parameter(raw_parameter: inspect.Parameter) -> Parameter:
@@ -57,7 +66,7 @@ def factory(object_: Callable[..., Range]) -> Signature:
                          has_default=has_default)
 
     parameters = map(normalize_parameter, raw_signature.parameters.values())
-    return Signature(*parameters)
+    return Plain(*parameters)
 
 
 if platform.python_implementation() != 'PyPy':
@@ -66,17 +75,32 @@ if platform.python_implementation() != 'PyPy':
     from . import arboretum
 
 
-    def with_typeshed(function: Map[Callable[..., Range], Signature]
-                      ) -> Map[Callable[..., Range], Signature]:
+    class Overloaded(Base):
+        def __init__(self, *signatures: Base) -> None:
+            self.signatures = signatures
+
+        def __repr__(self) -> str:
+            return '\nor\n'.join(map(repr, self.signatures))
+
+
+    def with_typeshed(function: Map[Callable[..., Range], Base]
+                      ) -> Map[Callable[..., Range], Base]:
         @wraps(function)
-        def wrapped(object_: Callable[..., Range]) -> Signature:
+        def wrapped(object_: Callable[..., Range]) -> Base:
             try:
                 return function(object_)
             except ValueError:
                 from . import arboretum
 
-                object_node = arboretum.to_node(object_)
-                return from_ast(object_node.args)
+                object_nodes = arboretum.to_nodes(object_)
+                to_signatures = mapper(compose(from_ast, attrgetter('args')))
+                signatures = list(to_signatures(object_nodes))
+                try:
+                    signature, = signatures
+                except ValueError:
+                    return Overloaded(*signatures)
+                else:
+                    return signature
 
         return wrapped
 
@@ -84,9 +108,9 @@ if platform.python_implementation() != 'PyPy':
     factory = with_typeshed(factory)
 
 
-    def from_ast(object_: ast3.arguments) -> Signature:
+    def from_ast(object_: ast3.arguments) -> Base:
         parameters = to_parameters(object_)
-        return Signature(*parameters)
+        return Plain(*parameters)
 
 
     def to_positional_parameters(signature_ast: ast3.arguments
