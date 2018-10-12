@@ -64,7 +64,8 @@ modules = (strategies.sampled_from(list(stdlib_modules))
            .filter(is_module_supported))
 
 
-def flatten(object_: Union[ModuleType, type]) -> SearchStrategy:
+def flatten_module_or_class(object_: Union[ModuleType, type]
+                            ) -> SearchStrategy:
     return strategies.sampled_from(list(vars(object_).values()))
 
 
@@ -73,7 +74,7 @@ def is_object_supported(object_: Any) -> bool:
             or is_module_supported(object_))
 
 
-objects = modules.flatmap(flatten)
+objects = modules.flatmap(flatten_module_or_class)
 
 
 def is_not_private(object_: Union[BuiltinFunctionType,
@@ -99,7 +100,7 @@ def is_class_supported(class_: type) -> bool:
 classes = (objects.filter(inspect.isclass)
            .filter(is_class_supported)
            .filter(is_not_private))
-classes_objects = classes.flatmap(flatten)
+classes_objects = classes.flatmap(flatten_module_or_class)
 methods = classes_objects.filter(inspect.isfunction)
 
 
