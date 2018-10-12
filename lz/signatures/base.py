@@ -36,6 +36,16 @@ class Parameter:
         self.kind = kind
         self.has_default = has_default
 
+    def __eq__(self, other: 'Parameter') -> bool:
+        if not isinstance(other, Parameter):
+            return NotImplemented
+        return (self.name == other.name
+                and self.kind == other.kind
+                and self.has_default is other.has_default)
+
+    def __hash__(self) -> int:
+        return hash((self.name, self.kind, self.has_default))
+
     def __repr__(self) -> str:
         return ''.join([self.kinds_prefixes.get(self.kind, ''),
                         self.name,
@@ -47,10 +57,28 @@ class Base(ABC):
     def __repr__(self) -> str:
         pass
 
+    @abstractmethod
+    def __eq__(self, other: 'Base') -> bool:
+        pass
+
+    @abstractmethod
+    def __hash__(self) -> int:
+        pass
+
 
 class Plain(Base):
     def __init__(self, *parameters: Parameter) -> None:
         self.parameters = parameters
+
+    def __eq__(self, other: Base) -> bool:
+        if not isinstance(other, Base):
+            return NotImplemented
+        if not isinstance(other, Plain):
+            return False
+        return self.parameters == other.parameters
+
+    def __hash__(self) -> int:
+        return hash(self.parameters)
 
     def __repr__(self) -> str:
         return '(' + ', '.join(map(repr, self.parameters)) + ')'
@@ -77,7 +105,17 @@ if platform.python_implementation() != 'PyPy':
 
     class Overloaded(Base):
         def __init__(self, *signatures: Base) -> None:
-            self.signatures = signatures
+            self.signatures = frozenset(signatures)
+
+        def __eq__(self, other: Base) -> bool:
+            if not isinstance(other, Base):
+                return NotImplemented
+            if not isinstance(other, Overloaded):
+                return False
+            return self.signatures == other.signatures
+
+        def __hash__(self) -> int:
+            return hash(self.signatures)
 
         def __repr__(self) -> str:
             return '\nor\n'.join(map(repr, self.signatures))
