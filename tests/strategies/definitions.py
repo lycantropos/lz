@@ -1,19 +1,26 @@
+import _ast
+import _collections
 import _collections_abc
 import _hashlib
 import _io
 import _string
 import _thread
+import _weakrefset
 import codecs
 import collections
 import ctypes.util
+import encodings
 import faulthandler
 import inspect
+import itertools
 import os
 import platform
+import random
 import socket
 import struct
 import sys
 import types
+import warnings
 import zipimport
 from operator import methodcaller
 from pathlib import Path
@@ -83,14 +90,40 @@ def is_not_private(object_: Union[BuiltinFunctionType,
     return not object_.__name__.startswith('_')
 
 
-unsupported_classes = {_thread.LockType,
-                       _thread.RLock,
+unsupported_classes = {_ast.excepthandler,
                        _collections_abc.mappingproxy,
                        _collections_abc.dict_keys,
                        _collections_abc.dict_items,
-                       types.FrameType}
+                       _collections_abc.range_iterator,
+                       _thread.LockType,
+                       _thread.RLock,
+                       _thread._local,
+                       _io._IOBase,
+                       _io._RawIOBase,
+                       _io._TextIOBase,
+                       _io._BufferedIOBase,
+                       itertools._tee,
+                       itertools._tee_dataobject,
+                       _weakrefset.ref,
+                       encodings.CodecRegistryError,
+                       random._MethodType,
+                       struct.Struct,
+                       types.CodeType,
+                       types.FrameType,
+                       types.ModuleType,
+                       warnings._OptionError}
+
 if platform.python_implementation() != 'PyPy':
-    unsupported_classes.add(_hashlib.HASH)
+    import _json
+
+    unsupported_classes.update({_collections._deque_iterator,
+                                _collections._deque_reverse_iterator,
+                                _hashlib.HASH,
+                                _json.make_scanner,
+                                _json.make_encoder,
+                                itertools._grouper})
+if sys.platform == 'win32':
+    unsupported_classes.add(os.statvfs_result)
 
 
 def is_class_supported(class_: type) -> bool:
@@ -122,12 +155,7 @@ unsupported_methods_descriptors = {dict.get,
                                    collections.OrderedDict.clear,
                                    collections.OrderedDict.pop,
                                    collections.OrderedDict.update,
-                                   collections.OrderedDict.setdefault,
-                                   struct.Struct.pack,
-                                   struct.Struct.unpack,
-                                   struct.Struct.unpack_from,
-                                   struct.Struct.iter_unpack,
-                                   struct.Struct.pack_into}
+                                   collections.OrderedDict.setdefault}
 if sys.version_info >= (3, 6):
     unsupported_methods_descriptors.update(
             {_collections_abc.async_generator.asend,
