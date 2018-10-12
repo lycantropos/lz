@@ -36,7 +36,7 @@ false_predicates = strategies.just(to_constant(False))
 true_predicates = strategies.just(to_constant(True))
 predicates = false_predicates | true_predicates
 starting_maps = [identity, float, str, json.dumps]
-suitable_maps = {identity: starting_maps,
+suitable_maps = {identity: [identity, float, str],
                  float: starting_maps,
                  str: [identity, float, str, json.loads],
                  json.dumps: [identity, float, str, json.loads],
