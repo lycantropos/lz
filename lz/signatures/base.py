@@ -128,8 +128,6 @@ if platform.python_implementation() != 'PyPy':
             try:
                 return function(object_)
             except ValueError:
-                from . import arboretum
-
                 object_nodes = arboretum.to_nodes(object_)
                 to_signatures = mapper(compose(from_ast, attrgetter('args')))
                 signatures = list(to_signatures(object_nodes))
