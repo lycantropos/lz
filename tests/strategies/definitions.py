@@ -1,10 +1,12 @@
 import _collections_abc
+import _hashlib
 import _io
 import _string
 import _thread
 import codecs
 import collections
 import ctypes.util
+import faulthandler
 import inspect
 import os
 import platform
@@ -21,8 +23,6 @@ from typing import (Any,
                     Iterable,
                     Union)
 
-import _hashlib
-import faulthandler
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
