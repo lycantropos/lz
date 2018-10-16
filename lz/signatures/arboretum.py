@@ -330,10 +330,13 @@ class Reducer(Base):
         path = self.resolve_path(catalog.factory(node.name))
         bases = complete_new_style_class_bases(node.bases)
         for base_path in map(self.visit, bases):
-            self.nodes.update({object_path.with_parent(path): node
-                               for object_path, node in self.nodes.items()
-                               if object_path.is_child_of(base_path)
-                               and object_path != base_path})
+            base_nodes = {object_path: node
+                          for object_path, node in self.nodes.items()
+                          if object_path.is_child_of(base_path)
+                          and object_path != base_path}
+            for base_object_path, base_object_node in base_nodes.items():
+                self.nodes.setdefault(base_object_path.with_parent(path),
+                                      base_object_node)
         transformer = type(self)(nodes=self.nodes,
                                  parent_path=path,
                                  is_nested=True)
