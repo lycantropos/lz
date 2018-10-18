@@ -128,8 +128,14 @@ class Flattener(Base):
                 self.namespace.update(namespaces.factory(parent_module_path))
             elif not namespace_contains(self.namespace, alias_path):
                 namespace = namespaces.factory(parent_module_path)
-                self.namespace[str(alias_path)] = search_by_path(namespace,
-                                                                 actual_path)
+                try:
+                    self.namespace[str(alias_path)] = search_by_path(
+                            namespace,
+                            actual_path)
+                except KeyError:
+                    module_path = parent_module_path.join(actual_path)
+                    self.namespace[str(alias_path)] = importlib.import_module(
+                        str(module_path))
             yield ast3.ImportFrom(str(parent_module_path), [name_alias], 0)
 
     def visit_ClassDef(self, node: ast3.ClassDef) -> ast3.ClassDef:
