@@ -414,11 +414,17 @@ def to_parent_module_path(object_: ast3.ImportFrom,
     import_is_relative = level > 0
     if not import_is_relative:
         return catalog.factory(object_.module)
-    depth = (1 - level) or None
+    depth = (len(parent_module_path.parts)
+             - is_package(parent_module_path)
+             - level) or None
     module_path_parts = filter(None,
                                chain(parent_module_path.parts[:depth],
                                      expand(object_.module)))
     return catalog.Path(*module_path_parts)
+
+
+def is_package(module_path: catalog.Path) -> bool:
+    return hasattr(importlib.import_module(str(module_path)), '__path__')
 
 
 def to_alias_path(node: ast3.alias) -> catalog.Path:
