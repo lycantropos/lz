@@ -27,9 +27,8 @@ OVERLOAD_DECORATORS_PATHS = {catalog.factory('typing.overload'),
                              catalog.factory('overload')}
 
 
-def to_nodes(object_: Any) -> List[ast3.AST]:
-    module_path = catalog.factory(catalog.module_name_factory(object_))
-    object_path = catalog.factory(object_)
+def to_nodes(object_path: catalog.Path,
+             module_path: catalog.Path) -> List[ast3.AST]:
     nodes = module_path_to_nodes(module_path)
     nodes = dictionaries.merge([built_ins_nodes, nodes])
     reducer = Reducer(nodes=nodes, parent_path=catalog.Path())

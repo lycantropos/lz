@@ -3,14 +3,20 @@ import platform
 from abc import (ABC,
                  abstractmethod)
 from functools import (partial,
+                       singledispatch,
                        wraps)
 from itertools import (repeat,
                        zip_longest)
 from operator import attrgetter
+from types import (BuiltinFunctionType,
+                   BuiltinMethodType,
+                   FunctionType,
+                   MethodType)
 from typing import (Callable,
                     Iterable,
                     Optional)
 
+from lz import right
 from lz.functional import (combine,
                            compose,
                            pack)
@@ -21,6 +27,7 @@ from lz.iterating import (expand,
                           mapper,
                           reverse,
                           sifter)
+from .hints import MethodDescriptorType
 
 
 class Parameter:
@@ -84,7 +91,13 @@ class Plain(Base):
         return '(' + ', '.join(map(repr, self.parameters)) + ')'
 
 
+@singledispatch
 def factory(object_: Callable[..., Range]) -> Base:
+    raise TypeError('Unsupported object type: {type}.'
+                    .format(type=type(object_)))
+
+
+def from_callable(object_: Callable[..., Range]) -> Base:
     raw_signature = inspect.signature(object_)
 
     def normalize_parameter(raw_parameter: inspect.Parameter) -> Parameter:
@@ -97,10 +110,44 @@ def factory(object_: Callable[..., Range]) -> Base:
     return Plain(*parameters)
 
 
-if platform.python_implementation() != 'PyPy':
+@singledispatch
+def slice_parameters(signature: Base,
+                     slice_: slice) -> Base:
+    raise TypeError('Unsupported signature type: {type}.'
+                    .format(type=type(signature)))
+
+
+@slice_parameters.register(Plain)
+def slice_plain_parameters(signature: Plain,
+                           slice_: slice) -> Base:
+    return Plain(*signature.parameters[slice_])
+
+
+if platform.python_implementation() == 'PyPy':
+    from lz.iterating import slider
+
+
+    @factory.register(type)
+    def from_class(object_: type) -> Base:
+        try:
+            return from_callable(object_)
+        except ValueError:
+            method = None
+            for cls, next_cls in slider(2)(object_.__mro__):
+                if cls.__new__ is not next_cls.__new__:
+                    method = cls.__new__
+                    break
+                elif cls.__init__ is not next_cls.__init__:
+                    method = cls.__init__
+                    break
+            if method is None:
+                raise
+            return slice_parameters(factory(method), slice(1, None))
+else:
     from typed_ast import ast3
 
     from . import arboretum
+    from . import catalog
 
 
     class Overloaded(Base):
@@ -127,26 +174,63 @@ if platform.python_implementation() != 'PyPy':
         def wrapped(object_: Callable[..., Range]) -> Base:
             try:
                 return function(object_)
-            except ValueError:
-                object_nodes = arboretum.to_nodes(object_)
-                to_signatures = mapper(compose(from_ast, attrgetter('args')))
-                signatures = list(to_signatures(object_nodes))
+            except ValueError as error:
+                object_path = catalog.factory(object_)
+                module_path = catalog.factory(catalog
+                                              .module_name_factory(object_))
                 try:
-                    signature, = signatures
-                except ValueError:
-                    return Overloaded(*signatures)
-                else:
-                    return signature
+                    object_nodes = arboretum.to_nodes(object_path, module_path)
+                except KeyError:
+                    raise error
+                try:
+                    return flatten_signatures(to_signatures(object_nodes))
+                except AttributeError:
+                    raise error
 
         return wrapped
 
 
-    factory = with_typeshed(factory)
+    from_callable = with_typeshed(from_callable)
+
+
+    @factory.register(type)
+    def from_class(object_: type) -> Base:
+        try:
+            return from_callable(object_)
+        except ValueError:
+            method_path = (catalog.factory(object_)
+                           .join(catalog.factory('__init__')))
+            module_path = catalog.factory(catalog
+                                          .module_name_factory(object_))
+            method_nodes = arboretum.to_nodes(method_path, module_path)
+            method_signature = flatten_signatures(to_signatures(method_nodes))
+            return slice_parameters(method_signature, slice(1, None))
+
+
+    def flatten_signatures(signatures: Iterable[Base]) -> Base:
+        signatures = list(signatures)
+        try:
+            signature, = signatures
+        except ValueError:
+            return Overloaded(*signatures)
+        else:
+            return signature
+
+
+    @slice_parameters.register(Overloaded)
+    def slice_overloaded_parameters(signature: Overloaded,
+                                    slice_: slice) -> Base:
+        return Overloaded(*map(partial(slice_parameters,
+                                       slice_=slice_),
+                               signature.signatures))
 
 
     def from_ast(object_: ast3.arguments) -> Base:
         parameters = to_parameters(object_)
         return Plain(*parameters)
+
+
+    to_signatures = mapper(compose(from_ast, attrgetter('args')))
 
 
     def to_positional_parameters(signature_ast: ast3.arguments
@@ -208,3 +292,10 @@ if platform.python_implementation() != 'PyPy':
         return Parameter(name=parameter_ast.arg,
                          kind=kind,
                          has_default=default_ast is not None)
+
+from_callable = right.folder(factory.register, from_callable)([
+    BuiltinFunctionType,
+    BuiltinMethodType,
+    FunctionType,
+    MethodType,
+    MethodDescriptorType])
