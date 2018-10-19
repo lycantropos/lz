@@ -130,6 +130,7 @@ class Flattener(Base):
             actual_path = to_actual_path(name_alias)
             if actual_path == catalog.WILDCARD_IMPORT:
                 self.namespace.update(namespaces.factory(parent_module_path))
+                yield from module_path_to_nodes(parent_module_path).values()
             elif not namespace_contains(self.namespace, alias_path):
                 namespace = namespaces.factory(parent_module_path)
                 try:
@@ -139,8 +140,8 @@ class Flattener(Base):
                 except KeyError:
                     module_path = parent_module_path.join(actual_path)
                     self.namespace[str(alias_path)] = importlib.import_module(
-                        str(module_path))
-            yield ast3.ImportFrom(str(parent_module_path), [name_alias], 0)
+                            str(module_path))
+                yield ast3.ImportFrom(str(parent_module_path), [name_alias], 0)
 
     def visit_ClassDef(self, node: ast3.ClassDef) -> ast3.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
