@@ -6,7 +6,8 @@ from typing import (Any,
 
 import pytest
 
-from lz.signatures.hints import MethodDescriptorType
+from lz.signatures.hints import (MethodDescriptorType,
+                                 WrapperDescriptorType)
 from tests import strategies
 from tests.utils import find
 
@@ -38,4 +39,9 @@ def method() -> MethodType:
 
 @pytest.fixture(scope='function')
 def method_descriptor() -> MethodDescriptorType:
+    return find(strategies.methods_descriptors)
+
+
+@pytest.fixture(scope='function')
+def wrapper_descriptor() -> WrapperDescriptorType:
     return find(strategies.methods_descriptors)

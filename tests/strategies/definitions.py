@@ -14,7 +14,8 @@ from typing import (Any,
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
-from lz.signatures.hints import MethodDescriptorType
+from lz.signatures.hints import (MethodDescriptorType,
+                                 WrapperDescriptorType)
 
 
 def find_stdlib_modules_names(directory_path: Path = Path(os.__file__).parent,
@@ -250,6 +251,30 @@ def is_method_descriptor_supported(method_descriptor: MethodDescriptorType
 methods_descriptors = (classes_objects.filter(is_method_descriptor)
                        .filter(is_not_private)
                        .filter(is_method_descriptor_supported))
+
+
+def is_wrapper_descriptor(object_: Any) -> bool:
+    return isinstance(object_, WrapperDescriptorType)
+
+
+unsupported_wrappers_descriptors = set()
+
+if platform.python_implementation() != 'PyPy':
+    import _collections_abc
+
+    # not supported by ``typeshed`` package
+    unsupported_wrappers_descriptors.update({
+        _collections_abc.coroutine.__del__,
+        _collections_abc.generator.__del__})
+
+
+def is_wrapper_descriptor_supported(wrapper_descriptor: MethodDescriptorType
+                                    ) -> bool:
+    return wrapper_descriptor not in unsupported_wrappers_descriptors
+
+
+wrappers_descriptors = (classes_objects.filter(is_wrapper_descriptor)
+                        .filter(is_wrapper_descriptor_supported))
 functions = objects.filter(inspect.isfunction)
 
 unsupported_built_in_functions = set()

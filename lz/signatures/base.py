@@ -27,7 +27,8 @@ from lz.iterating import (expand,
                           mapper,
                           reverse,
                           sifter)
-from .hints import MethodDescriptorType
+from .hints import (MethodDescriptorType,
+                    WrapperDescriptorType)
 
 
 class Parameter:
@@ -298,4 +299,5 @@ from_callable = right.folder(factory.register, from_callable)([
     BuiltinMethodType,
     FunctionType,
     MethodType,
-    MethodDescriptorType])
+    MethodDescriptorType,
+    WrapperDescriptorType])

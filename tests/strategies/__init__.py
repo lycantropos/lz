@@ -3,7 +3,8 @@ from .definitions import (built_in_functions,
                           classes,
                           functions,
                           methods,
-                          methods_descriptors)
+                          methods_descriptors,
+                          wrappers_descriptors)
 from .functional import (false_predicates,
                          maps,
                          maps_arguments,

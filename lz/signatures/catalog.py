@@ -10,7 +10,8 @@ from typing import (Any,
 
 from lz import right
 from .file_system import INIT_MODULE_NAME
-from .hints import MethodDescriptorType
+from .hints import (MethodDescriptorType,
+                    WrapperDescriptorType)
 
 
 class Path:
@@ -58,6 +59,7 @@ def factory(object_: Any) -> Path:
 @factory.register(BuiltinMethodType)
 @factory.register(FunctionType)
 @factory.register(MethodDescriptorType)
+@factory.register(WrapperDescriptorType)
 @factory.register(type)
 def from_class_or_function(object_: Union[BuiltinMethodType, FunctionType,
                                           MethodDescriptorType, type]
@@ -128,5 +130,6 @@ def module_name_from_class_or_function(object_: Union[BuiltinMethodType,
 
 
 @module_name_factory.register(MethodDescriptorType)
+@module_name_factory.register(WrapperDescriptorType)
 def module_name_from_method_descriptor(object_: MethodDescriptorType) -> str:
     return module_name_factory(module_name_factory(object_.__objclass__))
