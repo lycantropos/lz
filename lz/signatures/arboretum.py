@@ -270,7 +270,7 @@ class Registry(Base):
 
     def visit_AnnAssign(self, node: ast3.AnnAssign) -> ast3.AnnAssign:
         path = self.visit(node.target)
-        self.nodes[path] = node.value
+        self.nodes[path] = node
         return node
 
     def visit_Name(self, node: ast3.Name) -> catalog.Path:
