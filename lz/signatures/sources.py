@@ -41,10 +41,13 @@ def from_module(object_: ModuleType) -> Path:
 def from_module_path(object_: catalog.Path) -> Path:
     try:
         return cache[object_]
-    except KeyError:
+    except KeyError as original_error:
         module_name_path = catalog.factory(object_.parts[-1].lstrip('_'))
         module_path = object_.parent.join(module_name_path)
-        return cache[module_path]
+        try:
+            return cache[module_path]
+        except KeyError:
+            raise original_error
 
 
 def generate_stubs_cache_items(root: Path
