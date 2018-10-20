@@ -37,7 +37,11 @@ def find_stdlib_modules_names(directory_path: Path = Path(os.__file__).parent,
                             sources_relative_paths))
 
 
-stdlib_modules_names = frozenset(find_stdlib_modules_names())
+stdlib_modules_names = set(find_stdlib_modules_names())
+
+if sys.platform == 'win32':
+    stdlib_modules_names -= {'crypt', 'curses', 'pty', 'tty'}
+
 stdlib_modules = list(map(importlib.import_module, stdlib_modules_names))
 supported_modules = set(stdlib_modules)
 unsupported_modules = set()
