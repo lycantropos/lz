@@ -1,7 +1,9 @@
+import enum
 import inspect
 import platform
 from abc import (ABC,
                  abstractmethod)
+from collections import defaultdict
 from functools import (partial,
                        singledispatch,
                        wraps)
@@ -32,13 +34,24 @@ from .hints import (MethodDescriptorType,
 
 
 class Parameter:
-    kinds_prefixes = {inspect._VAR_POSITIONAL: '*',
-                      inspect._VAR_KEYWORD: '**'}
+    class Kind(enum.IntEnum):
+        POSITIONAL_ONLY = 0
+        POSITIONAL_OR_KEYWORD = 1
+        VARIADIC_POSITIONAL = 2
+        KEYWORD_ONLY = 3
+        VARIADIC_KEYWORD = 4
+
+        def __repr__(self) -> str:
+            return type(self).__qualname__ + '.' + self._name_
+
+    kinds_prefixes = defaultdict(str,
+                                 {Kind.VARIADIC_POSITIONAL: '*',
+                                  Kind.VARIADIC_KEYWORD: '**'})
 
     def __init__(self,
                  *,
                  name: str,
-                 kind: inspect._ParameterKind,
+                 kind: Kind,
                  has_default: bool) -> None:
         self.name = name
         self.kind = kind
@@ -55,7 +68,7 @@ class Parameter:
         return hash((self.name, self.kind, self.has_default))
 
     def __repr__(self) -> str:
-        return ''.join([self.kinds_prefixes.get(self.kind, ''),
+        return ''.join([self.kinds_prefixes[self.kind],
                         self.name,
                         '=...' if self.has_default else ''])
 
@@ -104,7 +117,7 @@ def from_callable(object_: Callable[..., Range]) -> Base:
     def normalize_parameter(raw_parameter: inspect.Parameter) -> Parameter:
         has_default = raw_parameter.default is not inspect._empty
         return Parameter(name=raw_parameter.name,
-                         kind=raw_parameter.kind,
+                         kind=Parameter.Kind(raw_parameter.kind),
                          has_default=has_default)
 
     parameters = map(normalize_parameter, raw_signature.parameters.values())
@@ -241,7 +254,7 @@ else:
                                                    signature_ast.defaults)
         parameters_with_defaults_ast = reverse(parameters_with_defaults_ast)
         parameter_factory = partial(to_parameter,
-                                    kind=inspect._POSITIONAL_ONLY)
+                                    kind=Parameter.Kind.POSITIONAL_ONLY)
         parameters_factory = mapper(pack(parameter_factory))
         yield from parameters_factory(parameters_with_defaults_ast)
 
@@ -251,7 +264,7 @@ else:
         parameters_with_defaults_ast = zip(signature_ast.kwonlyargs,
                                            signature_ast.kw_defaults)
         parameter_factory = partial(to_parameter,
-                                    kind=inspect._KEYWORD_ONLY)
+                                    kind=Parameter.Kind.KEYWORD_ONLY)
         parameters_factory = mapper(pack(parameter_factory))
         yield from parameters_factory(parameters_with_defaults_ast)
 
@@ -262,7 +275,7 @@ else:
         if parameter_ast is None:
             return None
         return Parameter(name=parameter_ast.arg,
-                         kind=inspect._VAR_POSITIONAL,
+                         kind=Parameter.Kind.VARIADIC_POSITIONAL,
                          has_default=False)
 
 
@@ -272,7 +285,7 @@ else:
         if parameter_ast is None:
             return None
         return Parameter(name=parameter_ast.arg,
-                         kind=inspect._VAR_KEYWORD,
+                         kind=Parameter.Kind.VARIADIC_KEYWORD,
                          has_default=False)
 
 
@@ -289,7 +302,7 @@ else:
     def to_parameter(parameter_ast: ast3.arg,
                      default_ast: Optional[ast3.expr],
                      *,
-                     kind: inspect._ParameterKind) -> Parameter:
+                     kind: Parameter.Kind) -> Parameter:
         return Parameter(name=parameter_ast.arg,
                          kind=kind,
                          has_default=default_ast is not None)
