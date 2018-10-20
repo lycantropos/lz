@@ -37,7 +37,8 @@ def find_stdlib_modules_names(directory_path: Path = Path(os.__file__).parent,
                             sources_relative_paths))
 
 
-stdlib_modules_names = set(find_stdlib_modules_names())
+stdlib_modules_names = (set(find_stdlib_modules_names())
+                        - {'antigravity', 'this'})
 
 if sys.platform == 'win32':
     stdlib_modules_names -= {'crypt', 'curses', 'pty', 'tty'}
