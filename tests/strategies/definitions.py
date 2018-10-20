@@ -340,4 +340,9 @@ built_in_functions = (objects.filter(inspect.isbuiltin)
                       .filter(has_module)
                       .filter(is_not_private)
                       .filter(is_function_supported))
-callables = built_in_functions | functions | methods | methods_descriptors
+callables = (built_in_functions
+             | classes
+             | functions
+             | methods
+             | methods_descriptors
+             | wrappers_descriptors)
