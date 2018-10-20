@@ -115,7 +115,6 @@ if platform.python_implementation() != 'PyPy':
     import encodings
     import macpath
     import pdb
-    import plistlib
     import random
     import runpy
     import smtplib
@@ -154,7 +153,6 @@ if platform.python_implementation() != 'PyPy':
                                 os.terminal_size,
                                 os.times_result,
                                 os.uname_result,
-                                plistlib._InternalDict,
                                 pdb._rstr,
                                 pdb.Restart,
                                 random._MethodType,
@@ -182,6 +180,11 @@ if platform.python_implementation() != 'PyPy':
                                     os.waitid_result,
                                     pwd.struct_passwd,
                                     termios.error})
+
+    if sys.version_info < (3, 7):
+        import plistlib
+
+        unsupported_classes.add(plistlib._InternalDict)
 
 
 def is_class_supported(class_: type) -> bool:
