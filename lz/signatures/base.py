@@ -8,6 +8,7 @@ from functools import (partial,
                        singledispatch,
                        wraps)
 from itertools import (repeat,
+                       starmap,
                        zip_longest)
 from operator import attrgetter
 from types import (BuiltinFunctionType,
