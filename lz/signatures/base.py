@@ -68,6 +68,12 @@ class Parameter:
         return hash((self.name, self.kind, self.has_default))
 
     def __repr__(self) -> str:
+        return (type(self).__qualname__
+                + '('
+                + ', '.join(starmap('{}={!r}'.format, vars(self).items()))
+                + ')')
+
+    def __str__(self) -> str:
         return ''.join([self.kinds_prefixes[self.kind],
                         self.name,
                         '=...' if self.has_default else ''])
@@ -102,7 +108,11 @@ class Plain(Base):
         return hash(self.parameters)
 
     def __repr__(self) -> str:
-        return '(' + ', '.join(map(repr, self.parameters)) + ')'
+        return (type(self).__qualname__
+                + '(' + ', '.join(map(repr, self.parameters)) + ')')
+
+    def __str__(self) -> str:
+        return '(' + ', '.join(map(str, self.parameters)) + ')'
 
 
 @singledispatch
@@ -179,7 +189,11 @@ else:
             return hash(self.signatures)
 
         def __repr__(self) -> str:
-            return '\nor\n'.join(map(repr, self.signatures))
+            return (type(self).__qualname__
+                    + '(' + ', '.join(map(repr, self.signatures)) + ')')
+
+        def __str__(self) -> str:
+            return '\nor\n'.join(map(str, self.signatures))
 
 
     def with_typeshed(function: Map[Callable[..., Range], Base]
