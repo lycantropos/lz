@@ -31,12 +31,13 @@ def to_nodes(object_path: catalog.Path,
              module_path: catalog.Path) -> List[ast3.AST]:
     nodes = module_path_to_nodes(module_path)
     nodes = dictionaries.merge([built_ins_nodes, nodes])
-    reducer = Reducer(nodes=nodes, parent_path=catalog.Path())
-    reducer.visit(nodes[catalog.Path()])
+    reduce_node = Reducer(nodes=nodes,
+                          parent_path=catalog.Path()).visit
+    reduce_node(nodes[catalog.Path()])
     try:
         result = nodes[object_path]
     except KeyError:
-        reducer.visit(nodes[object_path.parent])
+        reduce_node(nodes[object_path.parent])
         result = nodes[object_path]
     if not isinstance(result, list):
         result = [result]
