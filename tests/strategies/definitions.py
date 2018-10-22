@@ -117,6 +117,7 @@ if platform.python_implementation() != 'PyPy':
     import _json
     import _ssl
     import _weakrefset
+    import asyncio.events
     import encodings
     import macpath
     import pdb
@@ -150,6 +151,7 @@ if platform.python_implementation() != 'PyPy':
                                 _thread.RLock,
                                 _thread._local,
                                 _weakrefset.ref,
+                                asyncio.events._RunningLoop,
                                 itertools._grouper,
                                 itertools._tee,
                                 itertools._tee_dataobject,
@@ -190,6 +192,8 @@ if platform.python_implementation() != 'PyPy':
         import plistlib
 
         unsupported_classes.add(plistlib._InternalDict)
+    else:
+        unsupported_classes.add(asyncio.events.SendfileNotAvailableError)
 
 
 def is_class_supported(class_: type) -> bool:
