@@ -329,7 +329,7 @@ if platform.python_implementation() != 'PyPy':
                                                os.set_handle_inheritable})
 
 
-def is_function_supported(function: BuiltinFunctionType) -> bool:
+def is_built_in_function_supported(function: BuiltinFunctionType) -> bool:
     return function not in unsupported_built_in_functions
 
 
@@ -340,7 +340,7 @@ def has_module(function: BuiltinFunctionType) -> bool:
 built_in_functions = (objects.filter(inspect.isbuiltin)
                       .filter(has_module)
                       .filter(is_not_private)
-                      .filter(is_function_supported))
+                      .filter(is_built_in_function_supported))
 callables = (built_in_functions
              | classes
              | functions
