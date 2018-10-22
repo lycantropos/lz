@@ -170,18 +170,6 @@ class Flattener(Base):
         return self.evaluate_expression(node)
 
     def evaluate_expression(self, node: ast3.expr) -> Any:
-        nodes = {}
-        transformer = type(self)(namespace=self.namespace,
-                                 module_path=self.module_path,
-                                 parent_path=self.parent_path)
-        for child in ast3.iter_child_nodes(node):
-            transformer.visit(child)
-        if nodes:
-            for path, node in nodes.items():
-                if namespace_contains(self.namespace, path):
-                    continue
-                evaluate(node,
-                         namespace=self.namespace)
         # to avoid name conflicts
         # we're using name that won't be present
         # because it'll lead to ``SyntaxError`` otherwise
