@@ -177,8 +177,8 @@ class Flattener(Base):
         temporary_name = '@tmp'
         assignment = expression_to_assignment(node,
                                               name=temporary_name)
-        evaluate(assignment,
-                 namespace=self.namespace)
+        execute(assignment,
+                namespace=self.namespace)
         return self.namespace.pop(temporary_name)
 
 
@@ -437,25 +437,25 @@ def expression_to_assignment(node: ast3.expr,
 
 
 @singledispatch
-def evaluate(node: ast3.AST,
-             *,
-             namespace: Namespace) -> None:
+def execute(node: ast3.AST,
+            *,
+            namespace: Namespace) -> None:
     raise TypeError('Unsupported node type: {type}.'
                     .format(type=type(node)))
 
 
-@evaluate.register(ast3.stmt)
-def evaluate_statement(node: ast3.stmt,
-                       *,
-                       namespace: Namespace) -> None:
-    evaluate_tree(factory(node),
-                  namespace=namespace)
+@execute.register(ast3.stmt)
+def execute_statement(node: ast3.stmt,
+                      *,
+                      namespace: Namespace) -> None:
+    execute_tree(factory(node),
+                 namespace=namespace)
 
 
-@evaluate.register(ast3.Module)
-def evaluate_tree(node: ast3.Module,
-                  *,
-                  namespace: Namespace) -> None:
+@execute.register(ast3.Module)
+def execute_tree(node: ast3.Module,
+                 *,
+                 namespace: Namespace) -> None:
     node = TypedToPlain().visit(node)
     code = compile(node, '<unknown>', 'exec')
     exec(code, namespace)
