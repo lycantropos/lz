@@ -95,6 +95,8 @@ to_parameters_by_name = compose(dict,
                                                combine([attrgetter('name'),
                                                         identity]),
                                                repeat)))
+all_parameters_has_defaults = compose(all,
+                                      mapper(attrgetter('has_default')))
 
 
 class Base(ABC):
@@ -163,8 +165,15 @@ class Plain(Base):
                 and kwargs.keys() - rest_keywords_by_name.keys())
         if unexpected_keyword_arguments_found:
             return False
-        return bool(rest_positionals_by_kind[Parameter.Kind.POSITIONAL_ONLY]
-                    or rest_keywords_by_name.keys() - kwargs.keys())
+        rest_keywords_by_name = {
+            name: parameter
+            for name, parameter in rest_keywords_by_name.items()
+            if name not in kwargs}
+        rest_positionals_only = (
+            rest_positionals_by_kind[Parameter.Kind.POSITIONAL_ONLY])
+        rest_keywords = rest_keywords_by_name.values()
+        return not (all_parameters_has_defaults(rest_positionals_only)
+                    and all_parameters_has_defaults(rest_keywords))
 
 
 @singledispatch
