@@ -146,7 +146,6 @@ unsupported_classes = set()
 
 if platform.python_implementation() != 'PyPy':
     import _ast
-    import _collections
     import _collections_abc
     import _hashlib
     import _io
@@ -171,12 +170,7 @@ if platform.python_implementation() != 'PyPy':
 
     # not supported by ``typeshed`` package
     unsupported_classes.update({_ast.excepthandler,
-                                _collections._deque_iterator,
-                                _collections._deque_reverse_iterator,
-                                _collections_abc.dict_items,
-                                _collections_abc.dict_keys,
                                 _collections_abc.mappingproxy,
-                                _collections_abc.range_iterator,
                                 _hashlib.HASH,
                                 _io._BufferedIOBase,
                                 _io._IOBase,
