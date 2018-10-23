@@ -162,7 +162,6 @@ if platform.python_implementation() != 'PyPy':
     import runpy
     import smtplib
     import socket
-    import struct
     import tarfile
     import tkinter
     import types
@@ -179,7 +178,6 @@ if platform.python_implementation() != 'PyPy':
                                 _json.make_encoder,
                                 _json.make_scanner,
                                 _ssl._SSLContext,
-                                _thread.LockType,
                                 _thread.RLock,
                                 _thread._local,
                                 _weakrefset.ref,
@@ -198,7 +196,6 @@ if platform.python_implementation() != 'PyPy':
                                 runpy._Error,
                                 smtplib.SMTPNotSupportedError,
                                 socket._GiveupOnSendfile,
-                                struct.Struct,
                                 tarfile.EmptyHeaderError,
                                 tarfile.EOFHeaderError,
                                 tarfile.InvalidHeaderError,
@@ -220,8 +217,10 @@ if platform.python_implementation() != 'PyPy':
 
     if sys.version_info < (3, 7):
         import plistlib
+        import struct
 
-        unsupported_classes.add(plistlib._InternalDict)
+        unsupported_classes.update({plistlib._InternalDict,
+                                    struct.Struct})
     else:
         unsupported_classes.add(asyncio.events.SendfileNotAvailableError)
 
