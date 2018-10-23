@@ -9,14 +9,14 @@ from lz.signatures.hints import (MethodDescriptorType,
                                  WrapperDescriptorType)
 
 
-def test_factory(class_: type,
+def test_factory(built_in_function: BuiltinFunctionType,
+                 class_: type,
                  function: FunctionType,
-                 built_in_function: BuiltinFunctionType,
                  method: MethodType,
                  method_descriptor: MethodDescriptorType,
                  wrapper_descriptor: WrapperDescriptorType) -> None:
-    class_result = signatures.factory(class_)
     built_in_function_result = signatures.factory(built_in_function)
+    class_result = signatures.factory(class_)
     function_result = signatures.factory(function)
     method_result = signatures.factory(method)
     method_descriptor_result = signatures.factory(method_descriptor)
