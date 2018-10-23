@@ -49,6 +49,11 @@ unsupported_modules = set()
 
 if platform.python_implementation() != 'PyPy':
     import _collections
+    import _codecs_hk
+    import _codecs_iso2022
+    import _codecs_jp
+    import _codecs_kr
+    import _codecs_cn
     import _codecs_tw
     import _lsprof
     import _multibytecodec
@@ -66,6 +71,11 @@ if platform.python_implementation() != 'PyPy':
 
     # not supported by ``typeshed`` package
     unsupported_modules.update({_collections,
+                                _codecs_hk,
+                                _codecs_iso2022,
+                                _codecs_jp,
+                                _codecs_kr,
+                                _codecs_cn,
                                 _codecs_tw,
                                 _lsprof,
                                 _multibytecodec,
@@ -81,9 +91,11 @@ if platform.python_implementation() != 'PyPy':
                                 unittest,
                                 xxsubtype})
     if sys.version_info >= (3, 6):
+        import _blake2
         import _sha3
 
-        unsupported_modules.add(_sha3)
+        unsupported_modules.update({_blake2,
+                                    _sha3})
 
 supported_modules -= unsupported_modules
 
