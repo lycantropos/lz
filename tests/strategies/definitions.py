@@ -206,6 +206,7 @@ if platform.python_implementation() != 'PyPy':
     if sys.version_info >= (3, 6):
         unsupported_classes.add(_ast.Constant)
 
+
 def is_class_supported(class_: type) -> bool:
     return class_ not in unsupported_classes
 
@@ -344,7 +345,9 @@ if platform.python_implementation() != 'PyPy':
 
 
 def is_built_in_function_supported(function: BuiltinFunctionType) -> bool:
-    return function not in unsupported_built_in_functions
+    return (is_not_private(function)
+            and has_module(function)
+            and function not in unsupported_built_in_functions)
 
 
 def has_module(function: BuiltinFunctionType) -> bool:
@@ -352,8 +355,6 @@ def has_module(function: BuiltinFunctionType) -> bool:
 
 
 built_in_functions = (objects.filter(inspect.isbuiltin)
-                      .filter(has_module)
-                      .filter(is_not_private)
                       .filter(is_built_in_function_supported))
 callables = (built_in_functions
              | classes
