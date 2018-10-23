@@ -48,6 +48,8 @@ supported_modules = set(stdlib_modules)
 unsupported_modules = set()
 
 if platform.python_implementation() != 'PyPy':
+    import _collections
+    import _codecs_tw
     import _lsprof
     import _multibytecodec
     import _string
@@ -63,7 +65,9 @@ if platform.python_implementation() != 'PyPy':
     import xxsubtype
 
     # not supported by ``typeshed`` package
-    unsupported_modules.update({_lsprof,
+    unsupported_modules.update({_collections,
+                                _codecs_tw,
+                                _lsprof,
                                 _multibytecodec,
                                 _string,
                                 aifc,
@@ -76,6 +80,10 @@ if platform.python_implementation() != 'PyPy':
                                 turtle,
                                 unittest,
                                 xxsubtype})
+    if sys.version_info >= (3, 6):
+        import _sha3
+
+        unsupported_modules.add(_sha3)
 
 supported_modules -= unsupported_modules
 
