@@ -3,17 +3,21 @@ import inspect
 import os
 import platform
 import sys
+from importlib.machinery import ModuleSpec
 from operator import methodcaller
 from pathlib import Path
 from types import (BuiltinFunctionType,
                    ModuleType)
 from typing import (Any,
                     Iterable,
+                    List,
                     Union)
 
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
+from lz.functional import compose
+from lz.iterating import flatmapper
 from lz.signatures.hints import (MethodDescriptorType,
                                  WrapperDescriptorType)
 
@@ -107,12 +111,23 @@ modules = (strategies.sampled_from(stdlib_modules)
 
 def flatten_module_or_class(object_: Union[ModuleType, type]
                             ) -> SearchStrategy:
-    return strategies.sampled_from(list(vars(object_).values()))
+    return strategies.sampled_from(object_to_contents(object_))
+
+
+def object_to_contents(object_: Union[ModuleType, type]) -> List[Any]:
+    return list(vars(object_).values())
+
+
+objects_to_contents = compose(list, flatmapper(object_to_contents))
+unsupported_modules_objects = objects_to_contents(unsupported_modules)
 
 
 def is_object_supported(object_: Any) -> bool:
-    return (not isinstance(object_, ModuleType)
-            or is_module_supported(object_))
+    if isinstance(object_, ModuleSpec):
+        return False
+    return (object_ not in unsupported_modules_objects
+            or isinstance(object_, ModuleType)
+            and is_module_supported(object_))
 
 
 objects = modules.flatmap(flatten_module_or_class)
