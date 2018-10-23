@@ -283,12 +283,15 @@ else:
     def from_class(object_: type) -> Base:
         try:
             return from_callable(object_)
-        except ValueError:
+        except ValueError as error:
             method_path = (catalog.factory(object_)
                            .join(catalog.factory('__init__')))
             module_path = catalog.factory(catalog
                                           .module_name_factory(object_))
-            method_nodes = arboretum.to_nodes(method_path, module_path)
+            try:
+                method_nodes = arboretum.to_nodes(method_path, module_path)
+            except KeyError:
+                raise error
             method_signature = flatten_signatures(to_signatures(method_nodes))
             return slice_parameters(method_signature, slice(1, None))
 
