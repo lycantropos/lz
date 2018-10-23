@@ -212,7 +212,6 @@ if platform.python_implementation() != 'PyPy':
                                 tarfile.SubsequentHeaderError,
                                 tkinter.TclError,
                                 types.CodeType,
-                                types.FrameType,
                                 types.ModuleType,
                                 warnings._OptionError})
     if sys.platform == 'win32':
