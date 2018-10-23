@@ -246,24 +246,24 @@ def is_method_descriptor(object_: Any) -> bool:
 unsupported_methods_descriptors = set()
 
 if platform.python_implementation() != 'PyPy':
+    import _collections_abc
+    import _io
     import collections
-    import zipimport
 
     # not supported by ``typeshed`` package
-    unsupported_methods_descriptors.update({_collections_abc.generator.close,
-                                            _collections_abc.generator.send,
-                                            _collections_abc.generator.throw,
-                                            _collections_abc.coroutine.close,
-                                            _collections_abc.coroutine.send,
-                                            _collections_abc.coroutine.throw,
-                                            _io.BufferedRWPair.peek,
-                                            collections.OrderedDict.clear,
-                                            collections.OrderedDict.pop,
-                                            collections.OrderedDict.setdefault,
-                                            collections.OrderedDict.update,
-                                            dict.get,
-                                            int.conjugate,
-                                            zipimport.zipimporter.find_loader})
+    unsupported_methods_descriptors.update(
+            {_collections_abc.dict_items.isdisjoint,
+             _collections_abc.generator.close,
+             _collections_abc.generator.send,
+             _collections_abc.generator.throw,
+             _collections_abc.coroutine.close,
+             _collections_abc.coroutine.send,
+             _collections_abc.coroutine.throw,
+             _io.BufferedRWPair.peek,
+             collections.OrderedDict.clear,
+             collections.OrderedDict.pop,
+             collections.OrderedDict.update,
+             int.conjugate})
     if sys.version_info >= (3, 6):
         unsupported_methods_descriptors.update(
                 {_collections_abc.async_generator.aclose,
@@ -281,7 +281,13 @@ if platform.python_implementation() != 'PyPy':
                                                 socket.socket.getblocking,
                                                 str.isascii})
     else:
-        unsupported_methods_descriptors.add(float.conjugate)
+        import zipimport
+
+        unsupported_methods_descriptors.update(
+                {collections.OrderedDict.setdefault,
+                 dict.get,
+                 float.conjugate,
+                 zipimport.zipimporter.find_loader})
 
     if sys.platform == 'win32':
         import socket
