@@ -352,8 +352,6 @@ if platform.python_implementation() != 'PyPy':
                                            codecs.replace_errors,
                                            codecs.strict_errors,
                                            codecs.xmlcharrefreplace_errors,
-                                           os.get_inheritable,
-                                           os.set_inheritable,
                                            socket.dup,
                                            sys.callstats,
                                            sys.getallocatedblocks,
@@ -363,9 +361,6 @@ if platform.python_implementation() != 'PyPy':
         unsupported_built_in_functions.update({sys.getfilesystemencodeerrors,
                                                sys.get_asyncgen_hooks,
                                                sys.set_asyncgen_hooks})
-    if sys.platform == 'win32':
-        unsupported_built_in_functions.update({os.get_handle_inheritable,
-                                               os.set_handle_inheritable})
 
 
 def is_built_in_function_supported(function: BuiltinFunctionType) -> bool:
