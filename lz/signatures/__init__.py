@@ -7,3 +7,5 @@ from .base import (Base,
 
 if platform.python_implementation() != 'PyPy':
     from .base import Overloaded
+
+del platform
