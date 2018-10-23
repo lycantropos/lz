@@ -220,8 +220,7 @@ if platform.python_implementation() != 'PyPy':
         import pwd
         import termios
 
-        unsupported_classes.update({os.sched_param,
-                                    os.waitid_result,
+        unsupported_classes.update({os.waitid_result,
                                     pwd.struct_passwd,
                                     termios.error})
 
