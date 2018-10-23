@@ -4,29 +4,37 @@ import platform
 from abc import (ABC,
                  abstractmethod)
 from collections import defaultdict
-from functools import (partial,
+from functools import (lru_cache,
+                       partial,
                        singledispatch,
                        wraps)
 from itertools import (repeat,
                        starmap,
                        zip_longest)
-from operator import attrgetter
+from operator import (attrgetter,
+                      methodcaller)
 from types import (BuiltinFunctionType,
                    BuiltinMethodType,
                    FunctionType,
                    MethodType)
 from typing import (Callable,
+                    Dict,
                     Iterable,
+                    List,
                     Optional)
 
 from lz import right
 from lz.functional import (combine,
                            compose,
+                           identity,
                            pack)
-from lz.hints import (Map,
+from lz.hints import (Domain,
+                      Map,
                       Range)
-from lz.iterating import (expand,
+from lz.iterating import (cutter,
+                          expand,
                           flatten,
+                          grouper,
                           mapper,
                           reverse,
                           sifter)
@@ -80,6 +88,15 @@ class Parameter:
                         '=...' if self.has_default else ''])
 
 
+to_parameters_by_kind = compose(partial(defaultdict, list),
+                                grouper(attrgetter('kind')))
+to_parameters_by_name = compose(dict,
+                                mapper(compose(tuple,
+                                               combine([attrgetter('name'),
+                                                        identity]),
+                                               repeat)))
+
+
 class Base(ABC):
     @abstractmethod
     def __repr__(self) -> str:
@@ -91,6 +108,10 @@ class Base(ABC):
 
     @abstractmethod
     def __hash__(self) -> int:
+        pass
+
+    @abstractmethod
+    def has_unset_parameters(self, *args: Domain, **kwargs: Domain) -> bool:
         pass
 
 
@@ -114,6 +135,36 @@ class Plain(Base):
 
     def __str__(self) -> str:
         return '(' + ', '.join(map(str, self.parameters)) + ')'
+
+    @property
+    @lru_cache(None)
+    def parameters_by_kind(self) -> Dict[Parameter.Kind, List[Parameter]]:
+        return to_parameters_by_kind(self.parameters)
+
+    def has_unset_parameters(self, *args: Domain, **kwargs: Domain) -> bool:
+        positionals = (
+                self.parameters_by_kind[Parameter.Kind.POSITIONAL_ONLY]
+                + self.parameters_by_kind[
+                    Parameter.Kind.POSITIONAL_OR_KEYWORD])
+        unexpected_positional_arguments_found = (
+                not self.parameters_by_kind[Parameter.Kind.VARIADIC_POSITIONAL]
+                and len(args) > len(positionals))
+        if unexpected_positional_arguments_found:
+            return False
+        to_rest_positionals = cutter(slice(len(args), None))
+        rest_positionals = to_rest_positionals(positionals)
+        rest_positionals_by_kind = to_parameters_by_kind(rest_positionals)
+        rest_keywords = (
+                rest_positionals_by_kind[Parameter.Kind.POSITIONAL_OR_KEYWORD]
+                + self.parameters_by_kind[Parameter.Kind.KEYWORD_ONLY])
+        rest_keywords_by_name = to_parameters_by_name(rest_keywords)
+        unexpected_keyword_arguments_found = (
+                not self.parameters_by_kind[Parameter.Kind.VARIADIC_KEYWORD]
+                and kwargs.keys() - rest_keywords_by_name.keys())
+        if unexpected_keyword_arguments_found:
+            return False
+        return bool(rest_positionals_by_kind[Parameter.Kind.POSITIONAL_ONLY]
+                    or rest_keywords_by_name.keys() - kwargs.keys())
 
 
 @singledispatch
@@ -195,6 +246,12 @@ else:
 
         def __str__(self) -> str:
             return '\nor\n'.join(map(str, self.signatures))
+
+        def has_unset_parameters(self, *args: Domain, **kwargs: Domain
+                                 ) -> bool:
+            return all(map(methodcaller(Base.has_unset_parameters.__name__,
+                                        *args, **kwargs),
+                           self.signatures))
 
 
     def with_typeshed(function: Map[Callable[..., Range], Base]
