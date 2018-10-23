@@ -186,7 +186,7 @@ if platform.python_implementation() != 'PyPy':
                                 types.ModuleType,
                                 warnings._OptionError})
     if sys.platform == 'win32':
-        unsupported_classes.update({os.statvfs_result})
+        unsupported_classes.add(os.statvfs_result)
     else:
         import pwd
         import termios
@@ -203,6 +203,8 @@ if platform.python_implementation() != 'PyPy':
     else:
         unsupported_classes.add(asyncio.events.SendfileNotAvailableError)
 
+    if sys.version_info >= (3, 6):
+        unsupported_classes.add(_ast.Constant)
 
 def is_class_supported(class_: type) -> bool:
     return class_ not in unsupported_classes
