@@ -271,7 +271,6 @@ if platform.python_implementation() != 'PyPy':
                                             collections.OrderedDict.update,
                                             dict.get,
                                             int.conjugate,
-                                            float.conjugate,
                                             zipimport.zipimporter.find_loader})
     if sys.version_info >= (3, 6):
         unsupported_methods_descriptors.update(
@@ -289,6 +288,9 @@ if platform.python_implementation() != 'PyPy':
                                                 bytearray.isascii,
                                                 socket.socket.getblocking,
                                                 str.isascii})
+    else:
+        unsupported_methods_descriptors.add(float.conjugate)
+
     if sys.platform == 'win32':
         import socket
 
