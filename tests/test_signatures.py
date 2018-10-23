@@ -1,8 +1,11 @@
+import platform
 from types import (BuiltinFunctionType,
                    FunctionType,
                    MethodType)
 from typing import (Any,
                     Callable)
+
+import pytest
 
 from lz import signatures
 from lz.signatures.hints import (MethodDescriptorType,
@@ -28,6 +31,13 @@ def test_factory(built_in_function: BuiltinFunctionType,
     assert isinstance(method_result, signatures.Base)
     assert isinstance(method_descriptor_result, signatures.Base)
     assert isinstance(wrapper_descriptor_result, signatures.Base)
+
+
+@pytest.mark.skipif(platform.python_implementation() == 'PyPy',
+                    reason='requires CPython')
+def test_factory_fail(unsupported_callable: Callable[..., Any]) -> None:
+    with pytest.raises(ValueError):
+        signatures.factory(unsupported_callable)
 
 
 def test_has_unset_parameters(callable_: Callable[..., Any]) -> None:

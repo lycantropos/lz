@@ -43,5 +43,10 @@ def method_descriptor() -> MethodDescriptorType:
 
 
 @pytest.fixture(scope='function')
+def unsupported_callable() -> Callable[..., Any]:
+    return find(strategies.unsupported_callables)
+
+
+@pytest.fixture(scope='function')
 def wrapper_descriptor() -> WrapperDescriptorType:
     return find(strategies.methods_descriptors)

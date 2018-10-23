@@ -386,6 +386,11 @@ def has_module(function: BuiltinFunctionType) -> bool:
 
 built_in_functions = (objects.filter(inspect.isbuiltin)
                       .filter(is_built_in_function_supported))
+unsupported_callables = strategies.sampled_from(
+        list(unsupported_built_in_functions
+             | unsupported_classes
+             | unsupported_methods_descriptors
+             | unsupported_wrappers_descriptors))
 callables = (built_in_functions
              | classes
              | functions
