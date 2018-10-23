@@ -47,6 +47,9 @@ stdlib_modules_names = (set(find_stdlib_modules_names())
 if sys.platform == 'win32':
     stdlib_modules_names -= {'crypt', 'curses', 'pty', 'tty'}
 
+if platform.python_implementation() == 'PyPy':
+    stdlib_modules_names -= {'msilib', 'symtable', 'tracemalloc'}
+
 stdlib_modules = list(map(importlib.import_module, stdlib_modules_names))
 supported_modules = set(stdlib_modules)
 unsupported_modules = set()
