@@ -147,7 +147,6 @@ unsupported_classes = set()
 if platform.python_implementation() != 'PyPy':
     import _ast
     import _collections_abc
-    import _hashlib
     import _io
     import _thread
     import itertools
@@ -170,7 +169,6 @@ if platform.python_implementation() != 'PyPy':
     # not supported by ``typeshed`` package
     unsupported_classes.update({_ast.excepthandler,
                                 _collections_abc.mappingproxy,
-                                _hashlib.HASH,
                                 _io._BufferedIOBase,
                                 _io._IOBase,
                                 _io._RawIOBase,
@@ -187,9 +185,6 @@ if platform.python_implementation() != 'PyPy':
                                 itertools._tee_dataobject,
                                 encodings.CodecRegistryError,
                                 macpath.norm_error,
-                                os.terminal_size,
-                                os.times_result,
-                                os.uname_result,
                                 pdb._rstr,
                                 pdb.Restart,
                                 random._MethodType,
@@ -203,11 +198,8 @@ if platform.python_implementation() != 'PyPy':
                                 tarfile.SubsequentHeaderError,
                                 tkinter.TclError,
                                 types.CodeType,
-                                types.ModuleType,
                                 warnings._OptionError})
-    if sys.platform == 'win32':
-        unsupported_classes.add(os.statvfs_result)
-    else:
+    if sys.platform != 'win32':
         import pwd
         import termios
 
@@ -219,8 +211,7 @@ if platform.python_implementation() != 'PyPy':
         import plistlib
         import struct
 
-        unsupported_classes.update({plistlib._InternalDict,
-                                    struct.Struct})
+        unsupported_classes.add(plistlib._InternalDict)
     else:
         unsupported_classes.add(asyncio.events.SendfileNotAvailableError)
 
@@ -287,8 +278,7 @@ if platform.python_implementation() != 'PyPy':
 
         unsupported_methods_descriptors.update({bytes.isascii,
                                                 bytearray.isascii,
-                                                socket.socket.getblocking,
-                                                str.isascii})
+                                                socket.socket.getblocking})
     else:
         import zipimport
 
@@ -347,7 +337,6 @@ if platform.python_implementation() != 'PyPy':
     import _thread
     import codecs
     import socket
-    import sqlite3
 
     # not supported by ``typeshed`` package
     unsupported_built_in_functions.update({_hashlib.openssl_md5,
@@ -387,14 +376,7 @@ if platform.python_implementation() != 'PyPy':
                  _locale.dcgettext,
                  _locale.dgettext,
                  _locale.gettext,
-                 _locale.textdomain,
-                 sqlite3.adapt,
-                 sqlite3.complete_statement,
-                 sqlite3.connect,
-                 sqlite3.enable_callback_tracebacks,
-                 sqlite3.enable_shared_cache,
-                 sqlite3.register_adapter,
-                 sqlite3.register_converter})
+                 _locale.textdomain})
 
 
 def is_built_in_function_supported(function: BuiltinFunctionType) -> bool:
