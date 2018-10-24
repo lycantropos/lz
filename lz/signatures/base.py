@@ -231,8 +231,8 @@ if platform.python_implementation() == 'PyPy':
 else:
     from typed_ast import ast3
 
-    from . import arboretum
-    from . import catalog
+    from . import (arboretum,
+                   catalog)
 
 
     class Overloaded(Base):
