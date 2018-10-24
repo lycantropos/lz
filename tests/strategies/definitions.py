@@ -382,6 +382,9 @@ if platform.python_implementation() != 'PyPy':
 
         unsupported_built_in_functions.update({_locale.bind_textdomain_codeset,
                                                _locale.bindtextdomain,
+                                               _locale.dcgettext,
+                                               _locale.dgettext,
+                                               _locale.gettext,
                                                _locale.textdomain})
 
 
