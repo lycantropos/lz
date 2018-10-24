@@ -1,5 +1,7 @@
 import inspect
 import pathlib
+import struct
+import types
 from functools import singledispatch
 from types import (BuiltinMethodType,
                    FunctionType,
@@ -12,6 +14,7 @@ from lz import right
 from .file_system import INIT_MODULE_NAME
 from .hints import (MethodDescriptorType,
                     WrapperDescriptorType)
+from .utils import cached_map
 
 
 class Path:
@@ -120,6 +123,8 @@ def module_name_from_string(object_: str) -> str:
 @module_name_factory.register(BuiltinMethodType)
 @module_name_factory.register(FunctionType)
 @module_name_factory.register(type)
+@cached_map({struct.Struct: struct.__name__,
+             types.FrameType: types.__name__})
 def module_name_from_class_or_function(object_: Union[BuiltinMethodType,
                                                       FunctionType, type]
                                        ) -> str:
