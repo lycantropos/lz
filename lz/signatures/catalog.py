@@ -132,4 +132,4 @@ def module_name_from_class_or_function(object_: Union[BuiltinMethodType,
 @module_name_factory.register(MethodDescriptorType)
 @module_name_factory.register(WrapperDescriptorType)
 def module_name_from_method_descriptor(object_: MethodDescriptorType) -> str:
-    return module_name_factory(module_name_factory(object_.__objclass__))
+    return module_name_factory(object_.__objclass__)
