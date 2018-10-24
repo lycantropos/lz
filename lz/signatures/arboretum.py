@@ -457,8 +457,7 @@ def expression_to_assignment(node: ast3.expr,
                              name: str) -> ast3.Assign:
     name_node = ast3.Name(name, ast3.Store())
     result = ast3.Assign([name_node], node, None)
-    result = ast3.fix_missing_locations(result)
-    return result
+    return ast3.fix_missing_locations(result)
 
 
 @singledispatch
