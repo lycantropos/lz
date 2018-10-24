@@ -369,6 +369,13 @@ if platform.python_implementation() != 'PyPy':
                                                sys.get_asyncgen_hooks,
                                                sys.set_asyncgen_hooks})
 
+    if sys.platform != 'win32':
+        import _locale
+
+        unsupported_built_in_functions.update({_locale.bind_textdomain_codeset,
+                                               _locale.bindtextdomain,
+                                               _locale.textdomain})
+
 
 def is_built_in_function_supported(function: BuiltinFunctionType) -> bool:
     return (is_not_private(function)
