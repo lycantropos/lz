@@ -248,6 +248,7 @@ unsupported_methods_descriptors = set()
 if platform.python_implementation() != 'PyPy':
     import _collections_abc
     import _io
+    import _thread
     import collections
     import types
 
@@ -261,6 +262,12 @@ if platform.python_implementation() != 'PyPy':
              _collections_abc.coroutine.send,
              _collections_abc.coroutine.throw,
              _io.BufferedRWPair.peek,
+             _thread.LockType.acquire,
+             _thread.LockType.acquire_lock,
+             _thread.LockType.locked,
+             _thread.LockType.locked_lock,
+             _thread.LockType.release,
+             _thread.LockType.release_lock,
              collections.OrderedDict.clear,
              collections.OrderedDict.pop,
              collections.OrderedDict.update,
