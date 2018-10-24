@@ -205,6 +205,19 @@ class Registry(Base):
 
     def visit_ClassDef(self, node: ast3.ClassDef) -> ast3.ClassDef:
         path = self.resolve_path(catalog.factory(node.name))
+        try:
+            self.nodes[path]
+        except KeyError:
+            pass
+        else:
+            inherits_itself = any(path == base_path
+                                  for base_path in map(self.visit, node.bases))
+            if not inherits_itself:
+                nodes = {object_path: object_node
+                         for object_path, object_node in self.nodes.items()
+                         if not object_path.is_child_of(path)}
+                self.nodes.clear()
+                self.nodes.update(nodes)
         self.nodes[path] = node
         transformer = type(self)(nodes=self.nodes,
                                  parent_path=path,
@@ -278,6 +291,13 @@ class Registry(Base):
         parent_path = self.visit(node.value)
         attribute_path = catalog.factory(node.attr)
         return parent_path.join(attribute_path)
+
+    def visit_Subscript(self, node: ast3.Subscript) -> catalog.Path:
+        context = node.ctx
+        if not isinstance(context, ast3.Load):
+            raise TypeError('Unsupported context type: {type}.'
+                            .format(type=type(context)))
+        return self.visit(node.value)
 
 
 complete_new_style_class_bases = right.attacher(ast3.Name('object',
