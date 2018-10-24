@@ -4,6 +4,7 @@ from contextlib import suppress
 from functools import singledispatch
 from itertools import chain
 from pathlib import Path
+from types import MappingProxyType
 from typing import (Any,
                     Dict,
                     Iterable,
@@ -30,8 +31,8 @@ OVERLOAD_DECORATORS_PATHS = {catalog.factory('typing.overload'),
 
 def to_nodes(object_path: catalog.Path,
              module_path: catalog.Path) -> List[ast3.AST]:
-    nodes = module_path_to_nodes(module_path)
-    nodes = dictionaries.merge([built_ins_nodes, nodes])
+    nodes = module_path_to_nodes(module_path,
+                                 base=built_ins_nodes)
     reduce_node = Reducer(nodes=nodes,
                           parent_path=catalog.Path()).visit
     reduce_node(nodes[catalog.Path()])
@@ -45,8 +46,9 @@ def to_nodes(object_path: catalog.Path,
     return result
 
 
-def module_path_to_nodes(module_path: catalog.Path) -> Nodes:
-    result = {}
+def module_path_to_nodes(module_path: catalog.Path,
+                         *,
+                         base: Nodes = MappingProxyType({})) -> Nodes:
     source_path = sources.factory(module_path)
     module_root = factory(source_path)
     namespace = namespaces.factory(module_path)
@@ -54,6 +56,7 @@ def module_path_to_nodes(module_path: catalog.Path) -> Nodes:
     Flattener(namespace=namespace,
               module_path=module_path,
               parent_path=catalog.Path()).visit(module_root)
+    result = dict(base)
     Registry(nodes=result,
              parent_path=catalog.Path()).visit(module_root)
     return result
