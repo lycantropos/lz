@@ -249,6 +249,7 @@ if platform.python_implementation() != 'PyPy':
     import _collections_abc
     import _io
     import collections
+    import types
 
     # not supported by ``typeshed`` package
     unsupported_methods_descriptors.update(
@@ -263,7 +264,8 @@ if platform.python_implementation() != 'PyPy':
              collections.OrderedDict.clear,
              collections.OrderedDict.pop,
              collections.OrderedDict.update,
-             int.conjugate})
+             int.conjugate,
+             types.FrameType.clear})
     if sys.version_info >= (3, 6):
         unsupported_methods_descriptors.update(
                 {_collections_abc.async_generator.aclose,
