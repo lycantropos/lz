@@ -23,8 +23,12 @@ class Path:
     def __init__(self, *parts: str) -> None:
         self.parts = parts
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return self.SEPARATOR.join(self.parts)
+
+    def __repr__(self) -> str:
+        return (type(self).__qualname__
+                + '(' + ', '.join(map(repr, self.parts)) + ')')
 
     def __eq__(self, other: 'Path') -> bool:
         if not isinstance(other, Path):
