@@ -299,7 +299,8 @@ if platform.python_implementation() != 'PyPy':
 
 def is_method_descriptor_supported(method_descriptor: MethodDescriptorType
                                    ) -> bool:
-    return method_descriptor not in unsupported_methods_descriptors
+    return (is_not_private(function)
+            and method_descriptor not in unsupported_methods_descriptors)
 
 
 methods_descriptors = (classes_objects.filter(is_method_descriptor)
