@@ -347,6 +347,7 @@ if platform.python_implementation() != 'PyPy':
     import _thread
     import codecs
     import socket
+    import sqlite3
 
     # not supported by ``typeshed`` package
     unsupported_built_in_functions.update({_hashlib.openssl_md5,
@@ -380,12 +381,20 @@ if platform.python_implementation() != 'PyPy':
     if sys.platform != 'win32':
         import _locale
 
-        unsupported_built_in_functions.update({_locale.bind_textdomain_codeset,
-                                               _locale.bindtextdomain,
-                                               _locale.dcgettext,
-                                               _locale.dgettext,
-                                               _locale.gettext,
-                                               _locale.textdomain})
+        unsupported_built_in_functions.update(
+                {_locale.bind_textdomain_codeset,
+                 _locale.bindtextdomain,
+                 _locale.dcgettext,
+                 _locale.dgettext,
+                 _locale.gettext,
+                 _locale.textdomain,
+                 sqlite3.adapt,
+                 sqlite3.complete_statement,
+                 sqlite3.connect,
+                 sqlite3.enable_callback_tracebacks,
+                 sqlite3.enable_shared_cache,
+                 sqlite3.register_adapter,
+                 sqlite3.register_converter})
 
 
 def is_built_in_function_supported(function: BuiltinFunctionType) -> bool:
