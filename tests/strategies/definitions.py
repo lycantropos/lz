@@ -97,12 +97,16 @@ if platform.python_implementation() != 'PyPy':
                                 turtle,
                                 unittest,
                                 xxsubtype})
+
     if sys.version_info >= (3, 6):
-        import _blake2
         import _sha3
 
-        unsupported_modules.update({_blake2,
-                                    _sha3})
+        unsupported_modules.add(_sha3)
+
+        if sys.version_info < (3, 6, 7):
+            import _blake2
+
+            unsupported_modules.add(_blake2)
 
 supported_modules -= unsupported_modules
 
@@ -200,13 +204,12 @@ if platform.python_implementation() != 'PyPy':
                                 tkinter.TclError,
                                 types.CodeType,
                                 warnings._OptionError})
-    if sys.platform != 'win32':
-        import pwd
-        import termios
 
-        unsupported_classes.update({os.waitid_result,
-                                    pwd.struct_passwd,
-                                    termios.error})
+    if sys.version_info >= (3, 6):
+        import asyncio.base_futures
+
+        unsupported_classes.update({_ast.Constant,
+                                    asyncio.base_futures.InvalidStateError})
 
     if sys.version_info < (3, 7):
         import os
@@ -217,10 +220,26 @@ if platform.python_implementation() != 'PyPy':
                                     os.uname_result,
                                     plistlib._InternalDict})
     else:
-        unsupported_classes.add(asyncio.events.SendfileNotAvailableError)
+        import dataclasses
+        import typing
 
-    if sys.version_info >= (3, 6):
-        unsupported_classes.add(_ast.Constant)
+        unsupported_classes.update({asyncio.events.SendfileNotAvailableError,
+                                    dataclasses._InitVarMeta,
+                                    typing._ProtocolMeta})
+
+    if sys.platform == 'win32':
+        import subprocess
+
+        unsupported_classes.add(subprocess.Handle)
+    else:
+        import pwd
+        import termios
+        import zipfile
+
+        unsupported_classes.update({os.waitid_result,
+                                    pwd.struct_passwd,
+                                    termios.error,
+                                    zipfile.BadZipFile})
 
 
 def is_class_supported(class_: type) -> bool:
@@ -268,6 +287,7 @@ if platform.python_implementation() != 'PyPy':
              collections.OrderedDict.update,
              int.conjugate,
              types.FrameType.clear})
+
     if sys.version_info >= (3, 6):
         unsupported_methods_descriptors.update(
                 {_collections_abc.async_generator.aclose,
@@ -277,6 +297,7 @@ if platform.python_implementation() != 'PyPy':
             import socket
 
             unsupported_methods_descriptors.add(socket.socket.sendmsg_afalg)
+
     if sys.version_info >= (3, 7):
         import socket
 
@@ -371,6 +392,10 @@ if platform.python_implementation() != 'PyPy':
                                                sys.get_asyncgen_hooks,
                                                sys.set_asyncgen_hooks})
 
+    if sys.version_info >= (3, 7):
+        unsupported_built_in_functions.update({socket.close,
+                                               sys.breakpointhook})
+
     if sys.platform != 'win32':
         import _locale
 
@@ -381,6 +406,11 @@ if platform.python_implementation() != 'PyPy':
                  _locale.dgettext,
                  _locale.gettext,
                  _locale.textdomain})
+
+        if sys.version_info >= (3, 7):
+            import time
+
+            unsupported_built_in_functions.add(time.pthread_getcpuclockid)
 
 
 def is_built_in_function_supported(function: BuiltinFunctionType) -> bool:
