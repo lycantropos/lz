@@ -4,8 +4,8 @@ import pathlib
 import struct
 import sys
 import types
-from collections import deque
 from functools import singledispatch
+from itertools import chain
 from types import (BuiltinMethodType,
                    FunctionType,
                    ModuleType)
@@ -16,6 +16,7 @@ from typing import (Any,
 
 from lz import right
 from lz.functional import compose
+from lz.iterating import expand
 from .file_system import INIT_MODULE_NAME
 from .hints import (MethodDescriptorType,
                     WrapperDescriptorType)
@@ -87,19 +88,21 @@ def paths_from_class_or_function(object_: Union[BuiltinMethodType,
                                                 MethodDescriptorType, type]
                                  ) -> Iterable[Path]:
     module = importlib.import_module(module_name_factory(object_))
-    propertyspaces = deque([(Path(), module)])
-    while propertyspaces:
-        parent_path, propertyspace = propertyspaces.pop()
+    propertyspaces = iter(expand((Path(), module)))
+    while True:
+        try:
+            parent_path, propertyspace = next(propertyspaces)
+        except StopIteration:
+            break
         to_path = compose(parent_path.join, factory)
         namespace = dict(vars(propertyspace))
-        try:
-            yield from (to_path(name)
-                        for name, content in namespace.items()
-                        if content is object_)
-        except StopIteration:
-            propertyspaces.extendleft(((to_path(name), content)
-                                       for name, content in namespace.items()
-                                       if is_propertyspace(content)))
+        yield from (to_path(name)
+                    for name, content in namespace.items()
+                    if content is object_)
+        propertyspaces = chain(propertyspaces,
+                               ((to_path(name), content)
+                                for name, content in namespace.items()
+                                if is_propertyspace(content)))
     yield from paths_factory(object_.__qualname__)
 
 
