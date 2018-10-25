@@ -10,6 +10,7 @@ from types import (BuiltinMethodType,
                    FunctionType,
                    ModuleType)
 from typing import (Any,
+                    Iterable,
                     Optional,
                     Union)
 
@@ -71,14 +72,20 @@ def is_propertyspace(object_: Any) -> bool:
     return isinstance(object_, (ModuleType, type))
 
 
-@factory.register(BuiltinMethodType)
-@factory.register(FunctionType)
-@factory.register(MethodDescriptorType)
-@factory.register(WrapperDescriptorType)
-@factory.register(type)
-def from_class_or_function(object_: Union[BuiltinMethodType, FunctionType,
-                                          MethodDescriptorType, type]
-                           ) -> Path:
+@singledispatch
+def paths_factory(object_: Any) -> Iterable[Path]:
+    yield factory(object_)
+
+
+@paths_factory.register(BuiltinMethodType)
+@paths_factory.register(FunctionType)
+@paths_factory.register(MethodDescriptorType)
+@paths_factory.register(WrapperDescriptorType)
+@paths_factory.register(type)
+def paths_from_class_or_function(object_: Union[BuiltinMethodType,
+                                                FunctionType,
+                                                MethodDescriptorType, type]
+                                 ) -> Iterable[Path]:
     module = importlib.import_module(module_name_factory(object_))
     propertyspaces = deque([(Path(), module)])
     while propertyspaces:
@@ -86,14 +93,14 @@ def from_class_or_function(object_: Union[BuiltinMethodType, FunctionType,
         to_path = compose(parent_path.join, factory)
         namespace = dict(vars(propertyspace))
         try:
-            return next(to_path(name)
+            yield from (to_path(name)
                         for name, content in namespace.items()
                         if content is object_)
         except StopIteration:
             propertyspaces.extendleft(((to_path(name), content)
                                        for name, content in namespace.items()
                                        if is_propertyspace(content)))
-    return factory(object_.__qualname__)
+    yield from paths_factory(object_.__qualname__)
 
 
 @factory.register(ModuleType)

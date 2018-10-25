@@ -270,12 +270,18 @@ else:
             try:
                 return function(object_)
             except ValueError as error:
-                object_path = catalog.factory(object_)
+                object_paths = catalog.paths_factory(object_)
                 module_path = catalog.factory(catalog
                                               .module_name_factory(object_))
-                try:
-                    object_nodes = arboretum.to_nodes(object_path, module_path)
-                except KeyError:
+                for object_path in object_paths:
+                    try:
+                        object_nodes = arboretum.to_nodes(object_path,
+                                                          module_path)
+                    except KeyError:
+                        continue
+                    else:
+                        break
+                else:
                     raise error
                 try:
                     return flatten_signatures(to_signatures(object_nodes))
@@ -287,19 +293,27 @@ else:
 
     from_callable = with_typeshed(from_callable)
 
+    to_methods_paths = mapper(methodcaller(catalog.Path.join.__name__,
+                                           catalog.factory('__init__')))
+
 
     @factory.register(type)
     def from_class(object_: type) -> Base:
         try:
             return from_callable(object_)
         except ValueError as error:
-            method_path = (catalog.factory(object_)
-                           .join(catalog.factory('__init__')))
+            method_paths = to_methods_paths(catalog.paths_factory(object_))
             module_path = catalog.factory(catalog
                                           .module_name_factory(object_))
-            try:
-                method_nodes = arboretum.to_nodes(method_path, module_path)
-            except KeyError:
+            for method_path in method_paths:
+                try:
+                    method_nodes = arboretum.to_nodes(method_path,
+                                                      module_path)
+                except KeyError:
+                    continue
+                else:
+                    break
+            else:
                 raise error
             method_signature = flatten_signatures(to_signatures(method_nodes))
             return slice_parameters(method_signature, slice(1, None))
