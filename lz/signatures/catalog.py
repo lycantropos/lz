@@ -2,6 +2,7 @@ import importlib
 import inspect
 import pathlib
 import struct
+import sys
 import types
 from collections import deque
 from functools import singledispatch
@@ -145,13 +146,26 @@ def module_name_from_string(object_: str) -> str:
     return replacements.get(object_, object_)
 
 
+module_name_from_class_or_function_cache = {
+    struct.Struct: struct.__name__,
+    types.CodeType: types.__name__,
+    types.FrameType: types.__name__,
+    types.ModuleType: types.__name__,
+}
+
+if sys.version_info >= (3, 7):
+    import contextvars
+
+    module_name_from_class_or_function_cache.update(
+            {contextvars.Context: contextvars.__name__,
+             contextvars.ContextVar: contextvars.__name__,
+             contextvars.Token: contextvars.__name__})
+
+
 @module_name_factory.register(BuiltinMethodType)
 @module_name_factory.register(FunctionType)
 @module_name_factory.register(type)
-@cached_map({struct.Struct: struct.__name__,
-             types.CodeType: types.__name__,
-             types.FrameType: types.__name__,
-             types.ModuleType: types.__name__})
+@cached_map(module_name_from_class_or_function_cache)
 def module_name_from_class_or_function(object_: Union[BuiltinMethodType,
                                                       FunctionType, type]
                                        ) -> str:
