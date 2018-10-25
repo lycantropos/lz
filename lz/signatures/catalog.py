@@ -1,7 +1,9 @@
+import importlib
 import inspect
 import pathlib
 import struct
 import types
+from collections import deque
 from functools import singledispatch
 from types import (BuiltinMethodType,
                    FunctionType,
@@ -11,6 +13,7 @@ from typing import (Any,
                     Union)
 
 from lz import right
+from lz.functional import compose
 from .file_system import INIT_MODULE_NAME
 from .hints import (MethodDescriptorType,
                     WrapperDescriptorType)
@@ -63,6 +66,10 @@ def factory(object_: Any) -> Path:
                     .format(type=type(object_)))
 
 
+def is_propertyspace(object_: Any) -> bool:
+    return isinstance(object_, (ModuleType, type))
+
+
 @factory.register(BuiltinMethodType)
 @factory.register(FunctionType)
 @factory.register(MethodDescriptorType)
@@ -71,6 +78,20 @@ def factory(object_: Any) -> Path:
 def from_class_or_function(object_: Union[BuiltinMethodType, FunctionType,
                                           MethodDescriptorType, type]
                            ) -> Path:
+    module = importlib.import_module(module_name_factory(object_))
+    propertyspaces = deque([(Path(), module)])
+    while propertyspaces:
+        parent_path, propertyspace = propertyspaces.pop()
+        to_path = compose(parent_path.join, factory)
+        namespace = dict(vars(propertyspace))
+        try:
+            return next(to_path(name)
+                        for name, content in namespace.items()
+                        if content is object_)
+        except StopIteration:
+            propertyspaces.extendleft(((to_path(name), content)
+                                       for name, content in namespace.items()
+                                       if is_propertyspace(content)))
     return factory(object_.__qualname__)
 
 
