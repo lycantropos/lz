@@ -140,6 +140,6 @@ def copier(count: int) -> Map[Iterable[Domain], Iterable[Iterable[Domain]]]:
 
 
 first = compose(next, iter)
-last = compose(deque.pop,
+last = compose(first,
                functools.partial(deque,
                                  maxlen=1))
