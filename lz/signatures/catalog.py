@@ -166,7 +166,8 @@ if sys.version_info >= (3, 7):
     module_name_from_class_or_function_cache.update(
             {contextvars.Context: contextvars.__name__,
              contextvars.ContextVar: contextvars.__name__,
-             contextvars.Token: contextvars.__name__})
+             contextvars.Token: contextvars.__name__,
+             types.TracebackType: types.__name__})
 
 
 @module_name_factory.register(BuiltinMethodType)
