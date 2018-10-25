@@ -149,7 +149,9 @@ def module_name_from_string(object_: str) -> str:
 @module_name_factory.register(FunctionType)
 @module_name_factory.register(type)
 @cached_map({struct.Struct: struct.__name__,
-             types.FrameType: types.__name__})
+             types.CodeType: types.__name__,
+             types.FrameType: types.__name__,
+             types.ModuleType: types.__name__})
 def module_name_from_class_or_function(object_: Union[BuiltinMethodType,
                                                       FunctionType, type]
                                        ) -> str:
