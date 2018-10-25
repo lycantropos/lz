@@ -169,6 +169,7 @@ if platform.python_implementation() != 'PyPy':
     # not supported by ``typeshed`` package
     unsupported_classes.update({_ast.excepthandler,
                                 _collections_abc.mappingproxy,
+                                _collections_abc.range_iterator,
                                 _io._BufferedIOBase,
                                 _io._IOBase,
                                 _io._RawIOBase,
@@ -208,10 +209,13 @@ if platform.python_implementation() != 'PyPy':
                                     termios.error})
 
     if sys.version_info < (3, 7):
+        import os
         import plistlib
-        import struct
 
-        unsupported_classes.add(plistlib._InternalDict)
+        unsupported_classes.update({os.terminal_size,
+                                    os.times_result,
+                                    os.uname_result,
+                                    plistlib._InternalDict})
     else:
         unsupported_classes.add(asyncio.events.SendfileNotAvailableError)
 
