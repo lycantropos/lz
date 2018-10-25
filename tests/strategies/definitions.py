@@ -148,13 +148,13 @@ if platform.python_implementation() != 'PyPy':
     import _ast
     import _collections_abc
     import _io
-    import _thread
-    import itertools
     import _json
     import _ssl
+    import _thread
     import _weakrefset
     import asyncio.events
     import encodings
+    import itertools
     import macpath
     import pdb
     import random
