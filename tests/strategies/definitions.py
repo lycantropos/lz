@@ -133,8 +133,8 @@ def is_object_supported(object_: Any) -> bool:
     if isinstance(object_, ModuleSpec):
         return False
     return (object_ not in unsupported_modules_objects
-            or isinstance(object_, ModuleType)
-            and is_module_supported(object_))
+            and (not isinstance(object_, ModuleType)
+                 or is_module_supported(object_)))
 
 
 objects = (modules.flatmap(flatten_module_or_class)
