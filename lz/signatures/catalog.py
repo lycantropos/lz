@@ -69,10 +69,6 @@ def factory(object_: Any) -> Path:
                     .format(type=type(object_)))
 
 
-def is_propertyspace(object_: Any) -> bool:
-    return isinstance(object_, (ModuleType, type))
-
-
 @singledispatch
 def paths_factory(object_: Any) -> Iterable[Path]:
     yield factory(object_)
@@ -102,7 +98,7 @@ def paths_from_class_or_function(object_: Union[BuiltinMethodType,
         propertyspaces = chain(propertyspaces,
                                ((to_path(name), content)
                                 for name, content in namespace.items()
-                                if is_propertyspace(content)))
+                                if inspect.isclass(content)))
     yield from paths_factory(object_.__qualname__)
 
 
