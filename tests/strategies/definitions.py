@@ -103,10 +103,11 @@ if platform.python_implementation() != 'PyPy':
 
         unsupported_modules.add(_sha3)
 
-        if sys.version_info < (3, 6, 7):
-            import _blake2
+    if ((3, 6) <= sys.version_info < (3, 6, 7)
+            or (3, 7) <= sys.version_info < (3, 7, 1)):
+        import _blake2
 
-            unsupported_modules.add(_blake2)
+        unsupported_modules.add(_blake2)
 
 supported_modules -= unsupported_modules
 
