@@ -175,13 +175,10 @@ if platform.python_implementation() != 'PyPy':
     # not supported by ``typeshed`` package
     unsupported_classes.update({_ast.excepthandler,
                                 _collections_abc.mappingproxy,
-                                _collections_abc.range_iterator,
                                 _io._BufferedIOBase,
                                 _io._IOBase,
                                 _io._RawIOBase,
                                 _io._TextIOBase,
-                                _json.make_encoder,
-                                _json.make_scanner,
                                 _ssl._SSLContext,
                                 _thread.RLock,
                                 _thread._local,
@@ -204,7 +201,6 @@ if platform.python_implementation() != 'PyPy':
                                 tarfile.TruncatedHeaderError,
                                 tarfile.SubsequentHeaderError,
                                 tkinter.TclError,
-                                types.CodeType,
                                 warnings._OptionError})
 
     if sys.version_info >= (3, 6):
@@ -217,7 +213,8 @@ if platform.python_implementation() != 'PyPy':
         import os
         import plistlib
 
-        unsupported_classes.update({os.terminal_size,
+        unsupported_classes.update({_collections_abc.range_iterator,
+                                    os.terminal_size,
                                     os.times_result,
                                     os.uname_result,
                                     plistlib._InternalDict})
@@ -236,12 +233,10 @@ if platform.python_implementation() != 'PyPy':
     else:
         import pwd
         import termios
-        import zipfile
 
         unsupported_classes.update({os.waitid_result,
                                     pwd.struct_passwd,
-                                    termios.error,
-                                    zipfile.BadZipFile})
+                                    termios.error})
 
 
 def is_class_supported(class_: type) -> bool:
