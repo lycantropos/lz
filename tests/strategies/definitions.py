@@ -160,6 +160,7 @@ if platform.python_implementation() != 'PyPy':
     import _weakrefset
     import asyncio.events
     import encodings
+    import imaplib
     import itertools
     import macpath
     import pdb
@@ -184,6 +185,9 @@ if platform.python_implementation() != 'PyPy':
                                 _thread._local,
                                 _weakrefset.ref,
                                 asyncio.events._RunningLoop,
+                                imaplib.IMAP4.abort,
+                                imaplib.IMAP4.error,
+                                imaplib.IMAP4.readonly,
                                 itertools._grouper,
                                 itertools._tee,
                                 itertools._tee_dataobject,
@@ -210,7 +214,6 @@ if platform.python_implementation() != 'PyPy':
                                     asyncio.base_futures.InvalidStateError})
 
     if sys.version_info < (3, 7):
-        import os
         import plistlib
 
         unsupported_classes.update({_collections_abc.range_iterator,
@@ -227,9 +230,18 @@ if platform.python_implementation() != 'PyPy':
                                     typing._ProtocolMeta})
 
     if sys.platform == 'win32':
+        import msilib
         import subprocess
 
-        unsupported_classes.add(subprocess.Handle)
+        unsupported_classes.update({msilib.UuidCreate,
+                                    msilib.FCICreate,
+                                    msilib.OpenDatabase,
+                                    msilib.CreateRecord,
+                                    msilib.MSIError,
+                                    subprocess.Handle})
+
+        if sys.version_info < (3, 7):
+            unsupported_classes.add(os.statvfs_result)
     else:
         import pwd
         import termios
@@ -262,6 +274,7 @@ if platform.python_implementation() != 'PyPy':
     import _io
     import _thread
     import collections
+    import sqlite3
     import types
 
     # not supported by ``typeshed`` package
@@ -284,6 +297,8 @@ if platform.python_implementation() != 'PyPy':
              collections.OrderedDict.pop,
              collections.OrderedDict.update,
              int.conjugate,
+             sqlite3.Connection.enable_load_extension,
+             sqlite3.Connection.load_extension,
              types.FrameType.clear})
 
     if sys.version_info >= (3, 6):
@@ -335,11 +350,18 @@ unsupported_wrappers_descriptors = set()
 
 if platform.python_implementation() != 'PyPy':
     import _collections_abc
+    import asyncio
 
     # not supported by ``typeshed`` package
     unsupported_wrappers_descriptors.update({
         _collections_abc.coroutine.__del__,
-        _collections_abc.generator.__del__})
+        _collections_abc.generator.__del__,
+        asyncio.Task.__del__})
+
+    if sys.version_info >= (3, 6):
+        import _socket
+
+        unsupported_wrappers_descriptors.add(_socket.socket.__del__)
 
 
 def is_wrapper_descriptor_supported(wrapper_descriptor: MethodDescriptorType
