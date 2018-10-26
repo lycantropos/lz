@@ -324,7 +324,6 @@ def is_method_descriptor_supported(method_descriptor: MethodDescriptorType
 
 
 methods_descriptors = (classes_objects.filter(is_method_descriptor)
-                       .filter(is_not_private)
                        .filter(is_method_descriptor_supported))
 
 
