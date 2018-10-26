@@ -137,7 +137,8 @@ def is_object_supported(object_: Any) -> bool:
             and is_module_supported(object_))
 
 
-objects = modules.flatmap(flatten_module_or_class)
+objects = (modules.flatmap(flatten_module_or_class)
+           .filter(is_object_supported))
 
 
 def is_not_private(object_: Union[BuiltinFunctionType,
@@ -249,7 +250,8 @@ def is_class_supported(class_: type) -> bool:
 classes = (objects.filter(inspect.isclass)
            .filter(is_class_supported)
            .filter(is_not_private))
-classes_objects = classes.flatmap(flatten_module_or_class)
+classes_objects = (classes.flatmap(flatten_module_or_class)
+                   .filter(is_object_supported))
 methods = classes_objects.filter(inspect.isfunction)
 
 
