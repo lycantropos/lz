@@ -33,6 +33,7 @@ from lz.hints import (Domain,
                       Range)
 from lz.iterating import (cutter,
                           expand,
+                          first,
                           flatten,
                           grouper,
                           mapper,
@@ -273,19 +274,13 @@ else:
                 object_paths = catalog.paths_factory(object_)
                 module_path = catalog.factory(catalog
                                               .module_name_factory(object_))
-                for object_path in object_paths:
-                    try:
-                        object_nodes = arboretum.to_nodes(object_path,
-                                                          module_path)
-                    except KeyError:
-                        continue
-                    else:
-                        break
-                else:
-                    raise error
+                signature_factory = partial(to_signature,
+                                            module_path=module_path)
+                signatures_factory = compose(sifter(),
+                                             mapper(signature_factory))
                 try:
-                    return flatten_signatures(to_signatures(object_nodes))
-                except AttributeError:
+                    return first(signatures_factory(object_paths))
+                except StopIteration:
                     raise error
 
         return wrapped
@@ -305,18 +300,32 @@ else:
             method_paths = to_methods_paths(catalog.paths_factory(object_))
             module_path = catalog.factory(catalog
                                           .module_name_factory(object_))
-            for method_path in method_paths:
-                try:
-                    method_nodes = arboretum.to_nodes(method_path,
-                                                      module_path)
-                except KeyError:
-                    continue
-                else:
-                    break
-            else:
+            signature_factory = partial(to_signature,
+                                        module_path=module_path)
+            signatures_factory = compose(sifter(),
+                                         mapper(signature_factory))
+            try:
+                method_signature = first(signatures_factory(method_paths))
+            except StopIteration:
                 raise error
-            method_signature = flatten_signatures(to_signatures(method_nodes))
-            return slice_parameters(method_signature, slice(1, None))
+            else:
+                return slice_parameters(method_signature, slice(1, None))
+
+
+    def to_signature(object_path: catalog.Path,
+                     module_path: catalog.Path) -> Optional[Base]:
+        try:
+            object_nodes = arboretum.to_nodes(object_path,
+                                              module_path)
+        except KeyError:
+            return None
+        else:
+            try:
+                signatures = list(to_signatures(object_nodes))
+            except AttributeError:
+                return None
+            else:
+                return flatten_signatures(signatures)
 
 
     def flatten_signatures(signatures: Iterable[Base]) -> Base:
