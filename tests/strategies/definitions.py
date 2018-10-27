@@ -350,13 +350,11 @@ unsupported_wrappers_descriptors = set()
 
 if platform.python_implementation() != 'PyPy':
     import _collections_abc
-    import asyncio
 
     # not supported by ``typeshed`` package
     unsupported_wrappers_descriptors.update({
         _collections_abc.coroutine.__del__,
-        _collections_abc.generator.__del__,
-        asyncio.Task.__del__})
+        _collections_abc.generator.__del__})
 
     if sys.version_info >= (3, 6):
         import _socket
