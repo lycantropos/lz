@@ -17,7 +17,8 @@ from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
 from lz.functional import compose
-from lz.iterating import flatmapper
+from lz.iterating import (flatmapper,
+                          sifter)
 from lz.signatures.hints import (MethodDescriptorType,
                                  WrapperDescriptorType)
 
@@ -119,27 +120,30 @@ modules = (strategies.sampled_from(stdlib_modules)
 
 def flatten_module_or_class(object_: Union[ModuleType, type]
                             ) -> SearchStrategy:
-    return strategies.sampled_from(object_to_contents(object_))
+    return strategies.sampled_from(to_contents(object_))
 
 
-def object_to_contents(object_: Union[ModuleType, type]) -> List[Any]:
+def to_contents(object_: Union[ModuleType, type]) -> List[Any]:
     return list(vars(object_).values())
 
 
-objects_to_contents = compose(list, flatmapper(object_to_contents))
-unsupported_modules_objects = objects_to_contents(unsupported_modules)
+to_callables = compose(sifter(callable),
+                       to_contents)
+unsupported_modules_callables = list(flatmapper(to_callables)
+                                     (unsupported_modules))
 
 
-def is_object_supported(object_: Any) -> bool:
+def is_callable_supported(object_: Any) -> bool:
     if isinstance(object_, ModuleSpec):
         return False
-    return (object_ not in unsupported_modules_objects
+    return (object_ not in unsupported_modules_callables
             and (not isinstance(object_, ModuleType)
                  or is_module_supported(object_)))
 
 
-objects = (modules.flatmap(flatten_module_or_class)
-           .filter(is_object_supported))
+modules_callables = (modules.flatmap(flatten_module_or_class)
+                     .filter(callable)
+                     .filter(is_callable_supported))
 
 
 def is_not_private(object_: Union[BuiltinFunctionType,
@@ -255,12 +259,13 @@ def is_class_supported(class_: type) -> bool:
     return class_ not in unsupported_classes
 
 
-classes = (objects.filter(inspect.isclass)
+classes = (modules_callables.filter(inspect.isclass)
            .filter(is_class_supported)
            .filter(is_not_private))
-classes_objects = (classes.flatmap(flatten_module_or_class)
-                   .filter(is_object_supported))
-methods = classes_objects.filter(inspect.isfunction)
+classes_callables = (classes.flatmap(flatten_module_or_class)
+                     .filter(callable)
+                     .filter(is_callable_supported))
+methods = classes_callables.filter(inspect.isfunction)
 
 
 def is_method_descriptor(object_: Any) -> bool:
@@ -338,7 +343,7 @@ def is_method_descriptor_supported(method_descriptor: MethodDescriptorType
             and method_descriptor not in unsupported_methods_descriptors)
 
 
-methods_descriptors = (classes_objects.filter(is_method_descriptor)
+methods_descriptors = (classes_callables.filter(is_method_descriptor)
                        .filter(is_method_descriptor_supported))
 
 
@@ -367,9 +372,9 @@ def is_wrapper_descriptor_supported(wrapper_descriptor: MethodDescriptorType
     return wrapper_descriptor not in unsupported_wrappers_descriptors
 
 
-wrappers_descriptors = (classes_objects.filter(is_wrapper_descriptor)
+wrappers_descriptors = (classes_callables.filter(is_wrapper_descriptor)
                         .filter(is_wrapper_descriptor_supported))
-functions = objects.filter(inspect.isfunction)
+functions = modules_callables.filter(inspect.isfunction)
 
 unsupported_built_in_functions = set()
 
@@ -440,7 +445,7 @@ def has_module(function: BuiltinFunctionType) -> bool:
     return bool(function.__module__)
 
 
-built_in_functions = (objects.filter(inspect.isbuiltin)
+built_in_functions = (modules_callables.filter(inspect.isbuiltin)
                       .filter(is_built_in_function_supported))
 unsupported_callables = strategies.sampled_from(
         list(unsupported_built_in_functions
