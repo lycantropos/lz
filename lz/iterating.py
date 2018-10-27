@@ -40,7 +40,7 @@ def kicker(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     return functools.partial(itertools.dropwhile, predicate)
 
 
-def cutter(slice_: slice) -> Map[Iterable[Domain], Iterable[Domain]]:
+def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
     start = slice_.start
     stop = slice_.stop
     step = slice_.step
@@ -74,8 +74,7 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
     return slide
 
 
-def sorter(key: Map[Domain, Sortable] = None
-           ) -> Map[Iterable[Domain], Iterable[Domain]]:
+def sorter(key: Map[Domain, Sortable] = None) -> Operator[Iterable[Domain]]:
     def sort(iterable: Iterable[Domain]) -> Iterable[Domain]:
         yield from sorted(iterable,
                           key=key)
