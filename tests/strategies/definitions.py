@@ -3,7 +3,6 @@ import inspect
 import os
 import platform
 import sys
-from importlib.machinery import ModuleSpec
 from operator import methodcaller
 from pathlib import Path
 from types import (BuiltinFunctionType,
@@ -16,7 +15,8 @@ from typing import (Any,
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
-from lz.functional import compose
+from lz.functional import (compose,
+                           negate)
 from lz.iterating import (flatmapper,
                           sifter)
 from lz.signatures.hints import (MethodDescriptorType,
@@ -132,14 +132,7 @@ to_callables = compose(sifter(callable),
 unsupported_modules_callables = list(flatmapper(to_callables)
                                      (unsupported_modules))
 
-
-def is_callable_supported(object_: Any) -> bool:
-    if isinstance(object_, ModuleSpec):
-        return False
-    return (object_ not in unsupported_modules_callables
-            and (not isinstance(object_, ModuleType)
-                 or is_module_supported(object_)))
-
+is_callable_supported = negate(unsupported_modules_callables.__contains__)
 
 modules_callables = (modules.flatmap(flatten_module_or_class)
                      .filter(callable)
@@ -254,10 +247,7 @@ if platform.python_implementation() != 'PyPy':
                                     pwd.struct_passwd,
                                     termios.error})
 
-
-def is_class_supported(class_: type) -> bool:
-    return class_ not in unsupported_classes
-
+is_class_supported = negate(unsupported_classes.__contains__)
 
 classes = (modules_callables.filter(inspect.isclass)
            .filter(is_class_supported)
@@ -366,11 +356,8 @@ if platform.python_implementation() != 'PyPy':
 
         unsupported_wrappers_descriptors.add(_socket.socket.__del__)
 
-
-def is_wrapper_descriptor_supported(wrapper_descriptor: MethodDescriptorType
-                                    ) -> bool:
-    return wrapper_descriptor not in unsupported_wrappers_descriptors
-
+is_wrapper_descriptor_supported = negate(unsupported_wrappers_descriptors
+                                         .__contains__)
 
 wrappers_descriptors = (classes_callables.filter(is_wrapper_descriptor)
                         .filter(is_wrapper_descriptor_supported))
