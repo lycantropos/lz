@@ -139,6 +139,12 @@ def copier(count: int) -> Map[Iterable[Domain], Iterable[Iterable[Domain]]]:
 
 
 first = compose(next, iter)
-last = compose(first,
-               functools.partial(deque,
-                                 maxlen=1))
+
+
+def trailer(size: int) -> Operator[Iterable[Domain]]:
+    return compose(iter,
+                   functools.partial(deque,
+                                     maxlen=size))
+
+
+last = compose(first, trailer(1))
