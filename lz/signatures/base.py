@@ -8,7 +8,8 @@ from functools import (lru_cache,
                        partial,
                        singledispatch,
                        wraps)
-from itertools import (repeat,
+from itertools import (product,
+                       repeat,
                        starmap,
                        zip_longest)
 from operator import (attrgetter,
@@ -41,6 +42,7 @@ from lz.iterating import (cutter,
                           sifter)
 from .hints import (MethodDescriptorType,
                     WrapperDescriptorType)
+from .utils import cached_map
 
 
 class Parameter:
@@ -213,7 +215,6 @@ if platform.python_implementation() == 'PyPy':
     from lz.iterating import slider
 
 
-    @factory.register(type)
     def from_class(object_: type) -> Base:
         try:
             return from_callable(object_)
@@ -292,7 +293,6 @@ else:
                                            catalog.factory('__init__')))
 
 
-    @factory.register(type)
     def from_class(object_: type) -> Base:
         try:
             return from_callable(object_)
@@ -421,3 +421,12 @@ from_callable = right.folder(factory.register, from_callable)([
     MethodType,
     MethodDescriptorType,
     WrapperDescriptorType])
+from_class_cache = {
+    product: Plain(Parameter(name='iterables',
+                             kind=Parameter.Kind.VARIADIC_POSITIONAL,
+                             has_default=False),
+                   Parameter(name='repeat',
+                             kind=Parameter.Kind.KEYWORD_ONLY,
+                             has_default=True)),
+}
+from_class = factory.register(type)(cached_map(from_class_cache)(from_class))
