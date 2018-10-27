@@ -9,8 +9,8 @@ from tests.utils import (are_iterables_similar,
                          capacity)
 
 
-def test_size(iterable: Iterable[Any],
-              cutter_slice: slice) -> None:
+def test_capacity(iterable: Iterable[Any],
+                  cutter_slice: slice) -> None:
     cut = cutter(cutter_slice)
     result = cut(iterable)
 
