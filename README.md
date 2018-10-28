@@ -59,6 +59,65 @@ Install:
   pypy setup.py install
   ```
 
+Usage 
+----- 
+ 
+`lz` provides a bunch of utilities for working with functions & iterables such as
+
+1. [function composition](https://en.wikipedia.org/wiki/Function_composition):
+    ```pydocstring
+    >>> from lz.functional import compose
+    >>> from functools import partial
+    >>> sum_of_digits = compose(sum,
+                                partial(map, int),
+                                str)
+    >>> sum_of_digits(1234)
+    10
+    ```
+
+2. flipping positional parameters order
+    ```pydocstring
+    >>> from lz.functional import flip
+    >>> flipped_power = flip(pow)
+    >>> flipped_power(2, 4)
+    16
+    ```
+
+3. [currying](https://en.wikipedia.org/wiki/Currying)
+    ```pydocstring
+    >>> from lz.curry import curry 
+    >>> curried_power = curry(pow) 
+    >>> two_to_power = curried_power(2) 
+    >>> list(map(two_to_power, range(10))) 
+    [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    ```
+
+4. reversing iterable
+    ```pydocstring
+    >>> from lz.iterating import reverse
+    >>> list(reverse(range(10)))
+    [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    ```
+
+5. chunking iterable
+
+    ```pydocstring
+    >>> from lz.iterating import chopper
+    >>> to_triplets = chopper(3)
+    >>> list(to_triplets(range(10)))
+    [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
+    ```
+
+6. sliding over iterable
+
+    ```pydocstring
+    >>> from lz.iterating import slider
+    >>> slide_pairwise = slider(2)
+    >>> list(slide_pairwise(range(10)))
+    [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
+    ```
+and many more.
+
 Development
 -----------
 
