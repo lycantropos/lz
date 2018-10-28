@@ -110,6 +110,11 @@ if platform.python_implementation() != 'PyPy':
 
         unsupported_modules.add(_blake2)
 
+    if sys.platform == 'win32':
+        import _msi
+
+        unsupported_modules.add(_msi)
+
 supported_modules -= unsupported_modules
 
 is_module_supported = supported_modules.__contains__
