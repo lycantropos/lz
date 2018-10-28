@@ -69,6 +69,9 @@ def unwrap_partial(object_: partial
 
 
 def curry(callable_: Callable[..., Range]) -> Curry:
+    """
+    Returns curried version of given callable.
+    """
     callable_, args, kwargs = unwrap(callable_)
     signature = signatures.factory(callable_)
     return Curry(callable_, signature, *args, **kwargs)

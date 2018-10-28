@@ -12,11 +12,17 @@ from .hints import (Domain,
 
 
 def identity(argument: Domain) -> Domain:
+    """
+    Returns object itself.
+    """
     return argument
 
 
 def compose(last_function: Map[Any, Range],
             *front_functions: Callable[..., Any]) -> Callable[..., Range]:
+    """
+    Returns functions composition.
+    """
     def binary_compose(left_function: Map[Intermediate, Range],
                        right_function: Callable[..., Intermediate]
                        ) -> Callable[..., Range]:
@@ -30,6 +36,9 @@ def compose(last_function: Map[Any, Range],
 
 
 def combine(maps: Iterable[Map]) -> Map[Iterable[Domain], Iterable[Range]]:
+    """
+    Returns function that applies each map to corresponding argument.
+    """
     def combined(arguments: Iterable[Domain]) -> Iterable[Range]:
         yield from (map_(argument)
                     for map_, argument in zip(maps, arguments))
@@ -51,6 +60,9 @@ def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
 
 
 def to_constant(object_: Domain) -> Callable[..., Domain]:
+    """
+    Returns function that returns given object.
+    """
     def constant(*_: Domain, **__: Domain) -> Domain:
         return object_
 
@@ -58,6 +70,9 @@ def to_constant(object_: Domain) -> Callable[..., Domain]:
 
 
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
+    """
+    Returns function with positional arguments flipped.
+    """
     @functools.wraps(function)
     def flipped(*args, **kwargs):
         return function(*reversed(args), **kwargs)
@@ -66,4 +81,7 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
 
 
 def negate(predicate: Predicate) -> Predicate:
+    """
+    Returns negated version of predicate.
+    """
     return compose(operator.not_, predicate)
