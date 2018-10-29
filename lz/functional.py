@@ -23,6 +23,7 @@ def compose(last_function: Map[Any, Range],
     """
     Returns functions composition.
     """
+
     def binary_compose(left_function: Map[Intermediate, Range],
                        right_function: Callable[..., Intermediate]
                        ) -> Callable[..., Range]:
@@ -39,6 +40,7 @@ def combine(maps: Iterable[Map]) -> Map[Iterable[Domain], Iterable[Range]]:
     """
     Returns function that applies each map to corresponding argument.
     """
+
     def combined(arguments: Iterable[Domain]) -> Iterable[Range]:
         yield from (map_(argument)
                     for map_, argument in zip(maps, arguments))
@@ -63,6 +65,7 @@ def to_constant(object_: Domain) -> Callable[..., Domain]:
     """
     Returns function that returns given object.
     """
+
     def constant(*_: Domain, **__: Domain) -> Domain:
         return object_
 
@@ -73,6 +76,7 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
     """
+
     @functools.wraps(function)
     def flipped(*args, **kwargs):
         return function(*reversed(args), **kwargs)
