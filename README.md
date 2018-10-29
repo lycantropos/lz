@@ -62,7 +62,7 @@ Install:
 Usage 
 ----- 
  
-`lz` provides a bunch of utilities for working with functions & iterables such as
+`lz` provides a bunch of utilities for working with functions, predicates & iterables such as
 
 1. [function composition](https://en.wikipedia.org/wiki/Function_composition):
     ```pydocstring
@@ -92,14 +92,49 @@ Usage
     [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     ```
 
-4. reversing iterable
+4. [negating](https://en.wikipedia.org/wiki/Negation) predicate
+
+    ```pydocstring
+    >>> from lz.logical import negate
+    >>> false_like = negate(bool)
+    >>> false_like([])
+    True
+    >>> false_like([0])
+    False
+    ```
+
+5. [conjoining](https://en.wikipedia.org/wiki/Logical_conjunction) predicates
+
+    ```pydocstring
+    >>> from lz.logical import conjoin
+    >>> is_valid_constant_identifier = conjoin(str.isupper, str.isidentifier)
+    >>> is_valid_constant_identifier('SECOND_SECTION')
+    True
+    >>> is_valid_constant_identifier('2ND_SECTION')
+    False
+    ```
+
+6. [disjoining](https://en.wikipedia.org/wiki/Logical_disjunction) predicates
+
+    ```pydocstring
+    >>> from lz.logical import disjoin
+    >>> alphabetic_or_numeric = disjoin(str.isalpha, str.isnumeric)
+    >>> alphabetic_or_numeric('Hello')
+    True
+    >>> alphabetic_or_numeric('42')
+    True
+    >>> alphabetic_or_numeric('Hello42')
+    False
+    ```
+
+7. reversing iterable
     ```pydocstring
     >>> from lz.iterating import reverse
     >>> list(reverse(range(10)))
     [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     ```
 
-5. chunking iterable
+8. chunking iterable
 
     ```pydocstring
     >>> from lz.iterating import chopper
@@ -108,7 +143,7 @@ Usage
     [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
     ```
 
-6. sliding over iterable
+9. sliding over iterable
 
     ```pydocstring
     >>> from lz.iterating import slider
@@ -116,6 +151,7 @@ Usage
     >>> list(slide_pairwise(range(10)))
     [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
     ```
+
 and many more.
 
 Development
