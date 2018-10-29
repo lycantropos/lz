@@ -51,7 +51,7 @@ def test_elements(sortable_iterable: Iterable[Domain]) -> None:
                for element in result)
 
 
-def test_idempotence(sortable_iterable: Iterable[Domain]) -> None:
+def test_idempotency(sortable_iterable: Iterable[Domain]) -> None:
     first_target, second_target = tee(sortable_iterable)
     sort = sorter()
 
