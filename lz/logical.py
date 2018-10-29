@@ -12,6 +12,13 @@ def conjoin(*predicates: Predicate) -> Predicate:
     return compose(all, cleave(predicates))
 
 
+def disjoin(*predicates: Predicate) -> Predicate:
+    """
+    Returns disjunction of given predicates.
+    """
+    return compose(any, cleave(predicates))
+
+
 def negate(predicate: Predicate) -> Predicate:
     """
     Returns negated version of given predicate.
