@@ -50,6 +50,8 @@ if sys.platform == 'win32':
 
 if platform.python_implementation() == 'PyPy':
     stdlib_modules_names -= {'msilib', 'symtable', 'tracemalloc'}
+    if sys.platform == 'win32':
+        stdlib_modules_names -= {'asyncio'}
 
 stdlib_modules = list(map(importlib.import_module, stdlib_modules_names))
 supported_modules = set(stdlib_modules)
