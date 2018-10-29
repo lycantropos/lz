@@ -1,5 +1,4 @@
 import functools
-import operator
 from typing import (Any,
                     Callable,
                     Iterable)
@@ -7,7 +6,6 @@ from typing import (Any,
 from .hints import (Domain,
                     Intermediate,
                     Map,
-                    Predicate,
                     Range)
 
 
@@ -82,10 +80,3 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
         return function(*reversed(args), **kwargs)
 
     return flipped
-
-
-def negate(predicate: Predicate) -> Predicate:
-    """
-    Returns negated version of predicate.
-    """
-    return compose(operator.not_, predicate)

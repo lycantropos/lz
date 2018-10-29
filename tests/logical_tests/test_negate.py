@@ -2,8 +2,8 @@ from typing import (Any,
                     Dict,
                     Tuple)
 
-from lz.functional import negate
 from lz.hints import Predicate
+from lz.logical import negate
 
 
 def test_basic(false_predicate: Predicate,
@@ -17,8 +17,8 @@ def test_basic(false_predicate: Predicate,
             *positional_arguments,
             **keyword_arguments)
     negated_true_predicate_result = negated_true_predicate(
-        *positional_arguments,
-        **keyword_arguments)
+            *positional_arguments,
+            **keyword_arguments)
 
     assert isinstance(negated_false_predicate_result, bool)
     assert isinstance(negated_true_predicate_result, bool)

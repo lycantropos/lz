@@ -15,10 +15,10 @@ from typing import (Any,
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
-from lz.functional import (compose,
-                           negate)
+from lz.functional import compose
 from lz.iterating import (flatmapper,
                           sifter)
+from lz.logical import negate
 from lz.signatures.hints import (MethodDescriptorType,
                                  WrapperDescriptorType)
 
