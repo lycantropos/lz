@@ -1,7 +1,15 @@
 from operator import not_
 
-from .functional import compose
+from .functional import (cleave,
+                         compose)
 from .hints import Predicate
+
+
+def conjoin(*predicates: Predicate) -> Predicate:
+    """
+    Returns conjunction of given predicates.
+    """
+    return compose(all, cleave(predicates))
 
 
 def negate(predicate: Predicate) -> Predicate:
