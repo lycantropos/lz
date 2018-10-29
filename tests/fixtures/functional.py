@@ -47,6 +47,11 @@ def maps() -> List[Map]:
 
 
 @pytest.fixture(scope='function')
+def maps_arguments() -> List[Domain]:
+    return find(strategies.maps_lists_arguments)
+
+
+@pytest.fixture(scope='function')
 def next_map(map_: Map[Domain, Range]) -> Map[Range, Intermediate]:
     return find(strategies.to_one_of_suitable_maps(map_))
 
