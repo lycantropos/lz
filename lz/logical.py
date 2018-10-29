@@ -1,5 +1,7 @@
-from operator import not_
+from operator import (not_,
+                      xor)
 
+from . import left
 from .functional import (cleave,
                          compose)
 from .hints import Predicate
@@ -17,6 +19,13 @@ def disjoin(*predicates: Predicate) -> Predicate:
     Returns disjunction of given predicates.
     """
     return compose(any, cleave(predicates))
+
+
+def exclusive_disjoin(*predicates: Predicate) -> Predicate:
+    """
+    Returns exclusive disjunction of given predicates.
+    """
+    return compose(left.folder(xor, False), cleave(predicates))
 
 
 def negate(predicate: Predicate) -> Predicate:
