@@ -65,7 +65,7 @@ Usage
 `lz` provides a bunch of utilities for working with functions, predicates & iterables such as
 
 1. [function composition](https://en.wikipedia.org/wiki/Function_composition):
-    ```pydocstring
+    ```python
     >>> from lz.functional import compose
     >>> from functools import partial
     >>> sum_of_digits = compose(sum,
@@ -76,7 +76,7 @@ Usage
     ```
 
 2. flipping positional parameters order
-    ```pydocstring
+    ```python
     >>> from lz.functional import flip
     >>> flipped_power = flip(pow)
     >>> flipped_power(2, 4)
@@ -84,7 +84,7 @@ Usage
     ```
 
 3. [currying](https://en.wikipedia.org/wiki/Currying)
-    ```pydocstring
+    ```python
     >>> from lz.curry import curry 
     >>> curried_power = curry(pow) 
     >>> two_to_power = curried_power(2) 
@@ -94,7 +94,7 @@ Usage
 
 4. [negating](https://en.wikipedia.org/wiki/Negation) predicate
 
-    ```pydocstring
+    ```python
     >>> from lz.logical import negate
     >>> false_like = negate(bool)
     >>> false_like([])
@@ -105,7 +105,7 @@ Usage
 
 5. [conjoining](https://en.wikipedia.org/wiki/Logical_conjunction) predicates
 
-    ```pydocstring
+    ```python
     >>> from lz.logical import conjoin
     >>> is_valid_constant_identifier = conjoin(str.isupper, str.isidentifier)
     >>> is_valid_constant_identifier('SECOND_SECTION')
@@ -116,7 +116,7 @@ Usage
 
 6. [disjoining](https://en.wikipedia.org/wiki/Logical_disjunction) predicates
 
-    ```pydocstring
+    ```python
     >>> from lz.logical import disjoin
     >>> alphabetic_or_numeric = disjoin(str.isalpha, str.isnumeric)
     >>> alphabetic_or_numeric('Hello')
@@ -128,7 +128,7 @@ Usage
     ```
 
 7. reversing iterable
-    ```pydocstring
+    ```python
     >>> from lz.iterating import reverse
     >>> list(reverse(range(10)))
     [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
@@ -136,7 +136,7 @@ Usage
 
 8. chunking iterable
 
-    ```pydocstring
+    ```python
     >>> from lz.iterating import chopper
     >>> to_triplets = chopper(3)
     >>> list(to_triplets(range(10)))
@@ -145,7 +145,7 @@ Usage
 
 9. sliding over iterable
 
-    ```pydocstring
+    ```python
     >>> from lz.iterating import slider
     >>> slide_pairwise = slider(2)
     >>> list(slide_pairwise(range(10)))
