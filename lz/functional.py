@@ -83,8 +83,15 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     return flipped
 
 
-def cleave(maps: Iterable[Map]) -> Map[Domain, Iterable[Range]]:
+def cleave(functions: Iterable[Callable[..., Range]]
+           ) -> Callable[..., Iterable[Range]]:
     """
-    Returns function that separately applies given maps to single argument.
+    Returns function that separately applies
+    given functions to the same arguments.
     """
-    return compose(combine(maps), itertools.repeat)
+
+    def cleft(*args, **kwargs) -> Range:
+        yield from (function(*args, **kwargs)
+                    for function in functions)
+
+    return cleft
