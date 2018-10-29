@@ -77,7 +77,7 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
 
     @functools.wraps(function)
-    def flipped(*args, **kwargs):
+    def flipped(*args, **kwargs) -> Range:
         return function(*reversed(args), **kwargs)
 
     return flipped
