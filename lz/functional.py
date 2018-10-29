@@ -1,4 +1,5 @@
 import functools
+import itertools
 from typing import (Any,
                     Callable,
                     Iterable)
@@ -80,3 +81,10 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
         return function(*reversed(args), **kwargs)
 
     return flipped
+
+
+def cleave(maps: Iterable[Map]) -> Map[Domain, Iterable[Range]]:
+    """
+    Returns function that separately applies given maps to single argument.
+    """
+    return compose(combine(maps), itertools.repeat)

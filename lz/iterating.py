@@ -10,7 +10,7 @@ from typing import (Hashable,
                     Mapping,
                     Tuple)
 
-from .functional import (combine,
+from .functional import (cleave,
                          compose)
 from .hints import (Domain,
                     Map,
@@ -85,8 +85,7 @@ def chopper(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
     """
     cut = compose(tuple, cutter(slice(size)))
     return compose(grabber(),
-                   combine(itertools.repeat(cut)),
-                   itertools.repeat,
+                   cleave(itertools.repeat(cut)),
                    iter)
 
 

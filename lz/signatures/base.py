@@ -9,7 +9,6 @@ from functools import (lru_cache,
                        singledispatch,
                        wraps)
 from itertools import (product,
-                       repeat,
                        starmap,
                        zip_longest)
 from operator import (attrgetter,
@@ -25,7 +24,7 @@ from typing import (Callable,
                     Optional)
 
 from lz import right
-from lz.functional import (combine,
+from lz.functional import (cleave,
                            compose,
                            identity,
                            pack)
@@ -95,9 +94,8 @@ to_parameters_by_kind = compose(partial(defaultdict, list),
                                 grouper(attrgetter('kind')))
 to_parameters_by_name = compose(dict,
                                 mapper(compose(tuple,
-                                               combine([attrgetter('name'),
-                                                        identity]),
-                                               repeat)))
+                                               cleave([attrgetter('name'),
+                                                       identity]))))
 all_parameters_has_defaults = compose(all,
                                       mapper(attrgetter('has_default')))
 
@@ -399,11 +397,10 @@ else:
     to_parameters = compose(
             sifter(),
             flatten,
-            combine([to_positional_parameters,
-                     compose(expand, to_variadic_positional_parameter),
-                     to_keyword_parameters,
-                     compose(expand, to_variadic_keyword_parameter)]),
-            repeat)
+            cleave([to_positional_parameters,
+                    compose(expand, to_variadic_positional_parameter),
+                    to_keyword_parameters,
+                    compose(expand, to_variadic_keyword_parameter)]))
 
 
     def to_parameter(parameter_ast: ast3.arg,
