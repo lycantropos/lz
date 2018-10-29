@@ -45,6 +45,7 @@ suitable_maps = dict(zip(suitable_maps.keys(),
                          map(strategies.sampled_from, suitable_maps.values())))
 to_one_of_suitable_maps = suitable_maps.__getitem__
 maps = strategies.sampled_from(starting_maps)
+maps_lists = to_lists(maps)
 maps_arguments = (strategies.integers()
                   | strategies.floats(allow_nan=False,
                                       allow_infinity=False))

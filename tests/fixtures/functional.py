@@ -1,6 +1,7 @@
 from typing import (Callable,
                     Dict,
                     Iterable,
+                    List,
                     Tuple)
 
 import pytest
@@ -31,13 +32,18 @@ def true_predicate() -> Predicate:
 
 
 @pytest.fixture(scope='function')
-def map_() -> Map[Domain, Range]:
+def map_() -> Map:
     return find(strategies.maps)
 
 
 @pytest.fixture(scope='function')
 def map_argument() -> Domain:
     return find(strategies.maps_arguments)
+
+
+@pytest.fixture(scope='function')
+def maps() -> List[Map]:
+    return find(strategies.maps_lists)
 
 
 @pytest.fixture(scope='function')
