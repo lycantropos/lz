@@ -18,7 +18,8 @@ from hypothesis.searchstrategy import SearchStrategy
 from lz.functional import compose
 from lz.iterating import (flatmapper,
                           sifter)
-from lz.logical import negate
+from lz.logical import (conjoin,
+                        negate)
 from lz.signatures.hints import (MethodDescriptorType,
                                  WrapperDescriptorType)
 
@@ -254,11 +255,11 @@ if platform.python_implementation() != 'PyPy':
                                     pwd.struct_passwd,
                                     termios.error})
 
-is_class_supported = negate(unsupported_classes.__contains__)
+is_class_supported = conjoin(is_not_private,
+                             negate(unsupported_classes.__contains__))
 
 classes = (modules_callables.filter(inspect.isclass)
-           .filter(is_class_supported)
-           .filter(is_not_private))
+           .filter(is_class_supported))
 classes_callables = (classes.flatmap(flatten_module_or_class)
                      .filter(callable)
                      .filter(is_callable_supported))
@@ -333,12 +334,9 @@ if platform.python_implementation() != 'PyPy':
 
         unsupported_methods_descriptors.add(socket.socket.share)
 
-
-def is_method_descriptor_supported(method_descriptor: MethodDescriptorType
-                                   ) -> bool:
-    return (is_not_private(method_descriptor)
-            and method_descriptor not in unsupported_methods_descriptors)
-
+is_method_descriptor_supported = conjoin(
+        is_not_private,
+        negate(unsupported_methods_descriptors.__contains__))
 
 methods_descriptors = (classes_callables.filter(is_method_descriptor)
                        .filter(is_method_descriptor_supported))
@@ -429,15 +427,14 @@ if platform.python_implementation() != 'PyPy':
             unsupported_built_in_functions.add(time.pthread_getcpuclockid)
 
 
-def is_built_in_function_supported(function: BuiltinFunctionType) -> bool:
-    return (is_not_private(function)
-            and has_module(function)
-            and function not in unsupported_built_in_functions)
-
-
 def has_module(function: BuiltinFunctionType) -> bool:
     return bool(function.__module__)
 
+
+is_built_in_function_supported = conjoin(
+        is_not_private,
+        has_module,
+        negate(unsupported_built_in_functions.__contains__))
 
 built_in_functions = (modules_callables.filter(inspect.isbuiltin)
                       .filter(is_built_in_function_supported))
