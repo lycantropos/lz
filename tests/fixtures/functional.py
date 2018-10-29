@@ -17,6 +17,11 @@ from tests.utils import find
 
 
 @pytest.fixture(scope='session')
+def true_predicate() -> Predicate:
+    return find(strategies.true_predicates)
+
+
+@pytest.fixture(scope='session')
 def false_predicate() -> Predicate:
     return find(strategies.false_predicates)
 
@@ -27,8 +32,23 @@ def predicate() -> Predicate:
 
 
 @pytest.fixture(scope='session')
-def true_predicate() -> Predicate:
-    return find(strategies.true_predicates)
+def left_predicate() -> Predicate:
+    return find(strategies.predicates)
+
+
+@pytest.fixture(scope='session')
+def mid_predicate() -> Predicate:
+    return find(strategies.predicates)
+
+
+@pytest.fixture(scope='session')
+def right_predicate() -> Predicate:
+    return find(strategies.predicates)
+
+
+@pytest.fixture(scope='session')
+def predicate_argument() -> Domain:
+    return find(strategies.predicates_arguments)
 
 
 @pytest.fixture(scope='function')

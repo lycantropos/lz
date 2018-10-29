@@ -35,6 +35,7 @@ from .literals.factories import (to_iterables,
 false_predicates = strategies.just(to_constant(False))
 true_predicates = strategies.just(to_constant(True))
 predicates = false_predicates | true_predicates
+predicates_arguments = objects
 starting_maps = [identity, float, str, json.dumps]
 suitable_maps = {identity: [identity, float, str],
                  float: starting_maps,
