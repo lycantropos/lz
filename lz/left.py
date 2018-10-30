@@ -28,6 +28,7 @@ def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
     """
     Returns function that prepends given object to iterable.
     """
+
     def attach(iterable: Iterable[Domain]) -> Iterable[Domain]:
         yield from itertools.chain(expand(object_), iterable)
 
@@ -40,6 +41,7 @@ def folder(function: Callable[[Range, Domain], Range],
     Returns function that cumulatively applies given binary function
     starting from given initial object in direction from left to right.
     """
+
     def fold(iterable: Iterable[Domain]) -> Range:
         return functools.reduce(function, iterable, initial)
 

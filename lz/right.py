@@ -27,6 +27,7 @@ def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
     """
     Returns function that appends given object to iterable.
     """
+
     def attach(iterable: Iterable[Domain]) -> Iterable[Domain]:
         yield from itertools.chain(iterable, expand(object_))
 
