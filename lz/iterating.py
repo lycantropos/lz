@@ -37,6 +37,16 @@ def sifter(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     return functools.partial(filter, predicate)
 
 
+def scavenger(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
+    """
+    Returns function that selects elements from iterable
+    which dissatisfy a predicate.
+
+    If predicate is not specified than false-like objects are selected.
+    """
+    return functools.partial(itertools.filterfalse, predicate)
+
+
 def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from the beginning of iterable
