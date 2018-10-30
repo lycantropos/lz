@@ -22,7 +22,7 @@ from .hints import (Domain,
 
 def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     """
-    Returns function that applies map to the each element of iterable.
+    Returns function that applies given map to the each element of iterable.
     """
     return functools.partial(map, map_)
 
@@ -30,7 +30,7 @@ def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
 def sifter(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from iterable
-    which satisfy a predicate.
+    which satisfy given predicate.
 
     If predicate is not specified than true-like objects are selected.
     """
@@ -40,7 +40,7 @@ def sifter(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
 def scavenger(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from iterable
-    which dissatisfy a predicate.
+    which dissatisfy given predicate.
 
     If predicate is not specified than false-like objects are selected.
     """
@@ -50,7 +50,7 @@ def scavenger(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
 def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from the beginning of iterable
-    while predicate is satisfied.
+    while given predicate is satisfied.
 
     If predicate is not specified than true-like objects are selected.
     """
@@ -62,7 +62,7 @@ def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
 def kicker(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     """
     Returns function that skips elements from the beginning of iterable
-    while predicate is satisfied.
+    while given predicate is satisfied.
 
     If predicate is not specified than true-like objects are skipped.
     """
@@ -73,11 +73,10 @@ def kicker(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
 
 def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
     """
-    Returns function that selects elements from iterable based on slice.
+    Returns function that selects elements from iterable based on given slice.
 
     Slice supposed to have non-negative fields
-    since it is hard to evaluate negative indices
-    for arbitrary iterable.
+    since it is hard to evaluate negative indices for arbitrary iterable.
     """
     start = slice_.start
     stop = slice_.stop
