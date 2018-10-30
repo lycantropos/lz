@@ -219,6 +219,16 @@ def copier(count: int) -> Map[Iterable[Domain], Iterable[Iterable[Domain]]]:
     return copy
 
 
+def enumerator(*,
+               start: int = 0,
+               step: int = 1) -> Map[Iterable[Domain],
+                                     Iterable[Tuple[int, Domain]]]:
+    """
+    Returns function that enumerates iterable from given start by given step.
+    """
+    return functools.partial(zip, itertools.count(start, step))
+
+
 first = compose(next, iter)
 first.__doc__ = 'Returns first element of iterable.'
 
