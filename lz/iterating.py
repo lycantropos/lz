@@ -11,6 +11,7 @@ from typing import (Hashable,
                     Tuple)
 
 from .functional import (cleave,
+                         combine,
                          compose)
 from .hints import (Domain,
                     Map,
@@ -45,6 +46,19 @@ def scavenger(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     If predicate is not specified than false-like objects are selected.
     """
     return functools.partial(itertools.filterfalse, predicate)
+
+
+def separator(predicate: Predicate = None
+              ) -> Map[Iterable[Domain],
+                       Tuple[Iterable[Domain], Iterable[Domain]]]:
+    """
+    Returns function that returns pair of iterables
+    first of which consists of elements that dissatisfy given predicate
+    and second one consists of elements that satisfy given predicate.
+    """
+    return compose(tuple,
+                   combine([scavenger(predicate), sifter(predicate)]),
+                   copier(2))
 
 
 def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
