@@ -70,16 +70,24 @@ def to_constant(object_: Domain) -> Callable[..., Domain]:
     return constant
 
 
-def flip(function: Callable[..., Range]) -> Callable[..., Range]:
+@functools.singledispatch
+def flip(object_: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
     """
 
-    @functools.wraps(function)
+    @functools.wraps(object_)
     def flipped(*args, **kwargs) -> Range:
-        return function(*reversed(args), **kwargs)
+        return object_(*reversed(args), **kwargs)
 
     return flipped
+
+
+@flip.register(functools.partial)
+def flip_partial(object_: functools.partial) -> Callable[..., Range]:
+    return functools.partial(flip(object_.func),
+                             *object_.args,
+                             **object_.keywords)
 
 
 def cleave(functions: Iterable[Callable[..., Range]]
