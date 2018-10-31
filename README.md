@@ -219,16 +219,16 @@ This will set version to `major.minor.patch-alpha`.
 Test bumping version
 
 ```bash
-bump2version --dry-run --verbose release
+bump2version --dry-run --verbose --tag release
 ```
 
 Bump version
 
 ```bash
-bump2version --verbose release
+bump2version --verbose --tag release
 ```
 
-This will set version to `major.minor.patch`.
+This will set version to `major.minor.patch` and add `Git` tag.
 
 #### Notes
 
