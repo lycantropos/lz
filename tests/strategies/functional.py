@@ -66,7 +66,8 @@ suitable_maps = strategies.recursive(strategies.tuples(maps),
 # "transparent" is an abbr. of "referential transparent"
 transparent_functions = strategies.sampled_from([bool, complex, float,
                                                  identity, int,
-                                                 json.dumps, json.loads, str])
+                                                 json.dumps, json.loads,
+                                                 os.path.join, str])
 paths_names_parts = to_strings(string.digits + string.ascii_letters + '_')
 transparent_functions_args = {
     bool: strategies.tuples(objects),

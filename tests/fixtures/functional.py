@@ -1,3 +1,4 @@
+import random
 from typing import (Callable,
                     Dict,
                     Iterable,
@@ -7,6 +8,7 @@ from typing import (Callable,
 import pytest
 from hypothesis.searchstrategy import SearchStrategy
 
+from lz.directed import gap
 from lz.hints import (Domain,
                       Intermediate,
                       Map,
@@ -107,6 +109,80 @@ def transparent_function_kwargs(transparent_function: Callable[..., Range]
                                 ) -> Dict[str, Domain]:
     return find(strategies
                 .to_transparent_functions_kwargs(transparent_function))
+
+
+@pytest.fixture(scope='function')
+def transparent_function_args_count(
+        transparent_function_args: Tuple[Domain, ...]) -> int:
+    return len(transparent_function_args)
+
+
+@pytest.fixture(scope='function')
+def transparent_function_kwargs_count(
+        transparent_function_kwargs: Dict[str, Domain]) -> int:
+    return len(transparent_function_kwargs)
+
+
+@pytest.fixture(scope='function')
+def transparent_function_applied_kwargs_count(
+        transparent_function_kwargs_count: int) -> int:
+    return find(strategies.to_integers(
+            min_value=0,
+            max_value=transparent_function_kwargs_count))
+
+
+@pytest.fixture(scope='function')
+def transparent_function_gaps_count(transparent_function_args_count: int
+                                    ) -> int:
+    return find(strategies.to_integers(
+            min_value=0,
+            max_value=transparent_function_args_count))
+
+
+@pytest.fixture(scope='function')
+def transparent_function_gaps_indices(transparent_function_args_count: int,
+                                      transparent_function_gaps_count: int
+                                      ) -> Tuple[Domain, ...]:
+    return random.sample(range(transparent_function_args_count),
+                         transparent_function_gaps_count)
+
+
+@pytest.fixture(scope='function')
+def transparent_function_applied_args(
+        transparent_function_args: Tuple[Domain, ...],
+        transparent_function_gaps_indices: List[int]) -> Tuple[Domain, ...]:
+    return tuple(arg
+                 if index not in transparent_function_gaps_indices
+                 else gap
+                 for index, arg in enumerate(transparent_function_args))
+
+
+@pytest.fixture(scope='function')
+def transparent_function_applied_kwargs(
+        transparent_function_kwargs: Dict[str, Domain],
+        transparent_function_applied_kwargs_count: int) -> Dict[str, Domain]:
+    keys = random.sample(list(transparent_function_kwargs),
+                         transparent_function_applied_kwargs_count)
+    return {key: transparent_function_kwargs[key]
+            for key in keys}
+
+
+@pytest.fixture(scope='function')
+def transparent_function_rest_args(
+        transparent_function_args: Tuple[Domain, ...],
+        transparent_function_gaps_indices: List[int]) -> Tuple[Domain, ...]:
+    return tuple(arg
+                 for index, arg in enumerate(transparent_function_args)
+                 if index in transparent_function_gaps_indices)
+
+
+@pytest.fixture(scope='function')
+def transparent_function_rest_kwargs(
+        transparent_function_kwargs: Dict[str, Domain],
+        transparent_function_applied_kwargs: Dict[str, Domain]) -> len:
+    return {key: value
+            for key, value in transparent_function_kwargs.items()
+            if key not in transparent_function_applied_kwargs}
 
 
 @pytest.fixture(scope='function')
