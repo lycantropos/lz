@@ -97,12 +97,14 @@ def transparent_function() -> Callable[..., Range]:
 
 
 @pytest.fixture(scope='function')
-def transparent_function_args(transparent_function) -> Tuple[Domain, ...]:
+def transparent_function_args(transparent_function: Callable[..., Range]
+                              ) -> Tuple[Domain, ...]:
     return find(strategies.to_transparent_functions_args(transparent_function))
 
 
 @pytest.fixture(scope='function')
-def transparent_function_kwargs(transparent_function) -> Dict[str, Domain]:
+def transparent_function_kwargs(transparent_function: Callable[..., Range]
+                                ) -> Dict[str, Domain]:
     return find(strategies
                 .to_transparent_functions_kwargs(transparent_function))
 
