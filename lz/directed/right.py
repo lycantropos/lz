@@ -1,3 +1,4 @@
+import functools
 import itertools
 from typing import (Callable,
                     Iterable)
@@ -9,7 +10,8 @@ from lz.hints import (Domain,
                       Range)
 from lz.iterating import (expand,
                           reverse)
-from . import left
+from . import (common,
+               left)
 
 
 def accumulator(function: Callable[[Domain, Range], Range],
@@ -42,3 +44,26 @@ def folder(function: Callable[[Domain, Range], Range],
     """
     left_folder = left.folder(flip(function), initial)
     return compose(left_folder, reverse)
+
+
+def applier(function: Callable[..., Range],
+            *applied_args: Domain,
+            **applied_kwargs: Domain) -> Callable[..., Range]:
+    start = step = -1
+
+    def to_rest_start(occupied_indices: Iterable[int]) -> int:
+        return min(occupied_indices,
+                   default=start) + step
+
+    complete_args = common.to_applier_flow(applied_args,
+                                           start=start,
+                                           step=step,
+                                           rest_start_factory=to_rest_start)
+
+    @functools.wraps(function)
+    def applied(*args: Domain, **kwargs: Domain) -> Range:
+        return function(*complete_args(reverse(args)),
+                        **applied_kwargs,
+                        **kwargs)
+
+    return applied

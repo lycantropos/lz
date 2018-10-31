@@ -7,6 +7,7 @@ from lz.hints import (Domain,
                       Map,
                       Range)
 from lz.iterating import expand
+from . import common
 
 
 def accumulator(function: Callable[[Range, Domain], Range],
@@ -46,3 +47,25 @@ def folder(function: Callable[[Range, Domain], Range],
         return functools.reduce(function, iterable, initial)
 
     return fold
+
+
+def applier(function: Callable[..., Range],
+            *applied_args: Domain,
+            **applied_kwargs: Domain) -> Callable[..., Range]:
+    start = 0
+    step = 1
+
+    def to_rest_start(occupied_indices: Iterable[int]) -> int:
+        return max(occupied_indices,
+                   default=start) + step
+
+    complete_args = common.to_applier_flow(applied_args,
+                                           start=start,
+                                           step=step,
+                                           rest_start_factory=to_rest_start)
+
+    @functools.wraps(function)
+    def applied(*args: Domain, **kwargs: Domain) -> Range:
+        return function(*complete_args(args), **applied_kwargs, **kwargs)
+
+    return applied
