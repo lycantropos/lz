@@ -64,7 +64,7 @@ Usage
  
 `lz` provides a bunch of utilities for working with functions, predicates & iterables such as
 
-1. [function composition](https://en.wikipedia.org/wiki/Function_composition):
+1. [function composition](https://en.wikipedia.org/wiki/Function_composition)
     ```python
     >>> from lz.functional import compose
     >>> from functools import partial
@@ -75,15 +75,25 @@ Usage
     10
     ```
 
-2. flipping positional parameters order
+2. left [partial application](https://en.wikipedia.org/wiki/Partial_application)
     ```python
-    >>> from lz.functional import flip
-    >>> flipped_power = flip(pow)
-    >>> flipped_power(2, 4)
-    16
+    >>> from lz.directed import (gap as _,
+                                 left)
+    >>> count_from_zero_with_step_two_to = left.applier(range, 0, _, 2)
+    >>> list(count_from_zero_with_step_two_to(10))
+    [0, 2, 4, 6, 8]
     ```
 
-3. [currying](https://en.wikipedia.org/wiki/Currying)
+3. right [partial application](https://en.wikipedia.org/wiki/Partial_application)
+    ```python
+    >>> from lz.directed import (gap as _,
+                                 right)
+    >>> count_from_zero_with_step_two_to = right.applier(range, 2, _, 0)
+    >>> list(count_from_zero_with_step_two_to(10))
+    [0, 2, 4, 6, 8]
+    ```
+
+4. [currying](https://en.wikipedia.org/wiki/Currying)
     ```python
     >>> from lz.curry import curry 
     >>> curried_power = curry(pow) 
@@ -92,7 +102,25 @@ Usage
     [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     ```
 
-4. [negating](https://en.wikipedia.org/wiki/Negation) predicate
+5. flipping positional parameters order
+    ```python
+    >>> from lz.functional import flip
+    >>> flipped_power = flip(pow)
+    >>> flipped_power(2, 4)
+    16
+    ```
+
+6. packing function's arguments
+    ```python
+    >>> from lz.functional import pack
+    >>> packed_int = pack(int)
+    >>> packed_int(['10'])
+    10
+    >>> packed_int(['10'], {'base': 2})
+    2
+    ```
+
+7. [negating](https://en.wikipedia.org/wiki/Negation) predicate
 
     ```python
     >>> from lz.logical import negate
@@ -103,7 +131,7 @@ Usage
     False
     ```
 
-5. [conjoining](https://en.wikipedia.org/wiki/Logical_conjunction) predicates
+8. [conjoining](https://en.wikipedia.org/wiki/Logical_conjunction) predicates
 
     ```python
     >>> from lz.logical import conjoin
@@ -114,7 +142,7 @@ Usage
     False
     ```
 
-6. [disjoining](https://en.wikipedia.org/wiki/Logical_disjunction) predicates
+9. [disjoining](https://en.wikipedia.org/wiki/Logical_disjunction) predicates
 
     ```python
     >>> from lz.logical import disjoin
@@ -127,14 +155,14 @@ Usage
     False
     ```
 
-7. reversing iterable
+10. reversing iterable
     ```python
     >>> from lz.iterating import reverse
     >>> list(reverse(range(10)))
     [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     ```
 
-8. chunking iterable
+11. chunking iterable
 
     ```python
     >>> from lz.iterating import chopper
@@ -143,7 +171,7 @@ Usage
     [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
     ```
 
-9. sliding over iterable
+12. sliding over iterable
 
     ```python
     >>> from lz.iterating import slider
