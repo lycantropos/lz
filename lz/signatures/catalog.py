@@ -14,7 +14,7 @@ from typing import (Any,
                     Optional,
                     Union)
 
-from lz import right
+from lz.directed import right
 from lz.functional import compose
 from lz.iterating import expand
 from .file_system import INIT_MODULE_NAME

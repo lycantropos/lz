@@ -12,8 +12,8 @@ from typing import (Any,
 
 from typed_ast import ast3
 
-from lz import (left,
-                right)
+from lz.directed import (left,
+                         right)
 from lz.iterating import expand
 from . import (catalog,
                dictionaries,

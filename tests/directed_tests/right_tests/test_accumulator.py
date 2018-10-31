@@ -1,9 +1,8 @@
 from itertools import tee
-from typing import (Any,
-                    Callable,
+from typing import (Callable,
                     Iterable)
 
-from lz import right
+from lz.directed import right
 from lz.hints import (Domain,
                       Range)
 from lz.iterating import (first,

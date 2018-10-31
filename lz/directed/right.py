@@ -2,14 +2,14 @@ import itertools
 from typing import (Callable,
                     Iterable)
 
+from lz.functional import (compose,
+                           flip)
+from lz.hints import (Domain,
+                      Map,
+                      Range)
+from lz.iterating import (expand,
+                          reverse)
 from . import left
-from .functional import (compose,
-                         flip)
-from .hints import (Domain,
-                    Map,
-                    Range)
-from .iterating import (expand,
-                        reverse)
 
 
 def accumulator(function: Callable[[Domain, Range], Range],

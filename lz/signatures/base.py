@@ -23,7 +23,7 @@ from typing import (Callable,
                     List,
                     Optional)
 
-from lz import right
+from lz.directed import right
 from lz.functional import (cleave,
                            compose,
                            identity,
