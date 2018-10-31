@@ -65,7 +65,7 @@ def applier(function: Callable[..., Range],
                                            rest_start_factory=to_rest_start)
 
     @functools.wraps(function)
-    def applied(*args: Domain, **kwargs: Domain) -> Range:
+    def applied(*args, **kwargs) -> Range:
         return function(*complete_args(args), **applied_kwargs, **kwargs)
 
     return applied
