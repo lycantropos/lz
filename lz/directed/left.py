@@ -52,6 +52,11 @@ def folder(function: Callable[[Range, Domain], Range],
 def applier(function: Callable[..., Range],
             *applied_args: Domain,
             **applied_kwargs: Domain) -> Callable[..., Range]:
+    """
+    Returns function that behaves like given function
+    with given arguments partially applied.
+    Positional arguments will be applied from the left end.
+    """
     start = 0
     step = 1
 
