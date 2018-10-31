@@ -1,6 +1,8 @@
 import functools
+from types import MappingProxyType
 from typing import (Any,
                     Callable,
+                    Dict,
                     Iterable)
 
 from .hints import (Domain,
@@ -48,13 +50,14 @@ def combine(maps: Iterable[Map]) -> Map[Iterable[Domain], Iterable[Range]]:
 
 def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
     """
-    Creates function that works with single iterable parameter
-    by unpacking elements to original function.
+    Creates function that works with iterable and optional mapping parameters
+    that will be unpacked to original function.
     """
 
     @functools.wraps(function)
-    def packed(iterable: Iterable[Domain]) -> Range:
-        return function(*iterable)
+    def packed(args: Iterable[Domain],
+               kwargs: Dict[str, Any] = MappingProxyType({})) -> Range:
+        return function(*args, **kwargs)
 
     return packed
 
