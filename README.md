@@ -77,18 +77,18 @@ Usage
 
 2. left [partial application](https://en.wikipedia.org/wiki/Partial_application)
     ```python
-    >>> from lz.directed import (gap as _,
+    >>> from lz.directed import (gap,
                                  left)
-    >>> count_from_zero_with_step_two_to = left.applier(range, 0, _, 2)
+    >>> count_from_zero_with_step_two_to = left.applier(range, 0, gap, 2)
     >>> list(count_from_zero_with_step_two_to(10))
     [0, 2, 4, 6, 8]
     ```
 
 3. right [partial application](https://en.wikipedia.org/wiki/Partial_application)
     ```python
-    >>> from lz.directed import (gap as _,
+    >>> from lz.directed import (gap,
                                  right)
-    >>> count_from_zero_with_step_two_to = right.applier(range, 2, _, 0)
+    >>> count_from_zero_with_step_two_to = right.applier(range, 2, gap, 0)
     >>> list(count_from_zero_with_step_two_to(10))
     [0, 2, 4, 6, 8]
     ```
