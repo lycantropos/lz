@@ -1,6 +1,5 @@
 from functools import wraps
 from typing import (Any,
-                    Hashable,
                     MutableMapping)
 
 from lz.hints import (Domain,
@@ -9,7 +8,7 @@ from lz.hints import (Domain,
                       Range)
 
 
-def cached_map(cache: MutableMapping[Hashable, Any],
+def cached_map(cache: MutableMapping[Any, Any],
                *,
                update: bool = False) -> Operator[Map[Domain, Range]]:
     def wrapper(map_: Map[Domain, Range]) -> Map[Domain, Range]:
