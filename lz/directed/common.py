@@ -17,7 +17,8 @@ from lz.iterating import (enumerator,
                           sorter)
 from lz.literal import to_unique_object
 
-gap = to_unique_object()
+gap = to_unique_object(name='gap',
+                       documentation='Placeholder for arguments to skip.')
 
 
 def to_applier_flow(applied_args: Iterable[Domain],
