@@ -29,7 +29,7 @@ def to_applier_flow(applied_args: Iterable[Domain],
     to_argument_index = itemgetter(0)
     to_argument_value = itemgetter(1)
     split_args = compose(separator(compose(partial(is_not, gap),
-                                           itemgetter(1))),
+                                           to_argument_value)),
                          enumerator(start=start,
                                     step=step))
     placeholders, occupied_args = split_args(applied_args)
