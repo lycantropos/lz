@@ -1,6 +1,4 @@
 import inspect
-from functools import (partial,
-                       singledispatch)
 from itertools import (chain,
                        starmap)
 from typing import (Callable,
@@ -56,18 +54,6 @@ class Curry:
         return result
 
 
-@singledispatch
-def unwrap(object_: Callable[..., Range]
-           ) -> Tuple[Callable, Tuple[Domain, ...], Dict[str, Domain]]:
-    return inspect.unwrap(object_), (), {}
-
-
-@unwrap.register(partial)
-def unwrap_partial(object_: partial
-                   ) -> Tuple[Callable, Tuple[Domain, ...], Dict[str, Domain]]:
-    return object_.func, object_.args, object_.keywords
-
-
 def curry(callable_: Callable[..., Range]) -> Curry:
     """
     Returns curried version of given callable.
@@ -75,3 +61,11 @@ def curry(callable_: Callable[..., Range]) -> Curry:
     callable_, args, kwargs = unwrap(callable_)
     signature = signatures.factory(callable_)
     return Curry(callable_, signature, *args, **kwargs)
+
+
+def unwrap(object_: Callable[..., Range]
+           ) -> Tuple[Callable, Tuple[Domain, ...], Dict[str, Domain]]:
+    try:
+        return inspect.unwrap(object_.func), object_.args, object_.keywords
+    except AttributeError:
+        return inspect.unwrap(object_), (), {}
