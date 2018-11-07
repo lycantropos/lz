@@ -1,7 +1,7 @@
 from operator import (not_,
                       xor)
 
-from .directed import left
+from . import left
 from .functional import (cleave,
                          compose)
 from .hints import Predicate

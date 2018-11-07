@@ -8,7 +8,6 @@ from typing import (Callable,
 import pytest
 from hypothesis.searchstrategy import SearchStrategy
 
-from lz.directed import gap
 from lz.hints import (Domain,
                       Intermediate,
                       Map,
@@ -132,29 +131,18 @@ def transparent_function_applied_kwargs_count(
 
 
 @pytest.fixture(scope='function')
-def transparent_function_gaps_count(transparent_function_args_count: int
-                                    ) -> int:
+def transparent_function_applied_args_count(
+        transparent_function_args_count: int) -> int:
     return find(strategies.to_integers(
             min_value=0,
             max_value=transparent_function_args_count))
 
 
 @pytest.fixture(scope='function')
-def transparent_function_gaps_indices(transparent_function_args_count: int,
-                                      transparent_function_gaps_count: int
-                                      ) -> Tuple[Domain, ...]:
-    return random.sample(range(transparent_function_args_count),
-                         transparent_function_gaps_count)
-
-
-@pytest.fixture(scope='function')
 def transparent_function_applied_args(
         transparent_function_args: Tuple[Domain, ...],
-        transparent_function_gaps_indices: List[int]) -> Tuple[Domain, ...]:
-    return tuple(arg
-                 if index not in transparent_function_gaps_indices
-                 else gap
-                 for index, arg in enumerate(transparent_function_args))
+        transparent_function_applied_args_count: int) -> Tuple[Domain, ...]:
+    return transparent_function_args[:transparent_function_applied_args_count]
 
 
 @pytest.fixture(scope='function')
@@ -170,10 +158,8 @@ def transparent_function_applied_kwargs(
 @pytest.fixture(scope='function')
 def transparent_function_rest_args(
         transparent_function_args: Tuple[Domain, ...],
-        transparent_function_gaps_indices: List[int]) -> Tuple[Domain, ...]:
-    return tuple(arg
-                 for index, arg in enumerate(transparent_function_args)
-                 if index in transparent_function_gaps_indices)
+        transparent_function_applied_args_count: int) -> Tuple[Domain, ...]:
+    return transparent_function_args[transparent_function_applied_args_count:]
 
 
 @pytest.fixture(scope='function')

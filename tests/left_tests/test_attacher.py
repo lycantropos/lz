@@ -1,14 +1,14 @@
 from typing import (Any,
                     Iterable)
 
-from lz.directed import right
-from lz.iterating import last
+from lz import left
+from lz.iterating import first
 
 
 def test_basic(iterable: Iterable[Any],
                object_: Any) -> None:
-    attach = right.attacher(object_)
+    attach = left.attacher(object_)
 
     result = attach(iterable)
 
-    assert last(result) is object_
+    assert first(result) is object_

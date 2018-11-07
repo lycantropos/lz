@@ -74,34 +74,16 @@ Usage
     10
     ```
 
-2. left [partial application](https://en.wikipedia.org/wiki/Partial_application)
+2. [currying](https://en.wikipedia.org/wiki/Currying)
     ```python
-    >>> from lz.directed import (gap,
-                                 left)
-    >>> count_from_zero_with_step_two_to = left.applier(range, 0, gap, 2)
-    >>> list(count_from_zero_with_step_two_to(10))
-    [0, 2, 4, 6, 8]
-    ```
-
-3. right [partial application](https://en.wikipedia.org/wiki/Partial_application)
-    ```python
-    >>> from lz.directed import (gap,
-                                 right)
-    >>> count_from_zero_with_step_two_to = right.applier(range, 2, gap, 0)
-    >>> list(count_from_zero_with_step_two_to(10))
-    [0, 2, 4, 6, 8]
-    ```
-
-4. [currying](https://en.wikipedia.org/wiki/Currying)
-    ```python
-    >>> from lz.curry import curry 
+    >>> from lz.functional import curry 
     >>> curried_power = curry(pow) 
     >>> two_to_power = curried_power(2) 
     >>> list(map(two_to_power, range(10))) 
     [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     ```
 
-5. flipping positional parameters order
+3. flipping positional parameters order
     ```python
     >>> from lz.functional import flip
     >>> flipped_power = flip(pow)
@@ -109,7 +91,7 @@ Usage
     16
     ```
 
-6. packing function's arguments
+4. packing function's arguments
     ```python
     >>> from lz.functional import pack
     >>> packed_int = pack(int)
@@ -117,6 +99,22 @@ Usage
     10
     >>> packed_int(['10'], {'base': 2})
     2
+    ```
+
+5. left [partial application](https://en.wikipedia.org/wiki/Partial_application)
+    ```python
+    >>> from lz import left
+    >>> count_from_zero_to = left.applier(range, 0)
+    >>> list(count_from_zero_to(10))
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ```
+
+6. right [partial application](https://en.wikipedia.org/wiki/Partial_application)
+    ```python
+    >>> from lz import right
+    >>> square = right.applier(pow, 2)
+    >>> square(10)
+    100
     ```
 
 7. [negating](https://en.wikipedia.org/wiki/Negation) predicate

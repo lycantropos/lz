@@ -2,7 +2,7 @@ from typing import (Callable,
                     Dict,
                     Tuple)
 
-from lz.directed import left
+from lz import left
 from lz.hints import (Domain,
                       Range)
 

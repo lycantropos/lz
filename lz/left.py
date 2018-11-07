@@ -3,11 +3,10 @@ import itertools
 from typing import (Callable,
                     Iterable)
 
-from lz.hints import (Domain,
-                      Map,
-                      Range)
-from lz.iterating import expand
-from . import common
+from .hints import (Domain,
+                    Map,
+                    Range)
+from .iterating import expand
 
 
 def accumulator(function: Callable[[Range, Domain], Range],
@@ -49,28 +48,13 @@ def folder(function: Callable[[Range, Domain], Range],
     return fold
 
 
+@functools.singledispatch
 def applier(function: Callable[..., Range],
-            *applied_args: Domain,
-            **applied_kwargs: Domain) -> Callable[..., Range]:
+            *args: Domain,
+            **kwargs: Domain) -> Callable[..., Range]:
     """
     Returns function that behaves like given function
     with given arguments partially applied.
     Positional arguments will be applied from the left end.
     """
-    start = 0
-    step = 1
-
-    def to_rest_start(occupied_indices: Iterable[int]) -> int:
-        return max(occupied_indices,
-                   default=start) + step
-
-    complete_args = common.to_applier_flow(applied_args,
-                                           start=start,
-                                           step=step,
-                                           rest_start_factory=to_rest_start)
-
-    @functools.wraps(function)
-    def applied(*args, **kwargs) -> Range:
-        return function(*complete_args(args), **applied_kwargs, **kwargs)
-
-    return applied
+    return functools.partial(function, *args, **kwargs)
