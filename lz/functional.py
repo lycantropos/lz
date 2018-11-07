@@ -6,6 +6,7 @@ from typing import (Any,
                     Callable,
                     Dict,
                     Iterable,
+                    Mapping,
                     Tuple,
                     Union)
 
@@ -101,10 +102,19 @@ class Curry:
 def unwrap(function: Callable[..., Range]) -> Tuple[Callable[..., Range],
                                                     Tuple[Domain, ...],
                                                     Dict[str, Domain]]:
+    original_function = function
     try:
-        return inspect.unwrap(function.func), function.args, function.keywords
+        function, args, kwargs = (inspect.unwrap(function.func),
+                                  function.args,
+                                  function.keywords)
     except AttributeError:
-        return inspect.unwrap(function), (), {}
+        return inspect.unwrap(original_function), (), {}
+    else:
+        if (not isinstance(function, Callable)
+                or not isinstance(args, Iterable)
+                or not isinstance(kwargs, Mapping)):
+            return inspect.unwrap(original_function), (), {}
+        return function, args, kwargs
 
 
 def curry(callable_: Callable[..., Range]) -> Curry:
