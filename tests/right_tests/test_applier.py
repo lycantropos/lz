@@ -9,17 +9,18 @@ from lz.hints import (Domain,
 
 def test_basic(transparent_function: Callable[..., Range],
                transparent_function_args: Tuple[Domain, ...],
-               transparent_function_applied_args: Tuple[Domain, ...],
-               transparent_function_rest_args: Tuple[Domain, ...],
+               transparent_function_first_args_part: Tuple[Domain, ...],
+               transparent_function_second_args_part: Tuple[Domain, ...],
                transparent_function_kwargs: Dict[str, Domain],
-               transparent_function_applied_kwargs: Dict[str, Domain],
-               transparent_function_rest_kwargs: Dict[str, Domain]) -> None:
+               transparent_function_first_kwargs_part: Dict[str, Domain],
+               transparent_function_second_kwargs_part: Dict[str, Domain]
+               ) -> None:
     applied = right.applier(transparent_function,
-                            *reversed(transparent_function_applied_args),
-                            **transparent_function_applied_kwargs)
+                            *reversed(transparent_function_second_args_part),
+                            **transparent_function_first_kwargs_part)
 
-    result = applied(*transparent_function_rest_args,
-                     **transparent_function_rest_kwargs)
+    result = applied(*transparent_function_first_args_part,
+                     **transparent_function_second_kwargs_part)
 
     assert result == transparent_function(*transparent_function_args,
                                           **transparent_function_kwargs)

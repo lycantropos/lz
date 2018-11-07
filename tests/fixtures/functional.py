@@ -139,14 +139,14 @@ def transparent_function_applied_args_count(
 
 
 @pytest.fixture(scope='function')
-def transparent_function_applied_args(
+def transparent_function_first_args_part(
         transparent_function_args: Tuple[Domain, ...],
         transparent_function_applied_args_count: int) -> Tuple[Domain, ...]:
     return transparent_function_args[:transparent_function_applied_args_count]
 
 
 @pytest.fixture(scope='function')
-def transparent_function_applied_kwargs(
+def transparent_function_first_kwargs_part(
         transparent_function_kwargs: Dict[str, Domain],
         transparent_function_applied_kwargs_count: int) -> Dict[str, Domain]:
     keys = random.sample(list(transparent_function_kwargs),
@@ -156,19 +156,19 @@ def transparent_function_applied_kwargs(
 
 
 @pytest.fixture(scope='function')
-def transparent_function_rest_args(
+def transparent_function_second_args_part(
         transparent_function_args: Tuple[Domain, ...],
         transparent_function_applied_args_count: int) -> Tuple[Domain, ...]:
     return transparent_function_args[transparent_function_applied_args_count:]
 
 
 @pytest.fixture(scope='function')
-def transparent_function_rest_kwargs(
+def transparent_function_second_kwargs_part(
         transparent_function_kwargs: Dict[str, Domain],
-        transparent_function_applied_kwargs: Dict[str, Domain]) -> len:
+        transparent_function_first_kwargs_part) -> len:
     return {key: value
             for key, value in transparent_function_kwargs.items()
-            if key not in transparent_function_applied_kwargs}
+            if key not in transparent_function_first_kwargs_part}
 
 
 @pytest.fixture(scope='function')
