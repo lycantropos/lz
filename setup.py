@@ -1,4 +1,5 @@
 import platform
+from pathlib import Path
 
 from setuptools import (find_packages,
                         setup)
@@ -25,7 +26,7 @@ setup(name='lz',
       packages=find_packages(exclude=('tests',)),
       version=lz.__version__,
       description=lz.__doc__,
-      long_description=open('README.md').read(),
+      long_description=Path('README.md').read_text(),
       long_description_content_type='text/markdown',
       author='Azat Ibrakov',
       author_email='azatibrakov@gmail.com',
