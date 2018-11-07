@@ -64,7 +64,7 @@ Usage
 `lz` provides a bunch of utilities for working with functions, predicates & iterables such as
 
 1. [function composition](https://en.wikipedia.org/wiki/Function_composition)
-    ```pydocstring
+    ```python
     >>> from lz.functional import compose
     >>> from functools import partial
     >>> sum_of_digits = compose(sum,
@@ -75,7 +75,7 @@ Usage
     ```
 
 2. left [partial application](https://en.wikipedia.org/wiki/Partial_application)
-    ```pydocstring
+    ```python
     >>> from lz.directed import (gap,
                                  left)
     >>> count_from_zero_with_step_two_to = left.applier(range, 0, gap, 2)
@@ -84,7 +84,7 @@ Usage
     ```
 
 3. right [partial application](https://en.wikipedia.org/wiki/Partial_application)
-    ```pydocstring
+    ```python
     >>> from lz.directed import (gap,
                                  right)
     >>> count_from_zero_with_step_two_to = right.applier(range, 2, gap, 0)
@@ -93,7 +93,7 @@ Usage
     ```
 
 4. [currying](https://en.wikipedia.org/wiki/Currying)
-    ```pydocstring
+    ```python
     >>> from lz.curry import curry 
     >>> curried_power = curry(pow) 
     >>> two_to_power = curried_power(2) 
@@ -102,7 +102,7 @@ Usage
     ```
 
 5. flipping positional parameters order
-    ```pydocstring
+    ```python
     >>> from lz.functional import flip
     >>> flipped_power = flip(pow)
     >>> flipped_power(2, 4)
@@ -110,7 +110,7 @@ Usage
     ```
 
 6. packing function's arguments
-    ```pydocstring
+    ```python
     >>> from lz.functional import pack
     >>> packed_int = pack(int)
     >>> packed_int(['10'])
@@ -120,7 +120,7 @@ Usage
     ```
 
 7. [negating](https://en.wikipedia.org/wiki/Negation) predicate
-    ```pydocstring
+    ```python
     >>> from lz.logical import negate
     >>> false_like = negate(bool)
     >>> false_like([])
@@ -130,7 +130,7 @@ Usage
     ```
 
 8. [conjoining](https://en.wikipedia.org/wiki/Logical_conjunction) predicates
-    ```pydocstring
+    ```python
     >>> from lz.logical import conjoin
     >>> is_valid_constant_identifier = conjoin(str.isupper, str.isidentifier)
     >>> is_valid_constant_identifier('SECOND_SECTION')
@@ -140,7 +140,7 @@ Usage
     ```
 
 9. [disjoining](https://en.wikipedia.org/wiki/Logical_disjunction) predicates
-    ```pydocstring
+    ```python
     >>> from lz.logical import disjoin
     >>> alphabetic_or_numeric = disjoin(str.isalpha, str.isnumeric)
     >>> alphabetic_or_numeric('Hello')
@@ -152,14 +152,14 @@ Usage
     ```
 
 10. reversing iterable
-    ```pydocstring
+    ```python
     >>> from lz.iterating import reverse
     >>> list(reverse(range(10)))
     [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     ```
 
 11. chunking iterable
-    ```pydocstring
+    ```python
     >>> from lz.iterating import chopper
     >>> to_triplets = chopper(3)
     >>> list(to_triplets(range(10)))
@@ -167,7 +167,7 @@ Usage
     ```
 
 12. sliding over iterable
-    ```pydocstring
+    ```python
     >>> from lz.iterating import slider
     >>> slide_pairwise = slider(2)
     >>> list(slide_pairwise(range(10)))
@@ -192,7 +192,6 @@ Choose which version number category to bump following [semver
 specification](http://semver.org/).
 
 Test bumping version
-
 ```bash
 bump2version --dry-run --verbose $CATEGORY
 ```
@@ -201,7 +200,6 @@ where `$CATEGORY` is the target version number category name, possible
 values are `patch`/`minor`/`major`.
 
 Bump version
-
 ```bash
 bump2version --verbose $CATEGORY
 ```
@@ -211,13 +209,11 @@ This will set version to `major.minor.patch-alpha`.
 #### Release
 
 Test bumping version
-
 ```bash
 bump2version --dry-run --verbose --tag release
 ```
 
 Bump version
-
 ```bash
 bump2version --verbose --tag release
 ```
