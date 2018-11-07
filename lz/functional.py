@@ -1,9 +1,15 @@
 import functools
+import inspect
+import itertools
 from types import MappingProxyType
 from typing import (Any,
                     Callable,
                     Dict,
-                    Iterable)
+                    Iterable,
+                    Tuple,
+                    Union)
+
+from paradigm import signatures
 
 from .hints import (Domain,
                     Intermediate,
@@ -46,6 +52,68 @@ def combine(maps: Iterable[Map]) -> Map[Iterable[Domain], Iterable[Range]]:
                     for map_, argument in zip(maps, arguments))
 
     return combined
+
+
+class Curry:
+    def __init__(self,
+                 callable_: Callable[..., Range],
+                 signature: signatures.Base,
+                 *args: Domain,
+                 **kwargs: Domain) -> None:
+        self.callable_ = callable_
+        self.signature = signature
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self, *args: Domain, **kwargs: Domain
+                 ) -> Union['Curry', Range]:
+        args = self.args + args
+        kwargs = {**self.kwargs, **kwargs}
+        try:
+            return self.callable_(*args, **kwargs)
+        except TypeError:
+            if not self.signature.has_unset_parameters(*args, **kwargs):
+                raise
+            return type(self)(self.callable_, self.signature, *args, **kwargs)
+
+    def __eq__(self, other: 'Curry') -> bool:
+        if not isinstance(other, Curry):
+            return NotImplemented
+        return (self.callable_ is other.callable_
+                and self.signature == other.signature
+                and self.args == other.args
+                and self.kwargs == other.kwargs)
+
+    def __repr__(self) -> str:
+        result = ('<curried {callable_}'
+                  .format(callable_=self.callable_))
+        arguments_strings = list(
+                itertools.chain(map(str, self.args),
+                                itertools.starmap('{}={}'.format,
+                                                  self.kwargs.items())))
+        if arguments_strings:
+            result += (' with partially applied {arguments}'
+                       .format(arguments=', '.join(arguments_strings)))
+        result += '>'
+        return result
+
+
+def unwrap(function: Callable[..., Range]) -> Tuple[Callable[..., Range],
+                                                    Tuple[Domain, ...],
+                                                    Dict[str, Domain]]:
+    try:
+        return inspect.unwrap(function.func), function.args, function.keywords
+    except AttributeError:
+        return inspect.unwrap(function), (), {}
+
+
+def curry(callable_: Callable[..., Range]) -> Curry:
+    """
+    Returns curried version of given callable.
+    """
+    callable_, args, kwargs = unwrap(callable_)
+    signature = signatures.factory(callable_)
+    return Curry(callable_, signature, *args, **kwargs)
 
 
 def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:

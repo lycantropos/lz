@@ -6,8 +6,8 @@ from typing import (Any,
 
 import pytest
 
-from lz.signatures.hints import (MethodDescriptorType,
-                                 WrapperDescriptorType)
+from paradigm.hints import (MethodDescriptorType,
+                            WrapperDescriptorType)
 from tests import strategies
 from tests.utils import find
 
@@ -40,11 +40,6 @@ def method() -> MethodType:
 @pytest.fixture(scope='function')
 def method_descriptor() -> MethodDescriptorType:
     return find(strategies.methods_descriptors)
-
-
-@pytest.fixture(scope='function')
-def unsupported_callable() -> Callable[..., Any]:
-    return find(strategies.unsupported_callables)
 
 
 @pytest.fixture(scope='function')

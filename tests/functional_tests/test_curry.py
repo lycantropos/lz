@@ -4,11 +4,11 @@ from types import (BuiltinFunctionType,
 from typing import (Any,
                     Callable)
 
-from lz.curry import (Curry,
-                      curry)
-from lz.signatures.hints import (MethodDescriptorType,
-                                 WrapperDescriptorType)
-import pytest
+from paradigm.hints import (MethodDescriptorType,
+                            WrapperDescriptorType)
+
+from lz.functional import (Curry,
+                           curry)
 
 
 def test_basic(built_in_function: BuiltinFunctionType,
