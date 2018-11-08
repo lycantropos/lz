@@ -30,7 +30,7 @@ setup(name='lz',
       author_email='azatibrakov@gmail.com',
       url=project_base_url,
       download_url=project_base_url + 'archive/master.zip',
-      python_requires='>=3.5',
+      python_requires='>=3.5.3',
       install_requires=install_requires,
       setup_requires=setup_requires,
       tests_require=tests_require)
