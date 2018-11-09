@@ -88,10 +88,8 @@ class Curry:
     def __repr__(self) -> str:
         result = ('<curried {callable_}'
                   .format(callable_=self.callable_))
-        arguments_strings = list(
-                itertools.chain(map(str, self.args),
-                                itertools.starmap('{}={}'.format,
-                                                  self.kwargs.items())))
+        arguments_strings = list(arguments_to_strings(self.args,
+                                                      self.kwargs))
         if arguments_strings:
             result += (' with partially applied {arguments}'
                        .format(arguments=', '.join(arguments_strings)))
@@ -115,6 +113,12 @@ def unwrap(function: Callable[..., Range]) -> Tuple[Callable[..., Range],
                 or not isinstance(kwargs, Mapping)):
             return inspect.unwrap(original_function), (), {}
         return function, args, kwargs
+
+
+def arguments_to_strings(args: Tuple[Any, ...], kwargs: Dict[str, Any]
+                         ) -> Iterable[str]:
+    yield from map(str, args)
+    yield from itertools.starmap('{}={}'.format, kwargs.items())
 
 
 def curry(callable_: Callable[..., Range]) -> Curry:
