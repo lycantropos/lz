@@ -5,7 +5,8 @@ from typing import (Callable,
 
 from . import left
 from .functional import (compose,
-                         flip)
+                         flip,
+                         handle_partial)
 from .hints import (Domain,
                     Map,
                     Range)
@@ -45,6 +46,7 @@ def folder(function: Callable[[Domain, Range], Range],
     return compose(left_folder, reverse)
 
 
+@handle_partial
 def applier(function: Callable[..., Range],
             *args: Domain,
             **kwargs: Domain) -> Callable[..., Range]:
@@ -53,10 +55,14 @@ def applier(function: Callable[..., Range],
     with given arguments partially applied.
     Positional arguments will be applied from the right end.
     """
-    args = args[::-1]
 
     @functools.wraps(function)
     def applied(*rest_args, **rest_kwargs) -> Range:
-        return function(*rest_args, *args, **kwargs, **rest_kwargs)
+        return function(*rest_args, *applied.args,
+                        **applied.keywords, **rest_kwargs)
+
+    applied.func = function
+    applied.args = args[::-1]
+    applied.keywords = kwargs
 
     return applied
