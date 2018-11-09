@@ -1,12 +1,13 @@
-import functools
 import itertools
 from typing import (Callable,
                     Iterable)
 
 from . import left
-from .functional import (compose,
+from .functional import (arguments_to_strings,
+                         compose,
                          flip,
-                         handle_partial)
+                         handle_partial,
+                         update_metadata)
 from .hints import (Domain,
                     Map,
                     Range)
@@ -56,7 +57,6 @@ def applier(function: Callable[..., Range],
     Positional arguments will be applied from the right end.
     """
 
-    @functools.wraps(function)
     def applied(*rest_args, **rest_kwargs) -> Range:
         return function(*rest_args, *applied.args,
                         **applied.keywords, **rest_kwargs)
@@ -65,4 +65,15 @@ def applier(function: Callable[..., Range],
     applied.args = args[::-1]
     applied.keywords = kwargs
 
+    def name_factory(original: str) -> str:
+        result = original
+        arguments_strings = list(arguments_to_strings(applied.args,
+                                                      applied.keywords))
+        if arguments_strings:
+            result += (' with right partially applied {arguments}'
+                       .format(arguments=', '.join(arguments_strings)))
+        return result
+
+    update_metadata(function, applied,
+                    name_factory=name_factory)
     return applied
