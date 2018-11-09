@@ -1,5 +1,7 @@
 import functools
 import itertools
+from contextlib import suppress
+from operator import add
 from types import MappingProxyType
 from typing import (Any,
                     Callable,
@@ -14,6 +16,7 @@ from paradigm import signatures
 from .hints import (Domain,
                     Intermediate,
                     Map,
+                    Operator,
                     Range)
 
 
@@ -150,11 +153,12 @@ def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
     by unpacking elements to given function.
     """
 
-    @functools.wraps(function)
     def packed(args: Iterable[Domain],
                kwargs: Dict[str, Any] = MappingProxyType({})) -> Range:
         return function(*args, **kwargs)
 
+    update_metadata(function, packed,
+                    name_factory=functools.partial(add, 'packed '))
     return packed
 
 
@@ -179,6 +183,8 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     def flipped(*args, **kwargs) -> Range:
         return function(*reversed(args), **kwargs)
 
+    update_metadata(function, flipped,
+                    name_factory=functools.partial(add, 'flipped '))
     return flipped
 
 
@@ -194,3 +200,15 @@ def cleave(functions: Iterable[Callable[..., Range]]
                     for function in functions)
 
     return cleft
+
+
+def update_metadata(source_function: Callable[..., Range],
+                    target_function: Callable[..., Range],
+                    *,
+                    name_factory: Operator[str] = identity) -> None:
+    target_function.__name__ = name_factory(source_function.__name__)
+    target_function.__qualname__ = name_factory(source_function.__qualname__)
+    target_function.__module__ = source_function.__module__
+    target_function.__doc__ = source_function.__doc__
+    with suppress(AttributeError):
+        target_function.__dict__.update(source_function.__dict__)
