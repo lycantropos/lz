@@ -1,5 +1,4 @@
 import functools
-import inspect
 import itertools
 from types import MappingProxyType
 from typing import (Any,
@@ -64,12 +63,12 @@ class Curry:
         self.callable_ = callable_
         self.signature = signature
         self.args = args
-        self.kwargs = kwargs
+        self.keywords = kwargs
 
     def __call__(self, *args: Domain, **kwargs: Domain
                  ) -> Union['Curry', Range]:
         args = self.args + args
-        kwargs = {**self.kwargs, **kwargs}
+        kwargs = {**self.keywords, **kwargs}
         try:
             return self.callable_(*args, **kwargs)
         except TypeError:
@@ -83,13 +82,13 @@ class Curry:
         return (self.callable_ is other.callable_
                 and self.signature == other.signature
                 and self.args == other.args
-                and self.kwargs == other.kwargs)
+                and self.keywords == other.keywords)
 
     def __repr__(self) -> str:
         result = ('<curried {callable_}'
                   .format(callable_=self.callable_))
         arguments_strings = list(arguments_to_strings(self.args,
-                                                      self.kwargs))
+                                                      self.keywords))
         if arguments_strings:
             result += (' with partially applied {arguments}'
                        .format(arguments=', '.join(arguments_strings)))
@@ -97,22 +96,36 @@ class Curry:
         return result
 
 
-def unwrap(function: Callable[..., Range]) -> Tuple[Callable[..., Range],
-                                                    Tuple[Domain, ...],
-                                                    Dict[str, Domain]]:
-    original_function = function
-    try:
-        function, args, kwargs = (inspect.unwrap(function.func),
-                                  function.args,
-                                  function.keywords)
-    except AttributeError:
-        return inspect.unwrap(original_function), (), {}
-    else:
-        if (not isinstance(function, Callable)
-                or not isinstance(args, Iterable)
-                or not isinstance(kwargs, Mapping)):
-            return inspect.unwrap(original_function), (), {}
-        return function, args, kwargs
+def handle_partial(function_factory: Callable[..., Callable[..., Range]]
+                   ) -> Callable[..., Callable[..., Range]]:
+    @functools.wraps(function_factory)
+    def handled(function: Callable[..., Range], *args, **kwargs
+                ) -> Callable[..., Range]:
+        original_function = function
+        try:
+            function, applied_args, applied_kwargs = (function.func,
+                                                      function.args,
+                                                      function.keywords)
+        except AttributeError:
+            return function_factory(original_function, *args, **kwargs)
+        else:
+            if (not isinstance(function, Callable)
+                    or not isinstance(applied_args, Iterable)
+                    or not isinstance(applied_kwargs, Mapping)):
+                return function_factory(original_function, *args, **kwargs)
+        result = function_factory(function, *args, **kwargs)
+        result.func = function
+        try:
+            result.args += applied_args
+        except AttributeError:
+            result.args = applied_args
+        try:
+            result.keywords = {**applied_kwargs, **result.keywords}
+        except AttributeError:
+            result.keywords = applied_kwargs
+        return result
+
+    return handled
 
 
 def arguments_to_strings(args: Tuple[Any, ...], kwargs: Dict[str, Any]
@@ -121,15 +134,16 @@ def arguments_to_strings(args: Tuple[Any, ...], kwargs: Dict[str, Any]
     yield from itertools.starmap('{}={}'.format, kwargs.items())
 
 
+@handle_partial
 def curry(callable_: Callable[..., Range]) -> Curry:
     """
     Returns curried version of given callable.
     """
-    callable_, args, kwargs = unwrap(callable_)
     signature = signatures.factory(callable_)
-    return Curry(callable_, signature, *args, **kwargs)
+    return Curry(callable_, signature)
 
 
+@handle_partial
 def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
     """
     Returns function that works with single iterable parameter
@@ -155,24 +169,17 @@ def to_constant(object_: Domain) -> Callable[..., Domain]:
     return constant
 
 
-@functools.singledispatch
-def flip(object_: Callable[..., Range]) -> Callable[..., Range]:
+@handle_partial
+def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
     """
 
-    @functools.wraps(object_)
+    @functools.wraps(function)
     def flipped(*args, **kwargs) -> Range:
-        return object_(*reversed(args), **kwargs)
+        return function(*reversed(args), **kwargs)
 
     return flipped
-
-
-@flip.register(functools.partial)
-def flip_partial(object_: functools.partial) -> Callable[..., Range]:
-    return functools.partial(flip(object_.func),
-                             *object_.args,
-                             **object_.keywords)
 
 
 def cleave(functions: Iterable[Callable[..., Range]]
