@@ -48,7 +48,6 @@ def folder(function: Callable[[Range, Domain], Range],
     return fold
 
 
-@functools.singledispatch
 def applier(function: Callable[..., Range],
             *args: Domain,
             **kwargs: Domain) -> Callable[..., Range]:
