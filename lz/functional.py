@@ -133,8 +133,8 @@ def handle_partial(function_factory: Callable[..., Callable[..., Range]]
 
 def arguments_to_strings(args: Tuple[Any, ...], kwargs: Dict[str, Any]
                          ) -> Iterable[str]:
-    yield from map(str, args)
-    yield from itertools.starmap('{}={}'.format, kwargs.items())
+    yield from map(repr, args)
+    yield from itertools.starmap('{}={!r}'.format, kwargs.items())
 
 
 @handle_partial
