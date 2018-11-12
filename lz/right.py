@@ -3,11 +3,9 @@ from typing import (Callable,
                     Iterable)
 
 from . import left
-from .functional import (arguments_to_strings,
+from .functional import (ApplierBase,
                          compose,
-                         flip,
-                         handle_partial,
-                         update_metadata)
+                         flip)
 from .hints import (Domain,
                     Map,
                     Range)
@@ -47,7 +45,16 @@ def folder(function: Callable[[Domain, Range], Range],
     return compose(left_folder, reverse)
 
 
-@handle_partial
+class Applier(ApplierBase):
+    def __init__(self, function: Callable[..., Range],
+                 *args: Domain,
+                 **kwargs: Domain) -> None:
+        super().__init__(function, *args[::-1], **kwargs)
+
+    def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
+        return self.func(*args, *self.args, **self.keywords, **kwargs)
+
+
 def applier(function: Callable[..., Range],
             *args: Domain,
             **kwargs: Domain) -> Callable[..., Range]:
@@ -57,23 +64,4 @@ def applier(function: Callable[..., Range],
     Positional arguments will be applied from the right end.
     """
 
-    def applied(*rest_args, **rest_kwargs) -> Range:
-        return function(*rest_args, *applied.args,
-                        **applied.keywords, **rest_kwargs)
-
-    applied.func = function
-    applied.args = args[::-1]
-    applied.keywords = kwargs
-
-    def name_factory(original: str) -> str:
-        result = original
-        arguments_strings = list(arguments_to_strings(applied.args,
-                                                      applied.keywords))
-        if arguments_strings:
-            result += (' with right partially applied {arguments}'
-                       .format(arguments=', '.join(arguments_strings)))
-        return result
-
-    update_metadata(function, applied,
-                    name_factory=name_factory)
-    return applied
+    return Applier(function, *args, **kwargs)

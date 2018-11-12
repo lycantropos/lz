@@ -3,6 +3,7 @@ import itertools
 from typing import (Callable,
                     Iterable)
 
+from .functional import ApplierBase
 from .hints import (Domain,
                     Map,
                     Range)
@@ -48,6 +49,9 @@ def folder(function: Callable[[Range, Domain], Range],
     return fold
 
 
+Applier = ApplierBase.register(functools.partial)
+
+
 def applier(function: Callable[..., Range],
             *args: Domain,
             **kwargs: Domain) -> Callable[..., Range]:
@@ -56,4 +60,4 @@ def applier(function: Callable[..., Range],
     with given arguments partially applied.
     Positional arguments will be applied from the left end.
     """
-    return functools.partial(function, *args, **kwargs)
+    return Applier(function, *args, **kwargs)
