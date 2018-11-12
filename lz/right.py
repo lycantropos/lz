@@ -61,7 +61,7 @@ def applier(function: Callable[..., Range],
     """
     Returns function that behaves like given function
     with given arguments partially applied.
-    Positional arguments will be applied from the right end.
+    Given positional arguments will be added to the right end.
     """
 
     return Applier(function, *args, **kwargs)
