@@ -1,5 +1,6 @@
 import functools
 import itertools
+from collections import abc
 from contextlib import suppress
 from operator import add
 from types import MappingProxyType
@@ -7,7 +8,7 @@ from typing import (Any,
                     Callable,
                     Dict,
                     Iterable,
-                    Mapping,
+                    Optional,
                     Tuple,
                     Union)
 
@@ -57,78 +58,47 @@ def combine(maps: Iterable[Map]) -> Map[Iterable[Domain], Iterable[Range]]:
     return combined
 
 
-class Curry:
+class ApplierBase(abc.Callable):
+    def __init__(self, function: Callable[..., Range],
+                 *args: Domain,
+                 **kwargs: Domain) -> None:
+        if isinstance(function, type(self)):
+            args = function.args + args
+            kwargs = {**function.keywords, **kwargs}
+            function = function.func
+        self.func = function
+        self.args = args
+        self.keywords = kwargs
+
+    def __repr__(self) -> str:
+        arguments_strings = itertools.chain(
+                [repr(self.func)],
+                arguments_to_strings(self.args,
+                                     self.keywords))
+        cls = type(self)
+        return (cls.__module__ + '.' + cls.__qualname__
+                + '(' + ', '.join(arguments_strings) + ')')
+
+
+class Curry(ApplierBase):
     def __init__(self,
-                 callable_: Callable[..., Range],
+                 function: Callable[..., Range],
                  signature: signatures.Base,
                  *args: Domain,
                  **kwargs: Domain) -> None:
-        self.callable_ = callable_
+        super().__init__(function, *args, **kwargs)
         self.signature = signature
-        self.args = args
-        self.keywords = kwargs
 
     def __call__(self, *args: Domain, **kwargs: Domain
                  ) -> Union['Curry', Range]:
         args = self.args + args
         kwargs = {**self.keywords, **kwargs}
         try:
-            return self.callable_(*args, **kwargs)
+            return self.func(*args, **kwargs)
         except TypeError:
             if not self.signature.has_unset_parameters(*args, **kwargs):
                 raise
-            return type(self)(self.callable_, self.signature, *args, **kwargs)
-
-    def __eq__(self, other: 'Curry') -> bool:
-        if not isinstance(other, Curry):
-            return NotImplemented
-        return (self.callable_ is other.callable_
-                and self.signature == other.signature
-                and self.args == other.args
-                and self.keywords == other.keywords)
-
-    def __repr__(self) -> str:
-        result = ('<curried {callable_}'
-                  .format(callable_=self.callable_))
-        arguments_strings = list(arguments_to_strings(self.args,
-                                                      self.keywords))
-        if arguments_strings:
-            result += (' with partially applied {arguments}'
-                       .format(arguments=', '.join(arguments_strings)))
-        result += '>'
-        return result
-
-
-def handle_partial(function_factory: Callable[..., Callable[..., Range]]
-                   ) -> Callable[..., Callable[..., Range]]:
-    @functools.wraps(function_factory)
-    def handled(function: Callable[..., Range], *args, **kwargs
-                ) -> Callable[..., Range]:
-        original_function = function
-        try:
-            function, applied_args, applied_kwargs = (function.func,
-                                                      function.args,
-                                                      function.keywords)
-        except AttributeError:
-            return function_factory(original_function, *args, **kwargs)
-        else:
-            if (not isinstance(function, Callable)
-                    or not isinstance(applied_args, Iterable)
-                    or not isinstance(applied_kwargs, Mapping)):
-                return function_factory(original_function, *args, **kwargs)
-        result = function_factory(function, *args, **kwargs)
-        result.func = function
-        try:
-            result.args += applied_args
-        except AttributeError:
-            result.args = applied_args
-        try:
-            result.keywords = {**applied_kwargs, **result.keywords}
-        except AttributeError:
-            result.keywords = applied_kwargs
-        return result
-
-    return handled
+            return type(self)(self.func, self.signature, *args, **kwargs)
 
 
 def arguments_to_strings(args: Tuple[Any, ...], kwargs: Dict[str, Any]
@@ -137,16 +107,17 @@ def arguments_to_strings(args: Tuple[Any, ...], kwargs: Dict[str, Any]
     yield from itertools.starmap('{}={!r}'.format, kwargs.items())
 
 
-@handle_partial
-def curry(callable_: Callable[..., Range]) -> Curry:
+def curry(function: Callable[..., Range],
+          *,
+          signature: Optional[signatures.Base] = None) -> Curry:
     """
-    Returns curried version of given callable.
+    Returns curried version of given function.
     """
-    signature = signatures.factory(callable_)
-    return Curry(callable_, signature)
+    if signature is None:
+        signature = signatures.factory(function)
+    return Curry(function, signature)
 
 
-@handle_partial
 def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
     """
     Returns function that works with single iterable parameter
@@ -157,8 +128,11 @@ def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
                kwargs: Dict[str, Any] = MappingProxyType({})) -> Range:
         return function(*args, **kwargs)
 
+    members_factories = dict(members_copiers)
+    members_factories['__name__'] = functools.partial(add, 'packed ')
+    members_factories['__qualname__'] = functools.partial(add, 'packed ')
     update_metadata(function, packed,
-                    name_factory=functools.partial(add, 'packed '))
+                    members_factories=members_factories)
     return packed
 
 
@@ -173,18 +147,19 @@ def to_constant(object_: Domain) -> Callable[..., Domain]:
     return constant
 
 
-@handle_partial
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
     """
 
-    @functools.wraps(function)
     def flipped(*args, **kwargs) -> Range:
         return function(*reversed(args), **kwargs)
 
+    members_factories = dict(members_copiers)
+    members_factories['__name__'] = functools.partial(add, 'flipped ')
+    members_factories['__qualname__'] = functools.partial(add, 'flipped ')
     update_metadata(function, flipped,
-                    name_factory=functools.partial(add, 'flipped '))
+                    members_factories=members_factories)
     return flipped
 
 
@@ -202,13 +177,21 @@ def cleave(functions: Iterable[Callable[..., Range]]
     return cleft
 
 
+members_copiers = dict(itertools.chain(zip(functools.WRAPPER_ASSIGNMENTS,
+                                           itertools.repeat(identity))))
+
+
 def update_metadata(source_function: Callable[..., Range],
                     target_function: Callable[..., Range],
                     *,
-                    name_factory: Operator[str] = identity) -> None:
-    target_function.__name__ = name_factory(source_function.__name__)
-    target_function.__qualname__ = name_factory(source_function.__qualname__)
-    target_function.__module__ = source_function.__module__
-    target_function.__doc__ = source_function.__doc__
+                    members_factories: Dict[str, Operator]) -> None:
+    for member_name, member_factory in members_factories.items():
+        try:
+            source_member = getattr(source_function, member_name)
+        except AttributeError:
+            continue
+        else:
+            target_member = member_factory(source_member)
+            setattr(target_function, member_name, target_member)
     with suppress(AttributeError):
         target_function.__dict__.update(source_function.__dict__)
