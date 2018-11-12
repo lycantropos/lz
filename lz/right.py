@@ -49,7 +49,7 @@ class Applier(ApplierBase):
     def __init__(self, function: Callable[..., Range],
                  *args: Domain,
                  **kwargs: Domain) -> None:
-        super().__init__(function, *args[::-1], **kwargs)
+        super().__init__(function, *args, **kwargs)
 
     def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
         return self.func(*args, *self.args, **self.keywords, **kwargs)
