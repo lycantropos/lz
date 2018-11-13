@@ -21,14 +21,14 @@ from .functional import (false_predicates,
                          to_transparent_functions_kwargs,
                          transparent_functions,
                          true_predicates)
-from .iterating import groupers_keys
+from .iterating import (cutter_slices,
+                        groupers_keys)
 from .literals import empty
 from .literals.base import (hashables,
                             indices,
                             keywords_arguments,
                             objects,
                             positionals_arguments,
-                            slices,
                             sortable_iterables)
 from .literals.factories import (to_integers,
                                  to_iterables)

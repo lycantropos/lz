@@ -30,7 +30,7 @@ hashables = (scalars
 deferred_objects = strategies.deferred(lambda: objects)
 lists = to_lists(deferred_objects)
 tuples = lists.map(tuple)
-indices = strategies.integers(0, MAX_ITERABLES_SIZE)
+indices = strategies.integers(-MAX_ITERABLES_SIZE, MAX_ITERABLES_SIZE - 1)
 slices_fields = strategies.none() | indices
 slices = strategies.builds(slice,
                            slices_fields,
