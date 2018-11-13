@@ -89,8 +89,10 @@ def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from iterable based on given slice.
 
-    Slice supposed to have non-negative fields
-    since it is hard to evaluate negative indices for arbitrary iterable.
+    Slice fields supposed to be unset or non-negative
+    since it is hard to evaluate negative indices/step for arbitrary iterable
+    which may be potentially infinite
+    or change previous elements if iterating made backwards.
     """
     start = slice_.start
     stop = slice_.stop
