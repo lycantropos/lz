@@ -36,6 +36,12 @@ def natural_number() -> int:
 
 @pytest.fixture(scope='function')
 def iterable(min_iterables_size: int) -> Iterable[Any]:
+    return find(strategies.to_iterables(strategies.objects,
+                                        min_size=min_iterables_size))
+
+
+@pytest.fixture(scope='function')
+def hashable_iterable(min_iterables_size: int) -> Iterable[Any]:
     return find(strategies.to_iterables(strategies.hashables,
                                         min_size=min_iterables_size))
 
