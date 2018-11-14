@@ -1,15 +1,28 @@
 import functools
+import io
 import itertools
+import os
 import sys
 from collections import (abc,
                          defaultdict,
                          deque)
-from typing import (Hashable,
+from operator import sub
+from typing import (Any,
+                    AnyStr,
+                    BinaryIO,
+                    Hashable,
+                    IO,
                     Iterable,
+                    Iterator,
                     List,
                     Mapping,
-                    Tuple)
+                    Optional,
+                    Sequence,
+                    TextIO,
+                    Tuple,
+                    overload)
 
+from .arithmetical import ceil_division
 from .functional import (cleave,
                          combine,
                          compose)
@@ -19,6 +32,9 @@ from .hints import (Domain,
                     Predicate,
                     Range,
                     Sortable)
+from .textual import (decoder,
+                      read_batch,
+                      split)
 
 
 def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
@@ -163,8 +179,42 @@ def grouper(key: Map[Domain, Hashable]
     return group_by
 
 
+@overload
+def reverse(iterable: Iterator[Domain]) -> Iterable[Domain]:
+    pass
+
+
+@overload
+def reverse(iterable: Sequence[Domain]) -> Iterable[Domain]:
+    pass
+
+
+@overload
+def reverse(iterable: IO[AnyStr],
+            *,
+            batch_size: Optional[int] = None,
+            lines_separator: AnyStr = '\n',
+            keep_lines_separator: bool = True) -> Iterable[AnyStr]:
+    pass
+
+
+if sys.version_info >= (3, 6):
+    from typing import Reversible
+
+
+    @overload
+    def reverse(iterable: Reversible[Domain]) -> Iterable[Domain]:
+        pass
+
+
+@overload
+def reverse(iterable: Iterable[Domain]) -> Iterable[Domain]:
+    pass
+
+
 @functools.singledispatch
-def reverse(object_: Iterable[Domain]) -> Iterable[Domain]:
+def reverse(object_: Iterable[Domain],
+            **_: Any) -> Iterable[Domain]:
     """
     Returns iterable with reversed elements order.
     """
@@ -189,6 +239,59 @@ if sys.version_info >= (3, 6):
     @reverse.register(abc.Reversible)
     def reverse_reversible(iterable: Reversible[Domain]) -> Iterable[Domain]:
         yield from reversed(iterable)
+
+
+@reverse.register(io.TextIOWrapper)
+def reverse_file(iterable: TextIO,
+                 *,
+                 batch_size: Optional[int] = None,
+                 lines_separator: str = '\n',
+                 keep_lines_separator: bool = True) -> Iterable[str]:
+    encoding = iterable.encoding
+    yield from map(decoder(encoding),
+                   reverse(iterable.buffer,
+                           batch_size=batch_size,
+                           lines_separator=lines_separator.encode(encoding),
+                           keep_lines_separator=keep_lines_separator))
+
+
+@reverse.register(io.BufferedReader)
+def reverse_binary_file(iterable: BinaryIO,
+                        *,
+                        batch_size: Optional[int] = None,
+                        lines_separator: bytes = b'\n',
+                        keep_lines_separator: bool = True) -> Iterable[bytes]:
+    file_size = iterable.seek(0, os.SEEK_END)
+    if batch_size is None:
+        batch_size = file_size
+    batches_count = ceil_division(file_size, batch_size)
+    remaining_bytes_indicator = itertools.islice(
+            itertools.accumulate(itertools.chain([file_size],
+                                                 itertools.repeat(batch_size)),
+                                 sub),
+            batches_count)
+    remaining_bytes_count = next(remaining_bytes_indicator)
+    batch = read_batch(iterable,
+                       batch_size=batch_size,
+                       remaining_bytes_count=remaining_bytes_count)
+    segment, *lines = split(batch,
+                            separator=lines_separator,
+                            keep_separator=keep_lines_separator)
+    yield from reverse(lines)
+    for remaining_bytes_count in remaining_bytes_indicator:
+        batch = read_batch(iterable,
+                           batch_size=batch_size,
+                           remaining_bytes_count=remaining_bytes_count)
+        lines = split(batch,
+                      separator=lines_separator,
+                      keep_separator=keep_lines_separator)
+        if batch.endswith(lines_separator):
+            yield segment
+        else:
+            lines[-1] += segment
+        segment, *lines = lines
+        yield from reverse(lines)
+    yield segment
 
 
 def expand(object_: Domain) -> Iterable[Domain]:
