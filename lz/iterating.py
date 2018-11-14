@@ -164,11 +164,22 @@ def grouper(key: Map[Domain, Hashable]
 
 
 @functools.singledispatch
-def reverse(iterable: Iterable[Domain]) -> Iterable[Domain]:
+def reverse(object_: Iterable[Domain]) -> Iterable[Domain]:
     """
     Returns iterable with reversed elements order.
     """
+    raise TypeError('Unsupported iterable type: {type}.'
+                    .format(type=type(object_)))
+
+
+@reverse.register(abc.Iterator)
+def reverse_iterator(iterable: Iterator[Domain]) -> Iterable[Domain]:
     yield from reversed(list(iterable))
+
+
+@reverse.register(abc.Sequence)
+def reverse_sequence(iterable: Sequence[Domain]) -> Iterable[Domain]:
+    return iterable[::-1]
 
 
 if sys.version_info >= (3, 6):
