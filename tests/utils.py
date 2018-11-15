@@ -46,5 +46,14 @@ def are_iterables_similar(left_iterable: Iterable[Any],
                                        fillvalue=object())))
 
 
+def is_empty(iterable: Iterable[Any]) -> bool:
+    try:
+        next(iter(iterable))
+    except StopIteration:
+        return True
+    else:
+        return False
+
+
 def capacity(iterable: Iterable[Any]) -> int:
     return sum(1 for _ in iterable)

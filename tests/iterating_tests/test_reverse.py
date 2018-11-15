@@ -2,16 +2,37 @@ from itertools import tee
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import reverse
-from tests.utils import are_iterables_similar
+from lz import (left,
+                right)
+from lz.iterating import (first,
+                          last,
+                          reverse)
+from tests.utils import (are_iterables_similar,
+                         is_empty)
 
 
-def test_basic(iterable: Iterable[Any]) -> None:
-    original, target = tee(iterable)
+def test_base_case(empty_iterable: Iterable[Any]) -> None:
+    result = reverse(empty_iterable)
 
-    result = reverse(target)
+    assert is_empty(result)
 
-    assert are_iterables_similar(result, list(original)[::-1])
+
+def test_step_right(iterable: Iterable[Any],
+                    object_: Any) -> None:
+    attach = right.attacher(object_)
+
+    result = reverse(attach(iterable))
+
+    assert first(result) is object_
+
+
+def test_step_left(iterable: Iterable[Any],
+                   object_: Any) -> None:
+    attach = left.attacher(object_)
+
+    result = reverse(attach(iterable))
+
+    assert last(result) is object_
 
 
 def test_involution(iterable: Iterable[Any]) -> None:
