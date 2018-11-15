@@ -255,12 +255,13 @@ def reverse_file(iterable: TextIO,
                            keep_lines_separator=keep_lines_separator))
 
 
-@reverse.register(io.BufferedReader)
-def reverse_binary_file(iterable: BinaryIO,
-                        *,
-                        batch_size: Optional[int] = None,
-                        lines_separator: bytes = b'\n',
-                        keep_lines_separator: bool = True) -> Iterable[bytes]:
+@reverse.register(io.BufferedIOBase)
+def reverse_binary_stream(iterable: BinaryIO,
+                          *,
+                          batch_size: Optional[int] = None,
+                          lines_separator: bytes = b'\n',
+                          keep_lines_separator: bool = True
+                          ) -> Iterable[bytes]:
     stream_size = iterable.seek(0, os.SEEK_END)
     if batch_size is None:
         batch_size = stream_size or 1
