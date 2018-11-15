@@ -261,12 +261,12 @@ def reverse_binary_file(iterable: BinaryIO,
                         batch_size: Optional[int] = None,
                         lines_separator: bytes = b'\n',
                         keep_lines_separator: bool = True) -> Iterable[bytes]:
-    file_size = iterable.seek(0, os.SEEK_END)
+    stream_size = iterable.seek(0, os.SEEK_END)
     if batch_size is None:
-        batch_size = file_size or 1
-    batches_count = ceil_division(file_size, batch_size)
+        batch_size = stream_size or 1
+    batches_count = ceil_division(stream_size, batch_size)
     remaining_bytes_indicator = itertools.islice(
-            itertools.accumulate(itertools.chain([file_size],
+            itertools.accumulate(itertools.chain([stream_size],
                                                  itertools.repeat(batch_size)),
                                  sub),
             batches_count)
