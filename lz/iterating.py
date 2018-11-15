@@ -192,9 +192,9 @@ def reverse(iterable: Sequence[Domain]) -> Iterable[Domain]:
 @overload
 def reverse(iterable: IO[AnyStr],
             *,
-            batch_size: Optional[int] = None,
-            lines_separator: AnyStr = '\n',
-            keep_lines_separator: bool = True) -> Iterable[AnyStr]:
+            batch_size: Optional[int] = ...,
+            lines_separator: AnyStr = ...,
+            keep_lines_separator: bool = ...) -> Iterable[AnyStr]:
     pass
 
 
