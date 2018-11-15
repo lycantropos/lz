@@ -28,7 +28,7 @@ from .literals.base import (integers,
                             sortable_domains,
                             strings,
                             tuples)
-from .literals.factories import (to_lists,
+from .literals.factories import (to_homogeneous_lists,
                                  to_strings)
 
 false_predicates = strategies.just(to_constant(False))
@@ -45,11 +45,11 @@ suitable_maps = dict(zip(suitable_maps.keys(),
                          map(strategies.sampled_from, suitable_maps.values())))
 to_one_of_suitable_maps = suitable_maps.__getitem__
 maps = strategies.sampled_from(starting_maps)
-maps_lists = to_lists(maps)
+maps_lists = to_homogeneous_lists(maps)
 maps_arguments = (strategies.integers()
                   | strategies.floats(allow_nan=False,
                                       allow_infinity=False))
-maps_lists_arguments = to_lists(maps_arguments)
+maps_lists_arguments = to_homogeneous_lists(maps_arguments)
 
 
 @strategies.composite
@@ -76,8 +76,8 @@ transparent_functions_args = {
     int: strategies.tuples(integers),
     json.dumps: strategies.tuples(json_serializable_objects),
     json.loads: strategies.tuples(json_serializable_objects.map(json.dumps)),
-    os.path.join: to_lists(paths_names_parts,
-                           min_size=1).map(tuple),
+    os.path.join: to_homogeneous_lists(paths_names_parts,
+                                       min_size=1).map(tuple),
     str: strategies.tuples(objects),
 }
 transparent_functions_kwargs = {

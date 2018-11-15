@@ -30,5 +30,6 @@ from .literals.base import (hashables,
                             objects,
                             positionals_arguments,
                             sortable_iterables)
-from .literals.factories import (to_integers,
+from .literals.factories import (to_homogeneous_iterables,
+                                 to_integers,
                                  to_iterables)

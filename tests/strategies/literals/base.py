@@ -4,13 +4,18 @@ from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
 from tests.configs import MAX_ITERABLES_SIZE
-from .factories import (to_dictionaries,
-                        to_frozensets,
-                        to_iterables,
-                        to_lists,
-                        to_sets,
+from .factories import (to_byte_sequences,
+                        to_byte_strings,
+                        to_characters,
+                        to_dictionaries,
+                        to_homogeneous_frozensets,
+                        to_homogeneous_iterables,
+                        to_homogeneous_lists,
+                        to_homogeneous_sets,
+                        to_homogeneous_tuples,
                         to_strings)
 
+byte_strings = to_byte_strings()
 strings = to_strings()
 integers = (strategies.booleans()
             | strategies.integers())
@@ -22,28 +27,32 @@ numbers = (real_numbers
                                         allow_infinity=False))
 scalars = (strategies.none()
            | numbers
-           | strings)
+           | strategies.just(NotImplemented)
+           | strategies.just(Ellipsis))
+deferred_hashables = strategies.deferred(lambda: hashables)
 hashables = (scalars
-             | to_frozensets(strategies.deferred(lambda: hashables))
-             | to_lists(strategies.deferred(lambda: hashables))
-             .map(tuple))
-deferred_objects = strategies.deferred(lambda: objects)
-lists = to_lists(deferred_objects)
-tuples = lists.map(tuple)
+             | byte_strings
+             | strings
+             | to_homogeneous_frozensets(deferred_hashables)
+             | to_homogeneous_tuples(deferred_hashables))
 indices = strategies.integers(-MAX_ITERABLES_SIZE, MAX_ITERABLES_SIZE - 1)
 slices_fields = strategies.none() | indices
 slices = strategies.builds(slice,
                            slices_fields,
                            slices_fields,
                            slices_fields)
-sets = to_sets(hashables)
+deferred_objects = strategies.deferred(lambda: objects)
+iterables = (to_strings(to_characters())
+             | to_byte_sequences()
+             | to_homogeneous_iterables(deferred_objects))
+sets = to_homogeneous_sets(hashables)
 objects = (hashables
            | slices
-           | to_dictionaries(hashables, deferred_objects)
-           | to_iterables(deferred_objects)
-           | lists
+           | iterables
            | sets
-           | tuples)
+           | to_dictionaries(hashables, deferred_objects))
+tuples = to_homogeneous_tuples(objects)
+lists = to_homogeneous_lists(objects)
 
 
 def extend_json(children: SearchStrategy) -> SearchStrategy:
@@ -61,4 +70,5 @@ positionals_arguments = tuples
 keywords_arguments = to_dictionaries(strings, objects)
 
 sortable_domains = [real_numbers, sets, strings]
-sortable_iterables = strategies.one_of(*map(to_iterables, sortable_domains))
+sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
+                                            sortable_domains))

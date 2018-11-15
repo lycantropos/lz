@@ -196,5 +196,5 @@ def projector_initial(projector: Callable[[Domain, Domain], Domain],
 
 @pytest.fixture(scope='function')
 def projector_iterable(projector_domain: SearchStrategy) -> Iterable[Domain]:
-    return find(strategies.to_iterables(projector_domain,
-                                        min_size=1))
+    return find(strategies.to_homogeneous_iterables(projector_domain,
+                                                    min_size=1))

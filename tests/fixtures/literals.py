@@ -1,5 +1,6 @@
 from typing import (Any,
                     Dict,
+                    Hashable,
                     Iterable,
                     Tuple)
 
@@ -35,26 +36,27 @@ def natural_number() -> int:
 
 
 @pytest.fixture(scope='function')
+def empty_iterable() -> Iterable[Any]:
+    return find(strategies.empty.iterables)
+
+
+@pytest.fixture(scope='function')
 def iterable(min_iterables_size: int) -> Iterable[Any]:
     return find(strategies.to_iterables(strategies.objects,
                                         min_size=min_iterables_size))
 
 
 @pytest.fixture(scope='function')
-def hashable_iterable(min_iterables_size: int) -> Iterable[Any]:
-    return find(strategies.to_iterables(strategies.hashables,
-                                        min_size=min_iterables_size))
-
-
-@pytest.fixture(scope='function')
-def empty_iterable() -> Iterable[Any]:
-    return find(strategies.empty.iterables)
-
-
-@pytest.fixture(scope='function')
 def non_empty_iterable() -> Iterable[Any]:
-    return find(strategies.to_iterables(strategies.hashables,
-                                        min_size=1))
+    return find(strategies.to_homogeneous_iterables(strategies.hashables,
+                                                    min_size=1))
+
+
+@pytest.fixture(scope='function')
+def hashables_iterable(min_iterables_size: int) -> Iterable[Hashable]:
+    return find(strategies.to_homogeneous_iterables(
+            strategies.hashables,
+            min_size=min_iterables_size))
 
 
 @pytest.fixture(scope='function')
