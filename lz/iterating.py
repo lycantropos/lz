@@ -6,7 +6,8 @@ import sys
 from collections import (abc,
                          defaultdict,
                          deque)
-from operator import sub
+from operator import (methodcaller,
+                      sub)
 from typing import (Any,
                     AnyStr,
                     BinaryIO,
@@ -193,7 +194,7 @@ def reverse(iterable: Sequence[Domain]) -> Iterable[Domain]:
 def reverse(iterable: IO[AnyStr],
             *,
             batch_size: Optional[int] = ...,
-            lines_separator: AnyStr = ...,
+            lines_separator: Optional[AnyStr] = ...,
             keep_lines_separator: bool = ...) -> Iterable[AnyStr]:
     pass
 
@@ -245,13 +246,15 @@ if sys.version_info >= (3, 6):
 def reverse_file(iterable: TextIO,
                  *,
                  batch_size: Optional[int] = None,
-                 lines_separator: str = '\n',
+                 lines_separator: Optional[str] = None,
                  keep_lines_separator: bool = True) -> Iterable[str]:
     encoding = iterable.encoding
+    if lines_separator is not None:
+        lines_separator = lines_separator.encode(encoding)
     yield from map(decoder(encoding),
                    reverse(iterable.buffer,
                            batch_size=batch_size,
-                           lines_separator=lines_separator.encode(encoding),
+                           lines_separator=lines_separator,
                            keep_lines_separator=keep_lines_separator))
 
 
@@ -259,9 +262,16 @@ def reverse_file(iterable: TextIO,
 def reverse_binary_stream(iterable: BinaryIO,
                           *,
                           batch_size: Optional[int] = None,
-                          lines_separator: bytes = b'\n',
+                          lines_separator: Optional[bytes] = None,
                           keep_lines_separator: bool = True
                           ) -> Iterable[bytes]:
+    if lines_separator is None:
+        lines_splitter = methodcaller(str.splitlines.__name__,
+                                      keep_lines_separator)
+    else:
+        lines_splitter = functools.partial(split,
+                                           separator=lines_separator,
+                                           keep_separator=keep_lines_separator)
     stream_size = iterable.seek(0, os.SEEK_END)
     if batch_size is None:
         batch_size = stream_size or 1
@@ -275,17 +285,13 @@ def reverse_binary_stream(iterable: BinaryIO,
     batch = read_batch(iterable,
                        batch_size=batch_size,
                        remaining_bytes_count=remaining_bytes_count)
-    segment, *lines = split(batch,
-                            separator=lines_separator,
-                            keep_separator=keep_lines_separator)
+    segment, *lines = lines_splitter(batch)
     yield from reverse(lines)
     for remaining_bytes_count in remaining_bytes_indicator:
         batch = read_batch(iterable,
                            batch_size=batch_size,
                            remaining_bytes_count=remaining_bytes_count)
-        lines = split(batch,
-                      separator=lines_separator,
-                      keep_separator=keep_lines_separator)
+        lines = lines_splitter(batch)
         if batch.endswith(lines_separator):
             yield segment
         else:
