@@ -28,8 +28,7 @@ from .literals.base import (integers,
                             sortable_domains,
                             strings,
                             tuples)
-from .literals.factories import (to_iterables,
-                                 to_lists,
+from .literals.factories import (to_lists,
                                  to_strings)
 
 false_predicates = strategies.just(to_constant(False))
@@ -80,7 +79,6 @@ transparent_functions_args = {
     os.path.join: to_lists(paths_names_parts,
                            min_size=1).map(tuple),
     str: strategies.tuples(objects),
-    sum: strategies.tuples(to_iterables(numbers)),
 }
 transparent_functions_kwargs = {
     bool: empty.dictionaries,
@@ -99,7 +97,6 @@ transparent_functions_kwargs = {
                                                                   float])}),
     os.path.join: empty.dictionaries,
     str: empty.dictionaries,
-    sum: empty.dictionaries,
 }
 to_transparent_functions_args = transparent_functions_args.__getitem__
 to_transparent_functions_kwargs = transparent_functions_kwargs.__getitem__
