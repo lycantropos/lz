@@ -11,8 +11,10 @@ from hypothesis.errors import (NoSuchExample,
                                Unsatisfiable)
 from hypothesis.searchstrategy import SearchStrategy
 
+from lz.hints import Domain
 
-def find(strategy: SearchStrategy) -> Any:
+
+def find(strategy: SearchStrategy[Domain]) -> Domain:
     first_object_list = []
 
     def condition(object_: Any) -> bool:

@@ -1,13 +1,18 @@
 import io
 from functools import partial
 from operator import methodcaller
-from typing import (Any,
-                    Callable,
-                    Optional)
+from typing import (AnyStr,
+                    Iterable,
+                    Optional,
+                    Sequence,
+                    Tuple,
+                    Union)
 
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
+from lz.hints import (Domain,
+                      Map)
 from tests.configs import MAX_ITERABLES_SIZE
 
 to_characters = strategies.characters
@@ -17,18 +22,20 @@ limit_max_size = partial(partial,
 
 
 def to_byte_arrays(*,
-                   min_size: int = 0) -> SearchStrategy:
+                   min_size: int = 0) -> SearchStrategy[bytearray]:
     return to_byte_strings(min_size).map(bytearray)
 
 
 def to_byte_sequences(*,
-                      min_size: int = 0) -> SearchStrategy:
+                      min_size: int = 0
+                      ) -> SearchStrategy[Union[bytearray, bytes]]:
     return (to_byte_arrays(min_size=min_size)
             | to_byte_strings(min_size=min_size))
 
 
 def to_byte_streams(*,
-                    min_size: int = 0) -> SearchStrategy:
+                    min_size: int = 0
+                    ) -> SearchStrategy[io.BytesIO]:
     return strategies.builds(io.BytesIO,
                              to_byte_strings(min_size))
 
@@ -38,9 +45,10 @@ to_dictionaries = limit_max_size(strategies.dictionaries)
 to_homogeneous_frozensets = limit_max_size(strategies.frozensets)
 
 
-def to_homogeneous_iterables(elements: Optional[SearchStrategy] = None,
+def to_homogeneous_iterables(elements: Optional[SearchStrategy[Domain]] = None,
                              *,
-                             min_size: int = 0) -> SearchStrategy:
+                             min_size: int = 0
+                             ) -> SearchStrategy[Iterable[Domain]]:
     return (to_homogeneous_sequences(elements,
                                      min_size=min_size)
             | to_homogeneous_iterators(elements,
@@ -51,9 +59,10 @@ to_homogeneous_iterators = limit_max_size(strategies.iterables)
 to_homogeneous_lists = limit_max_size(strategies.lists)
 
 
-def to_homogeneous_sequences(elements: Optional[SearchStrategy] = None,
+def to_homogeneous_sequences(elements: Optional[SearchStrategy[Domain]] = None,
                              *,
-                             min_size: int = 0) -> SearchStrategy:
+                             min_size: int = 0
+                             ) -> SearchStrategy[Sequence[Domain]]:
     return (to_homogeneous_lists(elements,
                                  min_size=min_size)
             | to_homogeneous_tuples(elements,
@@ -63,18 +72,20 @@ def to_homogeneous_sequences(elements: Optional[SearchStrategy] = None,
 to_homogeneous_sets = limit_max_size(strategies.sets)
 
 
-def to_homogeneous_tuples(elements: Optional[SearchStrategy] = None,
+def to_homogeneous_tuples(elements: Optional[SearchStrategy[Domain]] = None,
                           *,
-                          min_size: int = 0) -> SearchStrategy:
+                          min_size: int = 0
+                          ) -> SearchStrategy[Tuple[Domain, ...]]:
     return (to_homogeneous_lists(elements,
                                  min_size=min_size)
             .map(tuple))
 
 
-def to_iterables(elements: Optional[SearchStrategy] = None,
+def to_iterables(elements: Optional[SearchStrategy[Domain]] = None,
                  *,
-                 alphabet: SearchStrategy = to_characters(),
-                 min_size: int = 0) -> SearchStrategy:
+                 alphabet: SearchStrategy[str] = to_characters(),
+                 min_size: int = 0
+                 ) -> SearchStrategy[Iterable[Union[AnyStr, Domain]]]:
     return (to_byte_sequences(min_size=min_size)
             | to_byte_streams(min_size=min_size)
             | to_homogeneous_iterables(elements,
@@ -113,11 +124,11 @@ supported_encodings = ['ascii', 'big5', 'big5hkscs', 'cp037', 'cp1006',
 
 
 @strategies.composite
-def to_text_streams(draw: Callable[[SearchStrategy], Any],
-                    alphabet: SearchStrategy,
-                    encodings: SearchStrategy =
+def to_text_streams(draw: Map[SearchStrategy[Domain], Domain],
+                    alphabet: SearchStrategy[str],
+                    encodings: SearchStrategy[str] =
                     strategies.sampled_from(supported_encodings),
-                    min_size: int = 0) -> SearchStrategy:
+                    min_size: int = 0) -> io.TextIOWrapper:
     encoding = draw(encodings)
     byte_string = draw(to_strings(alphabet,
                                   min_size=min_size)

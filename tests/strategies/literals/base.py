@@ -1,4 +1,7 @@
 import string
+from typing import (Dict,
+                    List,
+                    Union)
 
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
@@ -14,6 +17,9 @@ from .factories import (to_byte_sequences,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
                         to_strings)
+
+Serializable = Union[None, bool, float, int, str]
+Serializable = Union[Dict[str, Serializable], List[Serializable]]
 
 byte_strings = to_byte_strings()
 strings = to_strings()
@@ -55,7 +61,8 @@ tuples = to_homogeneous_tuples(objects)
 lists = to_homogeneous_lists(objects)
 
 
-def extend_json(children: SearchStrategy) -> SearchStrategy:
+def extend_json(children: SearchStrategy[Serializable]
+                ) -> SearchStrategy[Serializable]:
     return (strategies.lists(children)
             | to_dictionaries(to_strings(string.printable),
                               children))
