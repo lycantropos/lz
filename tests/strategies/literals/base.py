@@ -23,7 +23,8 @@ Serializable = Union[Dict[str, Serializable], List[Serializable]]
 
 byte_strings = to_byte_strings()
 strings = to_strings()
-integers = (strategies.booleans()
+booleans = strategies.booleans()
+integers = (booleans
             | strategies.integers())
 real_numbers = (integers
                 | strategies.floats(allow_nan=False,

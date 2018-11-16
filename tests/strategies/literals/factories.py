@@ -21,6 +21,14 @@ limit_max_size = partial(partial,
                          max_size=MAX_ITERABLES_SIZE)
 
 
+def to_any_strings(alphabet: SearchStrategy[str] = to_characters(),
+                   *,
+                   min_size: int = 0) -> SearchStrategy[AnyStr]:
+    return (to_byte_sequences(min_size=min_size)
+            | to_strings(alphabet,
+                         min_size=min_size))
+
+
 def to_byte_arrays(*,
                    min_size: int = 0) -> SearchStrategy[bytearray]:
     return to_byte_strings(min_size).map(bytearray)

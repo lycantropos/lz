@@ -25,11 +25,13 @@ from .iterating import (groupers_keys,
                         non_negative_indices,
                         non_negative_slices)
 from .literals import empty
-from .literals.base import (hashables,
+from .literals.base import (booleans,
+                            hashables,
                             keywords_arguments,
                             objects,
                             positionals_arguments,
                             sortable_iterables)
-from .literals.factories import (to_homogeneous_iterables,
+from .literals.factories import (to_any_strings,
+                                 to_homogeneous_iterables,
                                  to_integers,
                                  to_iterables)
