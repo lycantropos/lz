@@ -49,8 +49,9 @@ slices = strategies.builds(slice,
                            slices_fields,
                            slices_fields)
 deferred_objects = strategies.deferred(lambda: objects)
+byte_sequences = to_byte_sequences()
 iterables = (to_strings(to_characters())
-             | to_byte_sequences()
+             | byte_sequences
              | to_homogeneous_iterables(deferred_objects))
 sets = to_homogeneous_sets(hashables)
 objects = (hashables
@@ -77,6 +78,6 @@ json_serializable_objects = strategies.recursive(
 positionals_arguments = tuples
 keywords_arguments = to_dictionaries(strings, objects)
 
-sortable_domains = [real_numbers, sets, strings]
+sortable_domains = [byte_sequences, real_numbers, sets, strings]
 sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
                                             sortable_domains))
