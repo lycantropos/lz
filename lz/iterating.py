@@ -282,7 +282,10 @@ def reverse_binary_stream(iterable: BinaryIO,
                                                  itertools.repeat(batch_size)),
                                  sub),
             batches_count)
-    remaining_bytes_count = next(remaining_bytes_indicator)
+    try:
+        remaining_bytes_count = next(remaining_bytes_indicator)
+    except StopIteration:
+        return
     batch = read_batch(iterable,
                        batch_size=batch_size,
                        remaining_bytes_count=remaining_bytes_count)
