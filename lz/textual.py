@@ -11,11 +11,12 @@ def split(string: AnyStr,
           *,
           separator: AnyStr,
           keep_separator: bool) -> List[AnyStr]:
-    *parts, last_part = string.split(separator)
+    parts = string.split(separator)
     if keep_separator:
+        *parts, last_part = parts
         parts = [part + separator for part in parts]
-    if last_part:
-        return parts + [last_part]
+        if last_part:
+            return parts + [last_part]
     return parts
 
 
