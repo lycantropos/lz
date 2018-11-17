@@ -1,6 +1,7 @@
 import os
 import random
-from typing import AnyStr
+from typing import (AnyStr,
+                    Union)
 
 import pytest
 
@@ -26,3 +27,21 @@ def any_separator(any_string: AnyStr) -> AnyStr:
 @pytest.fixture(scope='function')
 def keep_separator() -> bool:
     return find(strategies.booleans)
+
+
+@pytest.fixture(scope='function')
+def encoding() -> str:
+    return find(strategies.supported_encodings)
+
+
+@pytest.fixture(scope='function')
+def byte_sequence(encoding: str) -> Union[bytearray, bytes]:
+    result = find(strategies.to_byte_sequences())
+    return type(result)(result.decode(encoding, 'ignore')
+                        .encode(encoding))
+
+
+@pytest.fixture(scope='function')
+def string(byte_sequence: Union[bytearray, bytes],
+           encoding: str) -> str:
+    return byte_sequence.decode(encoding)

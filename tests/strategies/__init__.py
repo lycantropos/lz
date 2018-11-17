@@ -31,7 +31,10 @@ from .literals.base import (booleans,
                             objects,
                             positionals_arguments,
                             sortable_iterables)
-from .literals.factories import (to_any_strings,
+from .literals.factories import (supported_encodings,
+                                 to_any_strings,
+                                 to_byte_sequences,
                                  to_homogeneous_iterables,
                                  to_integers,
-                                 to_iterables)
+                                 to_iterables,
+                                 to_strings)
