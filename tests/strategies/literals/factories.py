@@ -43,10 +43,10 @@ def to_byte_sequences(*,
 
 def to_byte_streams(*,
                     min_size: int = 0
-                    ) -> SearchStrategy[Union[io.BufferedIOBase, io.BytesIO]]:
-    byte_strings = to_byte_strings(min_size)
-    return (strategies.builds(io.BufferedIOBase, byte_strings)
-            | strategies.builds(io.BytesIO, byte_strings))
+                    ) -> SearchStrategy[Union[io.BufferedReader, io.BytesIO]]:
+    bytes_io_streams = strategies.builds(io.BytesIO, to_byte_strings(min_size))
+    return (bytes_io_streams
+            | strategies.builds(io.BufferedReader, bytes_io_streams))
 
 
 to_byte_strings = limit_max_size(strategies.binary)

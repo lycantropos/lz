@@ -258,7 +258,8 @@ def reverse_file(iterable: TextIO,
                            keep_lines_separator=keep_lines_separator))
 
 
-@reverse.register(io.BufferedIOBase)
+@reverse.register(io.BufferedReader)
+@reverse.register(io.BytesIO)
 def reverse_binary_stream(iterable: BinaryIO,
                           *,
                           batch_size: Optional[int] = None,
