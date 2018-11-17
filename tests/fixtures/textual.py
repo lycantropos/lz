@@ -17,7 +17,10 @@ def any_string() -> AnyStr:
 @pytest.fixture(scope='function')
 def any_separator(any_string: AnyStr) -> AnyStr:
     if not any_string:
-        return type(any_string)(os.sep)
+        result = os.sep
+        if not isinstance(any_string, str):
+            return result.encode()
+        return result
     string_length = len(any_string)
     start = random.randint(0, string_length - 1)
     stop = random.randint(start + 1, string_length)
