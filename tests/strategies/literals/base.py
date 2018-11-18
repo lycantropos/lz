@@ -28,8 +28,11 @@ integers = (booleans
             | strategies.integers())
 real_numbers = (integers
                 | strategies.floats(allow_nan=False,
-                                    allow_infinity=False))
+                                    allow_infinity=False)
+                | strategies.fractions())
 numbers = (real_numbers
+           | strategies.decimals(allow_nan=False,
+                                 allow_infinity=False)
            | strategies.complex_numbers(allow_nan=False,
                                         allow_infinity=False))
 scalars = (strategies.none()
