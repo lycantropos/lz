@@ -30,6 +30,7 @@ from .literals.base import (booleans,
                             keywords_arguments,
                             objects,
                             positionals_arguments,
+                            real_numbers,
                             sortable_iterables)
 from .literals.factories import (supported_encodings,
                                  to_any_streams,

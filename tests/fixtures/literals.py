@@ -1,3 +1,4 @@
+from numbers import Real
 from typing import (Any,
                     Dict,
                     Hashable,
@@ -8,6 +9,19 @@ import pytest
 
 from tests import strategies
 from tests.utils import find
+
+
+@pytest.fixture(scope='function')
+def real_number() -> Real:
+    return find(strategies.real_numbers)
+
+
+@pytest.fixture(scope='function')
+def non_zero_real_number() -> Real:
+    def is_non_zero(number: Real) -> bool:
+        return number != 0
+
+    return find(strategies.real_numbers.filter(is_non_zero))
 
 
 @pytest.fixture(scope='function')
