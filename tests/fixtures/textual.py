@@ -37,7 +37,7 @@ def batch_size(stream_size: int) -> int:
 def byte_sequence(encoding: str) -> Union[bytearray, bytes]:
     result = find(strategies.to_byte_sequences())
     return type(result)(result.decode(encoding, 'ignore')
-                        .encode(encoding))
+                        .encode(encoding, 'ignore'))
 
 
 @pytest.fixture(scope='function')
