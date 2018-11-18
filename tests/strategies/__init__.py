@@ -32,6 +32,7 @@ from .literals.base import (booleans,
                             positionals_arguments,
                             sortable_iterables)
 from .literals.factories import (supported_encodings,
+                                 to_any_streams,
                                  to_any_strings,
                                  to_byte_sequences,
                                  to_homogeneous_iterables,

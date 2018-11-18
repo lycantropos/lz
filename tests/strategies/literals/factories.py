@@ -3,6 +3,7 @@ import sys
 from functools import partial
 from operator import methodcaller
 from typing import (AnyStr,
+                    IO,
                     Iterable,
                     Optional,
                     Sequence,
@@ -20,6 +21,14 @@ to_characters = strategies.characters
 to_integers = strategies.integers
 limit_max_size = partial(partial,
                          max_size=MAX_ITERABLES_SIZE)
+
+
+def to_any_streams(alphabet: SearchStrategy[str] = to_characters(),
+                   *,
+                   min_size: int = 0) -> SearchStrategy[IO[AnyStr]]:
+    return (to_byte_streams(min_size=min_size)
+            | to_text_streams(alphabet,
+                              min_size=min_size))
 
 
 def to_any_strings(alphabet: SearchStrategy[str] = to_characters(),

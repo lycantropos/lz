@@ -1,6 +1,7 @@
 import os
 import random
 from typing import (AnyStr,
+                    IO,
                     Union)
 
 import pytest
@@ -28,8 +29,15 @@ def any_separator(any_string: AnyStr) -> AnyStr:
 
 
 @pytest.fixture(scope='function')
-def keep_separator() -> bool:
-    return find(strategies.booleans)
+def batch_size(stream_size: int) -> int:
+    return find(strategies.to_integers(0, stream_size))
+
+
+@pytest.fixture(scope='function')
+def byte_sequence(encoding: str) -> Union[bytearray, bytes]:
+    result = find(strategies.to_byte_sequences())
+    return type(result)(result.decode(encoding, 'ignore')
+                        .encode(encoding))
 
 
 @pytest.fixture(scope='function')
@@ -38,10 +46,32 @@ def encoding() -> str:
 
 
 @pytest.fixture(scope='function')
-def byte_sequence(encoding: str) -> Union[bytearray, bytes]:
-    result = find(strategies.to_byte_sequences())
-    return type(result)(result.decode(encoding, 'ignore')
-                        .encode(encoding))
+def keep_separator() -> bool:
+    return find(strategies.booleans)
+
+
+@pytest.fixture(scope='function')
+def remaining_bytes_count(stream_size: int) -> int:
+    return find(strategies.to_integers(0, stream_size))
+
+
+@pytest.fixture(scope='function')
+def stream() -> IO[AnyStr]:
+    return find(strategies.to_any_streams())
+
+
+@pytest.fixture(scope='function')
+def stream_contents(stream: IO[AnyStr]) -> AnyStr:
+    result = stream.read()
+    stream.seek(0)
+    return result
+
+
+@pytest.fixture(scope='function')
+def stream_size(stream: IO[AnyStr]) -> int:
+    result = stream.seek(0, os.SEEK_END)
+    stream.seek(0)
+    return result
 
 
 @pytest.fixture(scope='function')
