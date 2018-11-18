@@ -41,17 +41,17 @@ def encoder(encoding: str) -> Map[str, bytes]:
                    encoding=encoding)
 
 
-def read_batch(stream: IO[AnyStr],
-               *,
-               batch_size: int,
-               remaining_bytes_count: int) -> AnyStr:
+def read_batch_from_end(stream: IO[AnyStr],
+                        *,
+                        size: int,
+                        end_position: int) -> AnyStr:
     """
-    Reads batch from given stream.
+    Reads batch from the end of given stream.
     """
-    if remaining_bytes_count > batch_size:
-        offset = remaining_bytes_count - batch_size
+    if end_position > size:
+        offset = end_position - size
     else:
         offset = 0
-        batch_size = remaining_bytes_count
+        size = end_position
     stream.seek(offset)
-    return stream.read(batch_size)
+    return stream.read(size)

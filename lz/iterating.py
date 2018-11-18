@@ -34,7 +34,7 @@ from .hints import (Domain,
                     Range,
                     Sortable)
 from .textual import (decoder,
-                      read_batch,
+                      read_batch_from_end,
                       split)
 
 
@@ -286,15 +286,15 @@ def reverse_binary_stream(iterable: BinaryIO,
         remaining_bytes_count = next(remaining_bytes_indicator)
     except StopIteration:
         return
-    batch = read_batch(iterable,
-                       batch_size=batch_size,
-                       remaining_bytes_count=remaining_bytes_count)
+    batch = read_batch_from_end(iterable,
+                                size=batch_size,
+                                end_position=remaining_bytes_count)
     segment, *lines = lines_splitter(batch)
     yield from reverse(lines)
     for remaining_bytes_count in remaining_bytes_indicator:
-        batch = read_batch(iterable,
-                           batch_size=batch_size,
-                           remaining_bytes_count=remaining_bytes_count)
+        batch = read_batch_from_end(iterable,
+                                    size=batch_size,
+                                    end_position=remaining_bytes_count)
         lines = lines_splitter(batch)
         if batch.endswith(lines_separator):
             yield segment

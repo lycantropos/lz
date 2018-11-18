@@ -29,6 +29,11 @@ def any_separator(any_string: AnyStr) -> AnyStr:
 
 
 @pytest.fixture(scope='function')
+def batch_end_position(stream_size: int) -> int:
+    return find(strategies.to_integers(0, stream_size))
+
+
+@pytest.fixture(scope='function')
 def batch_size(stream_size: int) -> int:
     return find(strategies.to_integers(0, stream_size))
 
@@ -48,11 +53,6 @@ def encoding() -> str:
 @pytest.fixture(scope='function')
 def keep_separator() -> bool:
     return find(strategies.booleans)
-
-
-@pytest.fixture(scope='function')
-def remaining_bytes_count(stream_size: int) -> int:
-    return find(strategies.to_integers(0, stream_size))
 
 
 @pytest.fixture(scope='function')
