@@ -1,6 +1,5 @@
 from itertools import tee
-from typing import (Any,
-                    Iterable)
+from typing import (Any, AnyStr, IO, Iterable)
 
 from lz import (left,
                 right)
@@ -41,3 +40,17 @@ def test_involution(iterable: Iterable[Any]) -> None:
     result = reverse(reverse(target))
 
     assert are_iterables_similar(result, original)
+
+
+def test_stream(stream: IO[AnyStr],
+                stream_batch_size: int,
+                stream_contents: AnyStr,
+                stream_lines_separator: AnyStr,
+                keep_separator: bool) -> None:
+    result = reverse(stream,
+                     batch_size=stream_batch_size,
+                     lines_separator=stream_lines_separator,
+                     keep_lines_separator=keep_separator)
+
+    assert all(line in stream_contents
+               for line in result)
