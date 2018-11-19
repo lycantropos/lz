@@ -1,3 +1,4 @@
+from functools import partial
 from numbers import Real
 from typing import (Any,
                     Dict,
@@ -56,8 +57,17 @@ def empty_iterable() -> Iterable[Any]:
 
 @pytest.fixture(scope='function')
 def iterable(min_iterables_size: int) -> Iterable[Any]:
-    return find(strategies.to_iterables(strategies.objects,
-                                        min_size=min_iterables_size))
+    limit_min_size = partial(partial,
+                             min_size=min_iterables_size)
+    return find(
+            strategies.encodings.flatmap(limit_min_size(strategies
+                                                        .to_byte_iterables))
+            | strategies.to_homogeneous_iterables(strategies.objects,
+                                                  min_size=min_iterables_size)
+            | strategies.to_strings(strategies.to_characters(),
+                                    min_size=min_iterables_size)
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_text_streams)))
 
 
 @pytest.fixture(scope='function')

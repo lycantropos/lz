@@ -25,18 +25,20 @@ from .iterating import (groupers_keys,
                         non_negative_indices,
                         non_negative_slices)
 from .literals import empty
-from .literals.base import (booleans,
+from .literals.base import (any_strings,
+                            booleans,
+                            encodings,
                             hashables,
                             keywords_arguments,
                             objects,
                             positionals_arguments,
                             real_numbers,
                             sortable_iterables)
-from .literals.factories import (supported_encodings,
-                                 to_any_streams,
-                                 to_any_strings,
+from .literals.factories import (to_any_streams,
                                  to_byte_sequences,
+                                 to_byte_iterables,
+                                 to_characters,
                                  to_homogeneous_iterables,
                                  to_integers,
-                                 to_iterables,
-                                 to_strings)
+                                 to_strings,
+                                 to_text_streams)

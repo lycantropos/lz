@@ -12,7 +12,7 @@ from tests.utils import find
 
 @pytest.fixture(scope='function')
 def any_string() -> AnyStr:
-    return find(strategies.to_any_strings())
+    return find(strategies.any_strings)
 
 
 @pytest.fixture(scope='function')
@@ -40,14 +40,12 @@ def batch_size(stream_size: int) -> int:
 
 @pytest.fixture(scope='function')
 def byte_sequence(encoding: str) -> Union[bytearray, bytes]:
-    result = find(strategies.to_byte_sequences())
-    return type(result)(result.decode(encoding, 'ignore')
-                        .encode(encoding, 'ignore'))
+    return find(strategies.to_byte_sequences(encoding))
 
 
 @pytest.fixture(scope='function')
 def encoding() -> str:
-    return find(strategies.supported_encodings)
+    return find(strategies.encodings)
 
 
 @pytest.fixture(scope='function')
@@ -57,7 +55,7 @@ def keep_separator() -> bool:
 
 @pytest.fixture(scope='function')
 def stream() -> IO[AnyStr]:
-    return find(strategies.to_any_streams())
+    return find(strategies.encodings.flatmap(strategies.to_any_streams))
 
 
 @pytest.fixture(scope='function')
