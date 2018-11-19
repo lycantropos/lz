@@ -1,5 +1,3 @@
-from typing import Union
-
 from lz.functional import compose
 from lz.textual import (decoder,
                         encoder)
@@ -14,11 +12,10 @@ def test_basic(string: str,
     assert isinstance(result, bytes)
 
 
-def test_inversion(string: str,
-                   encoding: str) -> None:
-    composition = compose(decoder(encoding), encoder(encoding))
+def test_round_trip(string: str,
+                    encoding: str) -> None:
+    make_round_trip = compose(decoder(encoding), encoder(encoding))
 
-    result = composition(string)
+    result = make_round_trip(string)
 
-    assert isinstance(result, str)
     assert result == string
