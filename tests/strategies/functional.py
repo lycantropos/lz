@@ -16,9 +16,11 @@ from hypothesis.searchstrategy import SearchStrategy
 
 from lz.functional import (identity,
                            to_constant)
-from lz.hints import Map
+from lz.hints import (Map,
+                      Predicate)
 from .literals import empty
-from .literals.base import (integers,
+from .literals.base import (classes,
+                            integers,
                             json_serializable_objects,
                             lists,
                             numbers,
@@ -33,7 +35,19 @@ from .literals.factories import (to_homogeneous_lists,
 
 false_predicates = strategies.just(to_constant(False))
 true_predicates = strategies.just(to_constant(True))
-predicates = false_predicates | true_predicates
+
+
+def to_is_instance_predicate(class_: type) -> Predicate:
+    def predicate(object_: Any) -> bool:
+        return isinstance(object_, class_)
+
+    predicate.__name__ = 'is_instance_of' + class_.__name__
+    predicate.__qualname__ = 'is_instance_of' + class_.__qualname__
+    return predicate
+
+
+is_instance_predicates = classes.map(to_is_instance_predicate)
+predicates = false_predicates | true_predicates | is_instance_predicates
 predicates_arguments = objects
 starting_maps = [identity, float, str, json.dumps]
 suitable_maps = {identity: [identity, float, str],

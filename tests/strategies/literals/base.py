@@ -1,5 +1,9 @@
+import builtins
+import inspect
 import string
 import sys
+from collections import abc
+from types import ModuleType
 from typing import (Dict,
                     List,
                     Union)
@@ -63,10 +67,22 @@ if sys.platform == 'win32':
 encodings = strategies.sampled_from(encodings)
 byte_strings = encodings.flatmap(to_byte_strings)
 strings = to_strings(to_characters())
+
+
+def module_to_classes(module: ModuleType) -> List[type]:
+    return list(filter(inspect.isclass,
+                       vars(module).values()))
+
+
+abstract_base_classes = strategies.sampled_from(module_to_classes(abc))
+built_in_classes = strategies.sampled_from(module_to_classes(builtins))
+classes = abstract_base_classes | built_in_classes
+
 deferred_hashables = strategies.deferred(lambda: hashables)
 hashables = (scalars
              | byte_strings
              | strings
+             | classes
              | to_homogeneous_frozensets(deferred_hashables)
              | to_homogeneous_tuples(deferred_hashables))
 indices = strategies.integers(-MAX_ITERABLES_SIZE, MAX_ITERABLES_SIZE - 1)
