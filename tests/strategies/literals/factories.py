@@ -70,9 +70,18 @@ def to_byte_strings(encoding: Optional[str],
         return (byte_string.decode(encoding, 'replace')
                 .encode(encoding, 'replace'))
 
+    def is_decodable(byte_string: bytes) -> bool:
+        try:
+            byte_string.decode(encoding)
+        except UnicodeDecodeError:
+            return False
+        else:
+            return True
+
     return (strategies.binary(min_size=min_size,
                               max_size=max_size)
-            .map(to_decodable))
+            .map(to_decodable)
+            .filter(is_decodable))
 
 
 to_dictionaries = limit_max_size(strategies.dictionaries)
