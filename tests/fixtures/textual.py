@@ -49,8 +49,9 @@ def byte_stream_contents(byte_stream: BinaryIO) -> bytes:
 
 
 @pytest.fixture(scope='function')
-def byte_stream_lines_separator(byte_stream_contents: bytes) -> bytes:
-    return to_separator(byte_stream_contents)
+def byte_stream_lines_separator(encoding: str) -> bytes:
+    return find(strategies.to_byte_sequences(encoding,
+                                             min_size=1))
 
 
 @pytest.fixture(scope='function')
@@ -86,13 +87,15 @@ def text_stream_batch_size(text_stream_size: int) -> int:
 
 
 @pytest.fixture(scope='function')
-def text_stream_contents(text_stream: TextIO) -> str:
-    return to_stream_contents(text_stream)
+def text_stream_raw_contents(text_stream: TextIO) -> bytes:
+    return to_stream_contents(text_stream.buffer)
 
 
 @pytest.fixture(scope='function')
-def text_stream_lines_separator(text_stream_contents: str) -> str:
-    return to_separator(text_stream_contents)
+def text_stream_lines_separator(encoding: str) -> str:
+    return (find(strategies.to_byte_sequences(encoding,
+                                              min_size=1))
+            .decode(encoding))
 
 
 @pytest.fixture(scope='function')

@@ -62,7 +62,7 @@ def test_byte_stream(byte_stream: BinaryIO,
 def test_text_stream(encoding: str,
                      text_stream: TextIO,
                      text_stream_batch_size: int,
-                     text_stream_contents: str,
+                     text_stream_raw_contents: bytes,
                      text_stream_lines_separator: str,
                      keep_separator: bool) -> None:
     result = reverse(text_stream,
@@ -70,5 +70,5 @@ def test_text_stream(encoding: str,
                      lines_separator=text_stream_lines_separator,
                      keep_lines_separator=keep_separator)
 
-    assert all(line.encode(encoding) in text_stream_contents.encode(encoding)
+    assert all(line.encode(encoding) in text_stream_raw_contents
                for line in result)
