@@ -1,5 +1,8 @@
 from itertools import tee
-from typing import (Any, AnyStr, IO, Iterable)
+from typing import (Any,
+                    AnyStr,
+                    IO,
+                    Iterable)
 
 from lz import (left,
                 right)

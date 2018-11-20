@@ -5,9 +5,9 @@ from typing import (Any,
                     Callable)
 
 import pytest
-
 from paradigm.hints import (MethodDescriptorType,
                             WrapperDescriptorType)
+
 from tests import strategies
 from tests.utils import find
 
