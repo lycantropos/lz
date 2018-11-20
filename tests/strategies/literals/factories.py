@@ -7,6 +7,7 @@ from typing import (AnyStr,
                     Iterable,
                     Optional,
                     Sequence,
+                    TextIO,
                     Tuple,
                     Union)
 
@@ -141,7 +142,7 @@ to_strings = limit_max_size(strategies.text)
 
 def to_text_streams(encoding: Optional[str],
                     *,
-                    min_size: int = 0) -> io.TextIOWrapper:
+                    min_size: int = 0) -> SearchStrategy[TextIO]:
     return strategies.builds(io.TextIOWrapper,
                              to_byte_streams(encoding,
                                              min_size=min_size),

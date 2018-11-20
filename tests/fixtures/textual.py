@@ -3,6 +3,7 @@ import random
 from typing import (AnyStr,
                     BinaryIO,
                     IO,
+                    TextIO,
                     Union)
 
 import pytest
@@ -63,35 +64,35 @@ def keep_separator() -> bool:
 
 
 @pytest.fixture(scope='function')
-def stream(encoding: str) -> IO[AnyStr]:
-    return find(strategies.to_any_streams(encoding))
+def string(byte_sequence: Union[bytearray, bytes],
+           encoding: str) -> str:
+    return byte_sequence.decode(encoding)
 
 
 @pytest.fixture(scope='function')
-def stream_batch_size(stream_size: int) -> int:
-    max_batch_size = max(stream_size, 1)
+def text_stream(encoding: str) -> TextIO:
+    return find(strategies.to_text_streams(encoding))
+
+
+@pytest.fixture(scope='function')
+def text_stream_batch_size(text_stream_size: int) -> int:
+    max_batch_size = max(text_stream_size, 1)
     return find(strategies.to_integers(1, max_batch_size))
 
 
 @pytest.fixture(scope='function')
-def stream_contents(stream: IO[AnyStr]) -> AnyStr:
-    return to_stream_contents(stream)
+def text_stream_contents(text_stream: TextIO) -> str:
+    return to_stream_contents(text_stream)
 
 
 @pytest.fixture(scope='function')
-def stream_lines_separator(stream_contents: AnyStr) -> AnyStr:
-    return to_separator(stream_contents)
+def text_stream_lines_separator(text_stream_contents: str) -> str:
+    return to_separator(text_stream_contents)
 
 
 @pytest.fixture(scope='function')
-def stream_size(stream: IO[AnyStr]) -> int:
-    return to_stream_size(stream)
-
-
-@pytest.fixture(scope='function')
-def string(byte_sequence: Union[bytearray, bytes],
-           encoding: str) -> str:
-    return byte_sequence.decode(encoding)
+def text_stream_size(text_stream: TextIO) -> int:
+    return to_stream_size(text_stream)
 
 
 def to_separator(any_string: AnyStr) -> AnyStr:
