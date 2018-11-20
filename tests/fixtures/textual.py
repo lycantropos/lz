@@ -33,8 +33,8 @@ def byte_stream(encoding: str) -> BinaryIO:
 
 
 @pytest.fixture(scope='function')
-def byte_stream_batch_end_position(stream_size: int) -> int:
-    return find(strategies.to_integers(0, stream_size))
+def byte_stream_batch_end_position(byte_stream_size: int) -> int:
+    return find(strategies.to_integers(0, byte_stream_size))
 
 
 @pytest.fixture(scope='function')
@@ -46,6 +46,11 @@ def byte_stream_batch_size(byte_stream_size: int) -> int:
 @pytest.fixture(scope='function')
 def byte_stream_contents(byte_stream: BinaryIO) -> bytes:
     return to_stream_contents(byte_stream)
+
+
+@pytest.fixture(scope='function')
+def byte_stream_lines_separator(byte_stream_contents: bytes) -> bytes:
+    return to_separator(byte_stream_contents)
 
 
 @pytest.fixture(scope='function')
