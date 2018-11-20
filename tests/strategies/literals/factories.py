@@ -2,6 +2,7 @@ import io
 import locale
 from functools import partial
 from typing import (AnyStr,
+                    BinaryIO,
                     IO,
                     Iterable,
                     Optional,
@@ -50,7 +51,7 @@ def to_byte_sequences(encoding: Optional[str],
 
 def to_byte_streams(encoding: Optional[str],
                     *,
-                    min_size: int = 0) -> SearchStrategy[Iterable[bytes]]:
+                    min_size: int = 0) -> SearchStrategy[BinaryIO]:
     bytes_io_streams = strategies.builds(io.BytesIO,
                                          to_byte_sequences(encoding,
                                                            min_size=min_size))

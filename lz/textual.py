@@ -1,7 +1,7 @@
 import codecs
 from functools import partial
 from typing import (AnyStr,
-                    IO,
+                    BinaryIO,
                     List)
 
 from .hints import Map
@@ -41,17 +41,17 @@ def encoder(encoding: str) -> Map[str, bytes]:
                    encoding=encoding)
 
 
-def read_batch_from_end(stream: IO[AnyStr],
+def read_batch_from_end(byte_stream: BinaryIO,
                         *,
                         size: int,
                         end_position: int) -> AnyStr:
     """
-    Reads batch from the end of given stream.
+    Reads batch from the end of given byte stream.
     """
     if end_position > size:
         offset = end_position - size
     else:
         offset = 0
         size = end_position
-    stream.seek(offset)
-    return stream.read(size)
+    byte_stream.seek(offset)
+    return byte_stream.read(size)
