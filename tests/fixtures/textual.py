@@ -36,8 +36,8 @@ def keep_separator() -> bool:
 
 
 @pytest.fixture(scope='function')
-def stream() -> IO[AnyStr]:
-    return find(strategies.encodings.flatmap(strategies.to_any_streams))
+def stream(encoding: str) -> IO[AnyStr]:
+    return find(strategies.to_any_streams(encoding))
 
 
 @pytest.fixture(scope='function')
