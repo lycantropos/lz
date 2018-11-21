@@ -58,10 +58,9 @@ encodings = ['ascii', 'big5', 'big5hkscs', 'cp037', 'cp1006',
              'iso8859_9', 'johab', 'koi8_r', 'koi8_t', 'koi8_u',
              'kz1048', 'latin_1', 'mac_cyrillic', 'mac_greek',
              'mac_iceland', 'mac_latin2', 'mac_roman', 'mac_turkish',
-             'ptcp154',
-             'shift_jis', 'shift_jis_2004', 'shift_jisx0213',
+             'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213',
              'utf_16', 'utf_16_be', 'utf_16_le', 'utf_32',
-             'utf_32_be', 'utf_32_le', 'utf_7', 'utf_8', 'utf_8_sig']
+             'utf_32_be', 'utf_32_le', 'utf_8', 'utf_8_sig']
 if sys.platform == 'win32':
     encodings.append('cp65001')
 encodings = strategies.sampled_from(encodings)
