@@ -3,8 +3,7 @@ import sys
 from collections import defaultdict
 from functools import wraps
 from operator import methodcaller
-from typing import (Any,
-                    AnyStr,
+from typing import (AnyStr,
                     BinaryIO,
                     Callable,
                     IO,
@@ -28,9 +27,8 @@ to_integers = strategies.integers
 
 def limit_max_size(factory: Callable[..., SearchStrategy[Domain]]):
     @wraps(factory)
-    def limited(*args: Any,
-                max_size: int = MAX_ITERABLES_SIZE,
-                **kwargs: Any) -> SearchStrategy[Domain]:
+    def limited(*args, max_size: int = MAX_ITERABLES_SIZE, **kwargs
+                ) -> SearchStrategy[Domain]:
         return factory(*args, max_size=max_size, **kwargs)
 
     return limited
