@@ -1,3 +1,5 @@
+import codecs
+from collections import defaultdict
 from itertools import (starmap,
                        zip_longest)
 from operator import eq
@@ -59,3 +61,14 @@ def is_empty(iterable: Iterable[Any]) -> bool:
 
 def capacity(iterable: Iterable[Any]) -> int:
     return sum(1 for _ in iterable)
+
+
+encoding_to_bom = (defaultdict(bytes,
+                               {'utf_8_sig': codecs.BOM_UTF8,
+                                'utf_16': codecs.BOM_UTF16,
+                                'utf_16_be': codecs.BOM_UTF16_BE,
+                                'utf_16_le': codecs.BOM_UTF16_LE,
+                                'utf_32': codecs.BOM_UTF32,
+                                'utf_32_be': codecs.BOM_UTF32_BE,
+                                'utf_32_le': codecs.BOM_UTF32_LE})
+                   .__getitem__)
