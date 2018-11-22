@@ -1,4 +1,3 @@
-from functools import singledispatch
 from types import (BuiltinFunctionType,
                    FunctionType,
                    MethodType)
@@ -38,17 +37,6 @@ def test_call(callable_: Callable[..., Any]) -> None:
         assert isinstance(curried_callable_empty_call, Curry)
         assert are_curryings_equal(curried_callable_empty_call,
                                    curried_callable)
-
-
-def test_single_dispatched(single_dispatchable_callable: Callable[..., Any]
-                           ) -> None:
-    curried_callable = curry(singledispatch(single_dispatchable_callable))
-
-    curried_callable_empty_call = curried_callable()
-
-    assert isinstance(curried_callable_empty_call, Curry)
-    assert are_curryings_equal(curried_callable_empty_call,
-                               curried_callable)
 
 
 def are_curryings_equal(left_currying: Curry,

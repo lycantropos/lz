@@ -59,33 +59,3 @@ callables = (built_in_functions
              | methods
              | methods_descriptors
              | wrappers_descriptors)
-
-
-@singledispatch
-def has_one_positional_parameter(object_: Any) -> bool:
-    signature = signatures.factory(object_)
-    return has_one_positional_parameter(signature)
-
-
-@has_one_positional_parameter.register(signatures.Plain)
-def plain_has_one_positional_parameter(object_: signatures.Plain
-                                       ) -> bool:
-    kinds = signatures.Parameter.Kind
-    positional_parameters = (
-            object_.parameters_by_kind[kinds.POSITIONAL_ONLY]
-            + object_.parameters_by_kind[kinds.POSITIONAL_OR_KEYWORD])
-    try:
-        first_positional_parameter = positional_parameters[0]
-    except IndexError:
-        return False
-    else:
-        return not first_positional_parameter.has_default
-
-
-@has_one_positional_parameter.register(signatures.Overloaded)
-def overloaded_has_one_positional_parameter(object_: signatures.Overloaded
-                                            ) -> bool:
-    return any(map(has_one_positional_parameter, object_.signatures))
-
-
-single_dispatchable_callables = callables.filter(has_one_positional_parameter)

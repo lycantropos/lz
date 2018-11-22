@@ -4,7 +4,6 @@ from .definitions import (built_in_functions,
                           functions,
                           methods,
                           methods_descriptors,
-                          single_dispatchable_callables,
                           wrappers_descriptors)
 from .functional import (false_predicates,
                          maps,

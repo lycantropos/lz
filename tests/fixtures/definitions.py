@@ -23,11 +23,6 @@ def callable_() -> Callable[..., Any]:
 
 
 @pytest.fixture(scope='function')
-def single_dispatchable_callable() -> Callable[..., Any]:
-    return find(strategies.single_dispatchable_callables)
-
-
-@pytest.fixture(scope='function')
 def class_() -> type:
     return find(strategies.classes)
 
