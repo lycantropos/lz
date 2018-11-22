@@ -21,7 +21,6 @@ from .factories import (to_byte_sequences,
                         to_homogeneous_lists,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
-                        to_integers,
                         to_strings)
 
 Serializable = Union[None, bool, float, int, str]

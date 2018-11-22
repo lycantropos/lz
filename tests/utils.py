@@ -2,7 +2,6 @@ import codecs
 from collections import defaultdict
 from itertools import (starmap,
                        zip_longest)
-from operator import eq
 from typing import (Any,
                     Iterable)
 
