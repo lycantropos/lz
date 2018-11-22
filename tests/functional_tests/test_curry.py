@@ -1,3 +1,4 @@
+from functools import singledispatch
 from types import (BuiltinFunctionType,
                    FunctionType,
                    MethodType)
@@ -29,13 +30,25 @@ def test_basic(built_in_function: BuiltinFunctionType,
 
 
 def test_call(callable_: Callable[..., Any]) -> None:
-    result = curry(callable_)
+    curried_callable = curry(callable_)
 
-    if result.signature.has_unset_parameters():
-        result_empty_call = result()
+    if curried_callable.signature.has_unset_parameters():
+        curried_callable_empty_call = curried_callable()
 
-        assert isinstance(result_empty_call, Curry)
-        assert are_curryings_equal(result_empty_call, result)
+        assert isinstance(curried_callable_empty_call, Curry)
+        assert are_curryings_equal(curried_callable_empty_call,
+                                   curried_callable)
+
+
+def test_single_dispatched(single_dispatchable_callable: Callable[..., Any]
+                           ) -> None:
+    curried_callable = curry(singledispatch(single_dispatchable_callable))
+
+    curried_callable_empty_call = curried_callable()
+
+    assert isinstance(curried_callable_empty_call, Curry)
+    assert are_curryings_equal(curried_callable_empty_call,
+                               curried_callable)
 
 
 def are_curryings_equal(left_currying: Curry,
