@@ -25,5 +25,3 @@ def test_round_trip(byte_sequence: Union[bytearray, bytes],
     if is_unicode:
         bom = encoding_to_bom(encoding)
         assert result in (byte_sequence, bom + byte_sequence)
-    else:
-        assert not result or set(result) & set(byte_sequence)
