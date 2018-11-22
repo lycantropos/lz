@@ -21,6 +21,7 @@ from .factories import (to_byte_sequences,
                         to_homogeneous_lists,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
+                        to_integers,
                         to_strings)
 
 Serializable = Union[None, bool, float, int, str]
@@ -90,6 +91,7 @@ slices = strategies.builds(slice,
                            slices_fields,
                            slices_fields,
                            slices_fields)
+capacities = to_integers(0, MAX_ITERABLES_SIZE)
 deferred_objects = strategies.deferred(lambda: objects)
 byte_sequences = encodings.flatmap(to_byte_sequences)
 any_strings = strings | byte_sequences

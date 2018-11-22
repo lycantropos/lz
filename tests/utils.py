@@ -41,13 +41,23 @@ def find(strategy: SearchStrategy[Domain]) -> Domain:
             return result
 
 
-def are_iterables_similar(left_iterable: Iterable[Any],
-                          right_iterable: Iterable[Any]) -> bool:
-    return all(starmap(eq, zip_longest(left_iterable, right_iterable,
-                                       # we're assuming that ``object()``
-                                       # will create some unique object
-                                       # not presented in any of arguments
-                                       fillvalue=object())))
+def are_iterables_similar(*iterables: Iterable[Any]) -> bool:
+    return all(starmap(are_objects_equal,
+                       zip_longest(*iterables,
+                                   # we're assuming that ``object()``
+                                   # will create some unique object
+                                   # not presented in any of arguments
+                                   fillvalue=object())))
+
+
+def are_objects_equal(*objects: Iterable[Any]) -> bool:
+    objects = iter(objects)
+    previous_object = next(objects)
+    for object_ in objects:
+        if object_ != previous_object:
+            return False
+        previous_object = object_
+    return True
 
 
 def is_empty(iterable: Iterable[Any]) -> bool:
