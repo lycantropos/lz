@@ -98,7 +98,20 @@ class Curry(ApplierBase):
         except TypeError:
             if not self.signature.has_unset_parameters(*args, **kwargs):
                 raise
-            return type(self)(self.func, self.signature, *args, **kwargs)
+        except IndexError:
+            if args or not is_single_dispatched(self.func):
+                raise
+        return type(self)(self.func, self.signature, *args, **kwargs)
+
+
+def is_single_dispatched(function: Callable[..., Range],
+                         *,
+                         attributes: Iterable[str] = ('__wrapped__',
+                                                      'dispatch',
+                                                      'register',
+                                                      'registry')
+                         ) -> bool:
+    return all(map(functools.partial(hasattr, function), attributes))
 
 
 def arguments_to_strings(args: Tuple[Any, ...], kwargs: Dict[str, Any]
