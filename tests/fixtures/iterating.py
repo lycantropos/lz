@@ -14,6 +14,11 @@ def grouper_key() -> Map[Any, Hashable]:
 
 
 @pytest.fixture(scope='function')
+def copier_size() -> int:
+    return find(strategies.to_integers(1, 100))
+
+
+@pytest.fixture(scope='function')
 def cutter_slice() -> slice:
     return find(strategies.non_negative_slices)
 

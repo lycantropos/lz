@@ -19,6 +19,9 @@ def real_number() -> Real:
 
 @pytest.fixture(scope='function')
 def non_zero_real_number() -> Real:
+    def is_non_zero(number: Real) -> bool:
+        return number != 0
+
     return find(strategies.real_numbers.filter(is_non_zero))
 
 
@@ -45,11 +48,6 @@ def min_iterables_size() -> int:
 @pytest.fixture(scope='function')
 def natural_number() -> int:
     return find(strategies.to_integers(0))
-
-
-@pytest.fixture(scope='function')
-def positive_capacity() -> int:
-    return find(strategies.capacities.filter(is_non_zero))
 
 
 @pytest.fixture(scope='function')
@@ -93,7 +91,3 @@ def hashables_iterable(min_iterables_size: int) -> Iterable[Hashable]:
 @pytest.fixture(scope='function')
 def sortable_iterable() -> Iterable[Any]:
     return find(strategies.sortable_iterables)
-
-
-def is_non_zero(number: Real) -> bool:
-    return number != 0

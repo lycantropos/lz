@@ -91,7 +91,6 @@ slices = strategies.builds(slice,
                            slices_fields,
                            slices_fields,
                            slices_fields)
-capacities = to_integers(0, MAX_ITERABLES_SIZE)
 deferred_objects = strategies.deferred(lambda: objects)
 byte_sequences = encodings.flatmap(to_byte_sequences)
 any_strings = strings | byte_sequences

@@ -27,7 +27,6 @@ from .iterating import (groupers_keys,
 from .literals import empty
 from .literals.base import (any_strings,
                             booleans,
-                            capacities,
                             encodings,
                             hashables,
                             keywords_arguments,

@@ -8,8 +8,8 @@ from tests.utils import are_iterables_similar
 
 
 def test_basic(iterable: Iterable[Any],
-               positive_capacity: int) -> None:
-    copy = copier(positive_capacity)
+               copier_size: int) -> None:
+    copy = copier(copier_size)
 
     result = copy(iterable)
 
