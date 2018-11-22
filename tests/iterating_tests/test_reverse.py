@@ -9,6 +9,7 @@ from lz import (left,
 from lz.iterating import (first,
                           last,
                           reverse)
+from lz.textual import encoder
 from tests.utils import (are_iterables_similar,
                          is_empty)
 
@@ -55,8 +56,7 @@ def test_byte_stream(byte_stream: BinaryIO,
                      lines_separator=byte_stream_lines_separator,
                      keep_lines_separator=keep_separator)
 
-    assert all(line in byte_stream_contents
-               for line in result)
+    assert are_byte_substrings(result, byte_stream_contents)
 
 
 def test_text_stream(encoding: str,
@@ -70,5 +70,11 @@ def test_text_stream(encoding: str,
                      lines_separator=text_stream_lines_separator,
                      keep_lines_separator=keep_separator)
 
-    assert all(line.encode(encoding) in text_stream_raw_contents
-               for line in result)
+    assert are_byte_substrings(map(encoder(encoding), result),
+                               text_stream_raw_contents)
+
+
+def are_byte_substrings(byte_strings: Iterable[bytes],
+                        target_string: bytes) -> bool:
+    return all(set(target_string) >= set(line)
+               for line in byte_strings)
