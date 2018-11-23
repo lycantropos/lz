@@ -1,13 +1,11 @@
 import importlib
 import inspect
-from functools import singledispatch
 from types import ModuleType
 from typing import (Any,
                     Union)
 
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
-from paradigm import signatures
 from paradigm.definitions import (is_supported,
                                   stdlib_modules_names,
                                   to_contents,
