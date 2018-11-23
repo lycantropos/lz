@@ -44,7 +44,7 @@ def encoder(encoding: str) -> Map[str, bytes]:
 def read_batch_from_end(byte_stream: BinaryIO,
                         *,
                         size: int,
-                        end_position: int) -> AnyStr:
+                        end_position: int) -> bytes:
     """
     Reads batch from the end of given byte stream.
     """
