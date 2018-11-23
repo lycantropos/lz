@@ -267,6 +267,7 @@ def reverse_binary_stream(iterable: BinaryIO,
                           keep_lines_separator: bool = True
                           ) -> Iterable[bytes]:
     if lines_separator is None:
+        lines_separator = (b'\r', b'\n', b'\r\n')
         lines_splitter = methodcaller(str.splitlines.__name__,
                                       keep_lines_separator)
     else:
