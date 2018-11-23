@@ -7,9 +7,9 @@ from lz.hints import Map
 from lz.iterating import grouper
 
 
-def test_basic(iterable: Iterable[Any],
+def test_basic(hashables_iterable: Iterable[Hashable],
                grouper_key: Map[Any, Hashable]) -> None:
-    original, target = tee(iterable)
+    original, target = tee(hashables_iterable)
 
     result = grouper(grouper_key)(target)
     result_list = list(result)

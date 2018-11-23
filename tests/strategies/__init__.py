@@ -21,14 +21,25 @@ from .functional import (false_predicates,
                          to_transparent_functions_kwargs,
                          transparent_functions,
                          true_predicates)
-from .iterating import groupers_keys
+from .iterating import (groupers_keys,
+                        non_negative_indices,
+                        non_negative_slices)
 from .literals import empty
-from .literals.base import (hashables,
-                            indices,
+from .literals.base import (any_strings,
+                            booleans,
+                            encodings,
+                            hashables,
                             keywords_arguments,
                             objects,
                             positionals_arguments,
-                            slices,
+                            real_numbers,
                             sortable_iterables)
-from .literals.factories import (to_integers,
-                                 to_iterables)
+from .literals.factories import (to_any_streams,
+                                 to_byte_iterables,
+                                 to_byte_sequences,
+                                 to_byte_streams,
+                                 to_characters,
+                                 to_homogeneous_iterables,
+                                 to_integers,
+                                 to_strings,
+                                 to_text_streams)

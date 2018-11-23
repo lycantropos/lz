@@ -73,8 +73,7 @@ class ApplierBase(abc.Callable):
     def __repr__(self) -> str:
         arguments_strings = itertools.chain(
                 [repr(self.func)],
-                arguments_to_strings(self.args,
-                                     self.keywords))
+                arguments_to_strings(self.args, self.keywords))
         cls = type(self)
         return (cls.__module__ + '.' + cls.__qualname__
                 + '(' + ', '.join(arguments_strings) + ')')
@@ -98,13 +97,13 @@ class Curry(ApplierBase):
         except TypeError:
             if not self.signature.has_unset_parameters(*args, **kwargs):
                 raise
-            return type(self)(self.func, self.signature, *args, **kwargs)
+        return type(self)(self.func, self.signature, *args, **kwargs)
 
 
-def arguments_to_strings(args: Tuple[Any, ...], kwargs: Dict[str, Any]
-                         ) -> Iterable[str]:
-    yield from map(repr, args)
-    yield from itertools.starmap('{}={!r}'.format, kwargs.items())
+def arguments_to_strings(positional_arguments: Tuple[Any, ...],
+                         keyword_arguments: Dict[str, Any]) -> Iterable[str]:
+    yield from map(repr, positional_arguments)
+    yield from itertools.starmap('{}={!r}'.format, keyword_arguments.items())
 
 
 def curry(function: Callable[..., Range],

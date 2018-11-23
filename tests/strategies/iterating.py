@@ -4,6 +4,7 @@ from hypothesis import strategies
 
 from lz.functional import identity
 from lz.hints import Map
+from tests.configs import MAX_ITERABLES_SIZE
 
 
 def to_grouper_key(odd_order: int) -> Map[Hashable, Hashable]:
@@ -21,3 +22,9 @@ groupers_keys = (strategies.integers(1, 1000)
                  .filter(is_odd)
                  .map(to_grouper_key)
                  | strategies.just(identity))
+non_negative_indices = strategies.integers(0, MAX_ITERABLES_SIZE - 1)
+non_negative_slices_fields = strategies.none() | non_negative_indices
+non_negative_slices = strategies.builds(slice,
+                                        non_negative_slices_fields,
+                                        non_negative_slices_fields,
+                                        non_negative_slices_fields)
