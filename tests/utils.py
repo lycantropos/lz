@@ -1,5 +1,6 @@
 import codecs
-from collections import defaultdict
+from collections import (defaultdict,
+                         deque)
 from itertools import (starmap,
                        zip_longest)
 from typing import (Any,
@@ -38,6 +39,28 @@ def find(strategy: SearchStrategy[Domain]) -> Domain:
             raise unpacking_error from search_error
         else:
             return result
+
+
+def iterable_starts_with(iterable: Iterable[Any],
+                         prefix: Iterable[Any]) -> bool:
+    iterator = iter(iterable)
+    for prefix_element in prefix:
+        try:
+            element = next(iterator)
+        except StopIteration:
+            return False
+        else:
+            if prefix_element != element:
+                return False
+    return True
+
+
+def iterable_ends_with(iterable: Iterable[Any],
+                       suffix: Iterable[Any]) -> bool:
+    suffix = list(suffix)
+    end_elements = deque(iterable,
+                         maxlen=len(suffix))
+    return are_iterables_similar(end_elements, suffix)
 
 
 def are_iterables_similar(*iterables: Iterable[Any]) -> bool:

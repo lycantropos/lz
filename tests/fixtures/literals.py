@@ -7,6 +7,7 @@ from typing import (Any,
                     Tuple)
 
 import pytest
+from hypothesis.searchstrategy import SearchStrategy
 
 from tests import strategies
 from tests.utils import find
@@ -61,11 +62,16 @@ def empty_iterable() -> Iterable[Any]:
 
 
 @pytest.fixture(scope='function')
-def iterable(min_iterables_size: int) -> Iterable[Any]:
+def iterable(iterables_strategy: SearchStrategy[Iterable[Any]]
+             ) -> Iterable[Any]:
+    return find(iterables_strategy)
+
+
+@pytest.fixture(scope='function')
+def iterables_strategy(min_iterables_size: int) -> SearchStrategy:
     limit_min_size = partial(partial,
                              min_size=min_iterables_size)
-    return find(
-            strategies.encodings.flatmap(limit_min_size(strategies
+    return (strategies.encodings.flatmap(limit_min_size(strategies
                                                         .to_byte_iterables))
             | strategies.to_homogeneous_iterables(strategies.objects,
                                                   min_size=min_iterables_size)
@@ -73,6 +79,15 @@ def iterable(min_iterables_size: int) -> Iterable[Any]:
                                     min_size=min_iterables_size)
             | strategies.encodings.flatmap(limit_min_size(strategies
                                                           .to_text_streams)))
+
+
+@pytest.fixture(scope='function')
+def nested_iterable(min_iterables_size: int,
+                    iterables_strategy: SearchStrategy[Iterable[Any]]
+                    ) -> Iterable[Iterable[Any]]:
+    return find(strategies
+                .to_homogeneous_iterables(iterables_strategy,
+                                          min_size=min_iterables_size))
 
 
 @pytest.fixture(scope='function')
