@@ -24,4 +24,8 @@ def test_round_trip(byte_sequence: Union[bytearray, bytes],
     is_unicode = encoding.startswith('utf')
     if is_unicode:
         bom = encoding_to_bom(encoding)
+
+        assert isinstance(result, bytes)
         assert result in (byte_sequence, bom + byte_sequence)
+    else:
+        assert isinstance(result, bytes)
