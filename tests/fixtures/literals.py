@@ -42,7 +42,7 @@ def keyword_arguments() -> Dict[str, Any]:
 
 @pytest.fixture(scope='function')
 def min_iterables_size() -> int:
-    return find(strategies.to_integers(0, 100))
+    return find(strategies.to_integers(0, 10))
 
 
 @pytest.fixture(scope='function')
