@@ -361,5 +361,5 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
                                      maxlen=size))
 
 
-last = compose(first, trailer(1))
+last = compose(next, trailer(1))
 last.__doc__ = 'Returns last element of iterable.'
