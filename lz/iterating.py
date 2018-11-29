@@ -347,6 +347,14 @@ def copier(count: int) -> Map[Iterable[Domain], Iterable[Iterable[Domain]]]:
     return copy
 
 
+def header(size: int) -> Operator[Iterable[Domain]]:
+    """
+    Returns function that selects elements from the beginning of iterable.
+    Resulted iterable will have size not greater than given one.
+    """
+    return cutter(slice(size))
+
+
 first = compose(next, iter)
 first.__doc__ = 'Returns first element of iterable.'
 
