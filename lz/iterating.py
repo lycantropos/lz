@@ -125,9 +125,9 @@ def chopper(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
     """
     Returns function that splits iterable into chunks of given size.
     """
-    cut = compose(tuple, cutter(slice(size)))
+    head = compose(tuple, header(size))
     return compose(grabber(),
-                   cleave(itertools.repeat(cut)),
+                   cleave(itertools.repeat(head)),
                    iter)
 
 
