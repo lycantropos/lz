@@ -143,6 +143,10 @@ def to_constant(object_: Domain) -> Callable[..., Domain]:
     def constant(*_: Domain, **__: Domain) -> Domain:
         return object_
 
+    object_repr = repr(object_)
+    constant.__name__ = object_repr + ' constant'
+    constant.__qualname__ = object_repr + ' constant'
+    constant.__doc__ = 'Returns {}.'.format(object_repr)
     return constant
 
 
