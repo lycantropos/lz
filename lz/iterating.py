@@ -24,8 +24,7 @@ from typing import (Any,
                     overload)
 
 from .arithmetical import ceil_division
-from .functional import (cleave,
-                         combine,
+from .functional import (combine,
                          compose)
 from .hints import (Domain,
                     Map,
@@ -121,14 +120,23 @@ def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
     return cut
 
 
-def chopper(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
+def chopper(size: int) -> Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
     """
     Returns function that splits iterable into chunks of given size.
     """
-    head = compose(tuple, header(size))
-    return compose(grabber(),
-                   cleave(itertools.repeat(head)),
-                   iter)
+
+    @functools.singledispatch
+    def chop(iterable: Iterable[Domain]) -> Iterable[Sequence[Domain]]:
+        iterator = iter(iterable)
+        yield from iter(lambda: tuple(itertools.islice(iterator, size)), ())
+
+    @chop.register(abc.Sequence)
+    def chop_sequence(iterable: Sequence[Domain]
+                      ) -> Iterable[Sequence[Domain]]:
+        for start in range(0, len(iterable), size):
+            yield iterable[start:start + size]
+
+    return chop
 
 
 def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
