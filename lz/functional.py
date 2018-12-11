@@ -156,7 +156,7 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
 
     def flipped(*args, **kwargs) -> Range:
-        return function(*reversed(args), **kwargs)
+        return function(*args[::-1], **kwargs)
 
     members_factories = dict(members_copiers)
     members_factories['__name__'] = functools.partial(add, 'flipped ')
