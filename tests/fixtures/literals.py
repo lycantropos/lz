@@ -73,10 +73,9 @@ def iterables_strategy(min_iterables_size: int) -> SearchStrategy:
                              min_size=min_iterables_size)
     return (strategies.encodings.flatmap(limit_min_size(strategies
                                                         .to_byte_iterables))
-            | strategies.to_homogeneous_iterables(strategies.objects,
-                                                  min_size=min_iterables_size)
-            | strategies.to_strings(strategies.to_characters(),
-                                    min_size=min_iterables_size)
+            | limit_min_size(strategies
+                             .to_homogeneous_iterables)(strategies.objects)
+            | limit_min_size(strategies.to_strings)(strategies.to_characters())
             | strategies.encodings.flatmap(limit_min_size(strategies
                                                           .to_text_streams)))
 
@@ -85,15 +84,28 @@ def iterables_strategy(min_iterables_size: int) -> SearchStrategy:
 def nested_iterable(min_iterables_size: int,
                     iterables_strategy: SearchStrategy[Iterable[Any]]
                     ) -> Iterable[Iterable[Any]]:
-    return find(strategies
-                .to_homogeneous_iterables(iterables_strategy,
-                                          min_size=min_iterables_size))
+    limit_min_size = partial(partial,
+                             min_size=min_iterables_size)
+    return find(
+            limit_min_size(strategies
+                           .to_homogeneous_iterables)(iterables_strategy)
+            | limit_min_size(strategies.to_strings)(strategies.to_characters())
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_text_streams)))
 
 
 @pytest.fixture(scope='function')
 def non_empty_iterable() -> Iterable[Any]:
-    return find(strategies.to_homogeneous_iterables(strategies.hashables,
-                                                    min_size=1))
+    limit_min_size = partial(partial,
+                             min_size=1)
+    return find(
+            strategies.encodings.flatmap(limit_min_size(strategies
+                                                        .to_byte_iterables))
+            | limit_min_size(strategies
+                             .to_homogeneous_iterables)(strategies.objects)
+            | limit_min_size(strategies.to_strings)(strategies.to_characters())
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_text_streams)))
 
 
 @pytest.fixture(scope='function')
