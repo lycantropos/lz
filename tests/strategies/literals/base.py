@@ -1,5 +1,6 @@
 import builtins
 import inspect
+import platform
 import string
 import sys
 from collections import abc
@@ -61,7 +62,7 @@ encodings = ['ascii', 'big5', 'big5hkscs', 'cp037', 'cp1006',
              'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213',
              'utf_16', 'utf_16_be', 'utf_16_le', 'utf_32',
              'utf_32_be', 'utf_32_le', 'utf_8', 'utf_8_sig']
-if sys.platform == 'win32':
+if sys.platform == 'win32' and platform.python_implementation() != 'PyPy':
     encodings.append('cp65001')
 encodings = strategies.sampled_from(encodings)
 byte_strings = encodings.flatmap(to_byte_strings)
