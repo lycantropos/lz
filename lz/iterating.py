@@ -6,7 +6,8 @@ import sys
 from collections import (abc,
                          defaultdict,
                          deque)
-from operator import (methodcaller,
+from operator import (is_not,
+                      methodcaller,
                       sub)
 from typing import (Any,
                     AnyStr,
@@ -326,6 +327,20 @@ def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     Returns plain iterable from iterable of iterables.
     """
     yield from itertools.chain.from_iterable(iterable)
+
+
+def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
+    iterators = itertools.cycle(map(iter, iterable))
+    while True:
+        try:
+            for iterator in iterators:
+                yield next(iterator)
+        except StopIteration:
+            is_not_exhausted = functools.partial(is_not, iterator)
+            iterators = itertools.cycle(itertools.takewhile(is_not_exhausted,
+                                                            iterators))
+        else:
+            return
 
 
 def flatmapper(map_: Map[Domain, Iterable[Range]]
