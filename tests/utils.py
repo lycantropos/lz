@@ -1,6 +1,8 @@
 import codecs
-from collections import (defaultdict,
+from collections import (abc,
+                         defaultdict,
                          deque)
+from functools import singledispatch
 from itertools import (starmap,
                        zip_longest)
 from typing import (Any,
@@ -63,23 +65,34 @@ def iterable_ends_with(iterable: Iterable[Any],
     return are_iterables_similar(end_elements, suffix)
 
 
-def are_iterables_similar(*iterables: Iterable[Any]) -> bool:
-    return all(starmap(are_objects_equal,
-                       zip_longest(*iterables,
+@singledispatch
+def are_objects_similar(object_: Any, *rest: Any) -> bool:
+    raise TypeError('Unsupported object type: {type}.'
+                    .format(type=type(object_)))
+
+
+@are_objects_similar.register(object)
+@are_objects_similar.register(abc.Mapping)
+@are_objects_similar.register(abc.Sequence)
+@are_objects_similar.register(abc.Set)
+def are_objects_equal(object_: Any, *rest: Any) -> bool:
+    previous_object = object_
+    for next_object in rest:
+        if next_object != previous_object:
+            return False
+        previous_object = next_object
+    return True
+
+
+@are_objects_similar.register(abc.Iterable)
+def are_iterables_similar(object_: Iterable[Any],
+                          *rest: Iterable[Any]) -> bool:
+    return all(starmap(are_objects_similar,
+                       zip_longest(object_, *rest,
                                    # we're assuming that ``object()``
                                    # will create some unique object
                                    # not presented in any of arguments
                                    fillvalue=object())))
-
-
-def are_objects_equal(*objects: Iterable[Any]) -> bool:
-    objects = iter(objects)
-    previous_object = next(objects)
-    for object_ in objects:
-        if object_ != previous_object:
-            return False
-        previous_object = object_
-    return True
 
 
 def is_empty(iterable: Iterable[Any]) -> bool:
