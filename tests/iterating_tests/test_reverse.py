@@ -1,4 +1,3 @@
-from itertools import tee
 from typing import (Any,
                     BinaryIO,
                     Iterable,
@@ -6,7 +5,8 @@ from typing import (Any,
 
 from lz import (left,
                 right)
-from lz.iterating import (first,
+from lz.iterating import (duplicate,
+                          first,
                           last,
                           reverse)
 from lz.textual import encoder
@@ -39,7 +39,7 @@ def test_step_left(iterable: Iterable[Any],
 
 
 def test_involution(iterable: Iterable[Any]) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
 
     result = reverse(reverse(target))
 

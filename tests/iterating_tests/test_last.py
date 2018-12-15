@@ -1,14 +1,14 @@
-from itertools import tee
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import (first,
+from lz.iterating import (duplicate,
+                          first,
                           last,
                           reverse)
 
 
 def test_basic(non_empty_iterable: Iterable[Any]) -> None:
-    original, target = tee(non_empty_iterable)
+    original, target = duplicate(non_empty_iterable)
 
     result = last(target)
 

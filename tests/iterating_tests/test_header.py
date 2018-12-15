@@ -1,15 +1,15 @@
-from itertools import tee
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import header
+from lz.iterating import (duplicate,
+                          header)
 from tests.utils import (capacity,
                          iterable_starts_with)
 
 
 def test_capacity(non_empty_iterable: Iterable[Any],
                   natural_number: int) -> None:
-    original, target = tee(non_empty_iterable)
+    original, target = duplicate(non_empty_iterable)
     head = header(natural_number)
 
     result = head(target)
@@ -22,7 +22,7 @@ def test_capacity(non_empty_iterable: Iterable[Any],
 
 def test_elements(non_empty_iterable: Iterable[Any],
                   natural_number: int) -> None:
-    original, target = tee(non_empty_iterable)
+    original, target = duplicate(non_empty_iterable)
     head = header(natural_number)
 
     result = head(target)

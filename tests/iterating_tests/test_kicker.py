@@ -1,17 +1,17 @@
-from itertools import tee
 from typing import Iterable
 
 import pytest
 
 from lz.hints import (Domain,
                       Predicate)
-from lz.iterating import kicker
+from lz.iterating import (duplicate,
+                          kicker)
 from tests.utils import (are_iterables_similar,
                          capacity)
 
 
 def test_basic(iterable: Iterable[Domain]) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
     kick = kicker()
 
     result = kick(target)
@@ -31,7 +31,7 @@ def test_basic(iterable: Iterable[Domain]) -> None:
 
 def test_false_predicate(iterable: Iterable[Domain],
                          false_predicate: Predicate) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
     keep_all = kicker(false_predicate)
 
     keep_all_result = keep_all(target)

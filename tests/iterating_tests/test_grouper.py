@@ -1,15 +1,15 @@
-from itertools import tee
 from typing import (Any,
                     Hashable,
                     Iterable)
 
 from lz.hints import Map
-from lz.iterating import grouper
+from lz.iterating import (duplicate,
+                          grouper)
 
 
 def test_basic(hashables_iterable: Iterable[Hashable],
                grouper_key: Map[Any, Hashable]) -> None:
-    original, target = tee(hashables_iterable)
+    original, target = duplicate(hashables_iterable)
 
     result = grouper(grouper_key)(target)
     result_list = list(result)

@@ -1,17 +1,17 @@
-from itertools import tee
 from typing import Iterable
 
 import pytest
 
 from lz.hints import (Domain,
                       Predicate)
-from lz.iterating import grabber
+from lz.iterating import (duplicate,
+                          grabber)
 from tests.utils import (are_iterables_similar,
                          capacity)
 
 
 def test_basic(iterable: Iterable[Domain]) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
     grab = grabber()
 
     result = grab(target)
@@ -37,7 +37,7 @@ def test_false_predicate(iterable: Iterable[Domain],
 
 def test_true_predicate(iterable: Iterable[Domain],
                         true_predicate: Predicate) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
     grab_all = grabber(true_predicate)
 
     grab_all_result = grab_all(target)

@@ -1,4 +1,3 @@
-from itertools import tee
 from typing import (Callable,
                     Iterable)
 
@@ -6,6 +5,7 @@ from lz import (left,
                 right)
 from lz.hints import (Domain,
                       Range)
+from lz.iterating import duplicate
 
 
 def test_base_case(projector: Callable[[Domain, Range], Range],
@@ -22,7 +22,7 @@ def test_step(projector: Callable[[Domain, Range], Range],
               projector_initial: Range,
               projector_iterable: Iterable[Domain],
               projector_domain_element: Domain) -> None:
-    first_target, second_target = tee(projector_iterable)
+    first_target, second_target = duplicate(projector_iterable)
     fold = right.folder(projector, projector_initial)
     attach = left.attacher(projector_domain_element)
 

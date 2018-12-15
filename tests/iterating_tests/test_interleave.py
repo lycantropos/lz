@@ -1,16 +1,16 @@
-from itertools import tee
 from typing import (Any,
                     Iterable)
 
 from lz import left
-from lz.iterating import (first,
+from lz.iterating import (duplicate,
+                          first,
                           interleave)
 from tests.utils import are_iterables_similar
 
 
 def test_basic(empty_iterable: Iterable[Any],
                nested_iterable: Iterable[Iterable[Any]]) -> None:
-    original, target = tee(nested_iterable)
+    original, target = duplicate(nested_iterable)
 
     result = interleave(left.attacher(empty_iterable)(target))
 
@@ -19,7 +19,7 @@ def test_basic(empty_iterable: Iterable[Any],
 
 def test_step(non_empty_iterable: Iterable[Any],
               nested_iterable: Iterable[Iterable[Any]]) -> None:
-    original, target = tee(non_empty_iterable)
+    original, target = duplicate(non_empty_iterable)
 
     result = interleave(left.attacher(target)(nested_iterable))
 

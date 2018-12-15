@@ -1,16 +1,16 @@
-from itertools import (islice,
-                       tee)
+from itertools import islice
 from typing import (Any,
                     Iterable)
 
 import pytest
 
-from lz.iterating import slider
+from lz.iterating import (duplicate,
+                          slider)
 
 
 def test_basic(iterable: Iterable[Any],
                slider_size: int) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
     slide = slider(slider_size)
 
     result = slide(target)

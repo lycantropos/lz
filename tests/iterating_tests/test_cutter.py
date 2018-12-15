@@ -1,9 +1,9 @@
-from itertools import (islice,
-                       tee)
+from itertools import islice
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import cutter
+from lz.iterating import (cutter,
+                          duplicate)
 from tests.configs import MAX_ITERABLES_SIZE
 from tests.utils import (are_iterables_similar,
                          capacity)
@@ -19,7 +19,7 @@ def test_capacity(iterable: Iterable[Any],
 
 def test_elements(iterable: Iterable[Any],
                   cutter_slice: slice) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
 
     cut = cutter(cutter_slice)
     result = cut(target)

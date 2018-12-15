@@ -1,15 +1,15 @@
-from itertools import tee
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import trailer
+from lz.iterating import (duplicate,
+                          trailer)
 from tests.utils import (capacity,
                          iterable_ends_with)
 
 
 def test_capacity(non_empty_iterable: Iterable[Any],
                   natural_number: int) -> None:
-    original, target = tee(non_empty_iterable)
+    original, target = duplicate(non_empty_iterable)
     trail = trailer(natural_number)
 
     result = trail(target)
@@ -22,7 +22,7 @@ def test_capacity(non_empty_iterable: Iterable[Any],
 
 def test_elements(non_empty_iterable: Iterable[Any],
                   natural_number: int) -> None:
-    original, target = tee(non_empty_iterable)
+    original, target = duplicate(non_empty_iterable)
     trail = trailer(natural_number)
 
     result = trail(target)
