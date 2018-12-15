@@ -14,7 +14,7 @@ def grouper_key() -> Map[Any, Hashable]:
 
 
 @pytest.fixture(scope='function')
-def copier_size() -> int:
+def positive_replicator_size() -> int:
     return find(strategies.to_integers(1, 100))
 
 

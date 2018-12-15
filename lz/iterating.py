@@ -75,7 +75,7 @@ def separator(predicate: Predicate = None
     """
     return compose(tuple,
                    combine([scavenger(predicate), sifter(predicate)]),
-                   copier(2))
+                   replicator(2))
 
 
 def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
@@ -352,22 +352,66 @@ def flatmapper(map_: Map[Domain, Iterable[Range]]
     return compose(flatten, mapper(map_))
 
 
-def copier(count: int) -> Map[Iterable[Domain], Iterable[Iterable[Domain]]]:
+def replicator(count: int) -> Map[Domain, Iterable[Domain]]:
     """
-    Returns function that creates independent copies of iterable.
+    Returns function that replicates passed object.
     """
-    min_count = 0
-    if count < min_count:
-        raise ValueError('Count should be '
-                         'not less than {min_count}, '
-                         'but found {actual_count}.'
-                         .format(min_count=min_count,
-                                 actual_count=count))
+    return functools.partial(replicate,
+                             count=count)
 
-    def copy(iterable: Iterable[Domain]) -> Iterable[Iterable[Domain]]:
-        yield from itertools.tee(iterable, count)
 
-    return copy
+@functools.singledispatch
+def replicate(object_: Domain,
+              *,
+              count: int) -> Iterable[Domain]:
+    """
+    Returns given number of object replicas.
+    """
+    raise TypeError('Unsupported object type: {type}.'
+                    .format(type=type(object_)))
+
+
+@replicate.register(object)
+# mappings cannot be replicated as other iterables
+# since they are iterable only by key
+@replicate.register(abc.Mapping)
+# immutable strings represent a special kind of iterables
+# that can be replicated by simply repeating
+@replicate.register(bytes)
+@replicate.register(str)
+def replicate_object(object_: Domain,
+                     *,
+                     count: int) -> Iterable[Domain]:
+    """
+    Returns object repeated given number of times.
+    """
+    return itertools.repeat(object_, count)
+
+
+@replicate.register(abc.Iterable)
+def replicate_iterable(object_: Iterable[Domain],
+                       *,
+                       count: int) -> Iterable[Iterable[Domain]]:
+    """
+    Returns given number of iterable replicas.
+    """
+    iterator = iter(object_)
+    queues = [deque() for _ in itertools.repeat(None, count)]
+
+    def replica(queue: deque) -> Iterable[Domain]:
+        while True:
+            if not queue:
+                try:
+                    element = next(iterator)
+                except StopIteration:
+                    return
+                element_copies = replicate(element,
+                                           count=count)
+                for sub_queue, element_copy in zip(queues, element_copies):
+                    sub_queue.append(element_copy)
+            yield queue.popleft()
+
+    yield from map(replica, queues)
 
 
 def header(size: int) -> Operator[Iterable[Domain]]:
