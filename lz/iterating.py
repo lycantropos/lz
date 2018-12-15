@@ -414,6 +414,9 @@ def replicate_iterable(object_: Iterable[Domain],
     yield from map(replica, queues)
 
 
+duplicate = replicator(2)
+
+
 def header(size: int) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from the beginning of iterable.
