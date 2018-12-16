@@ -5,7 +5,7 @@ from lz import (left,
                 right)
 from lz.hints import (Domain,
                       Range)
-from lz.iterating import duplicate
+from lz.replication import duplicate
 
 
 def test_base_case(projector: Callable[[Domain, Range], Range],

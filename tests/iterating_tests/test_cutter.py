@@ -2,8 +2,8 @@ from itertools import islice
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import (cutter,
-                          duplicate)
+from lz.iterating import cutter
+from lz.replication import duplicate
 from tests.configs import MAX_ITERABLES_SIZE
 from tests.utils import (are_iterables_similar,
                          capacity)

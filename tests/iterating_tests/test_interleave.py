@@ -2,9 +2,9 @@ from typing import (Any,
                     Iterable)
 
 from lz import left
-from lz.iterating import (duplicate,
-                          first,
+from lz.iterating import (first,
                           interleave)
+from lz.replication import duplicate
 from tests.utils import are_iterables_similar
 
 

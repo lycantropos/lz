@@ -2,8 +2,8 @@ from typing import (Any,
                     Iterable)
 
 from lz.iterating import (chopper,
-                          duplicate,
                           flatten)
+from lz.replication import duplicate
 from tests.utils import are_iterables_similar
 
 

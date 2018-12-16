@@ -1,9 +1,9 @@
 from typing import Iterable
 
 from lz.hints import Domain
-from lz.iterating import (duplicate,
-                          slider,
+from lz.iterating import (slider,
                           sorter)
+from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
                          capacity)
 

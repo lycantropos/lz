@@ -1,7 +1,7 @@
 from typing import Any
 
-from lz.iterating import (first,
-                          replicator)
+from lz.iterating import first
+from lz.replication import replicator
 from tests.utils import (are_iterables_similar,
                          is_empty)
 

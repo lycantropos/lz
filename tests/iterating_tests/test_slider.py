@@ -4,8 +4,8 @@ from typing import (Any,
 
 import pytest
 
-from lz.iterating import (duplicate,
-                          slider)
+from lz.iterating import slider
+from lz.replication import duplicate
 
 
 def test_basic(iterable: Iterable[Any],

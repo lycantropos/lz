@@ -5,10 +5,10 @@ from typing import (Any,
 
 from lz import (left,
                 right)
-from lz.iterating import (duplicate,
-                          first,
+from lz.iterating import (first,
                           last,
                           reverse)
+from lz.replication import duplicate
 from lz.textual import encoder
 from tests.utils import (are_iterables_similar,
                          is_empty)

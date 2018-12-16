@@ -4,8 +4,8 @@ import pytest
 
 from lz.hints import (Domain,
                       Predicate)
-from lz.iterating import (duplicate,
-                          grabber)
+from lz.iterating import grabber
+from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
                          capacity)
 

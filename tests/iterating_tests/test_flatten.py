@@ -3,8 +3,8 @@ from typing import (Any,
 
 from lz import (left,
                 right)
-from lz.iterating import (duplicate,
-                          flatten)
+from lz.iterating import flatten
+from lz.replication import duplicate
 from tests.utils import (is_empty,
                          iterable_ends_with,
                          iterable_starts_with)

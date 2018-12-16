@@ -1,8 +1,8 @@
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import (duplicate,
-                          trailer)
+from lz.iterating import trailer
+from lz.replication import duplicate
 from tests.utils import (capacity,
                          iterable_ends_with)
 

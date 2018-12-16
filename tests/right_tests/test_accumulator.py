@@ -4,9 +4,9 @@ from typing import (Callable,
 from lz import right
 from lz.hints import (Domain,
                       Range)
-from lz.iterating import (duplicate,
-                          first,
+from lz.iterating import (first,
                           last)
+from lz.replication import duplicate
 
 
 def test_first(projector: Callable[[Domain, Range], Range],

@@ -1,8 +1,8 @@
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import (duplicate,
-                          header)
+from lz.iterating import header
+from lz.replication import duplicate
 from tests.utils import (capacity,
                          iterable_starts_with)
 
