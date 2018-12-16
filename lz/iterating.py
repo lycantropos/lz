@@ -75,7 +75,7 @@ def separator(predicate: Predicate = None
     """
     return compose(tuple,
                    combine([scavenger(predicate), sifter(predicate)]),
-                   replicator(2))
+                   duplicate)
 
 
 def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
