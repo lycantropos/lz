@@ -148,13 +148,13 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
 
     def slide(iterable: Iterable[Domain]) -> Iterable[Tuple[Domain, ...]]:
         iterator = iter(iterable)
-        result = tuple(itertools.islice(iterator, size))
+        initial = tuple(itertools.islice(iterator, size))
 
         def shift(previous: Tuple[Domain, ...],
                   element: Domain) -> Tuple[Domain, ...]:
             return previous[1:] + (element,)
 
-        yield from itertools.accumulate(itertools.chain([result], iterator),
+        yield from itertools.accumulate(itertools.chain([initial], iterator),
                                         shift)
 
     return slide
