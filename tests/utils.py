@@ -6,7 +6,8 @@ from functools import singledispatch
 from itertools import (starmap,
                        zip_longest)
 from typing import (Any,
-                    Iterable)
+                    Iterable,
+                    Sized)
 
 from hypothesis import (Phase,
                         core,
@@ -104,8 +105,14 @@ def is_empty(iterable: Iterable[Any]) -> bool:
         return False
 
 
+@singledispatch
 def capacity(iterable: Iterable[Any]) -> int:
     return sum(1 for _ in iterable)
+
+
+@capacity.register(abc.Sized)
+def sized_capacity(iterable: Sized) -> int:
+    return len(iterable)
 
 
 encoding_to_bom = (defaultdict(bytes,
