@@ -299,10 +299,12 @@ def to_text_streams(encoding: str,
                     max_size: Optional[int] = None
                     ) -> SearchStrategy[TextIO]:
     encoding_length = encodings_lengths[encoding]
-    byte_stream_min_size = min_size * encoding_length
+    bom = encoding_to_bom(encoding)
+    byte_stream_min_size = min_size * encoding_length + len(bom)
     byte_stream_max_size = max_size
     if byte_stream_max_size is not None:
-        byte_stream_max_size *= encoding_length
+        byte_stream_max_size = (byte_stream_max_size * encoding_length
+                                + len(bom))
     return strategies.builds(io.TextIOWrapper,
                              to_byte_streams(encoding,
                                              min_size=byte_stream_min_size,
