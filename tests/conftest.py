@@ -89,6 +89,7 @@ def patch_sized_replication() -> None:
         yield from map(type(object_), replicate_iterable(object_,
                                                          count=count))
 
+    replicate.register(bytearray, replicate_sized)
     replicate.register(frozenset, replicate_sized)
     replicate.register(list, replicate_sized)
     replicate.register(set, replicate_sized)
