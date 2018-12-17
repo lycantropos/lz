@@ -1,4 +1,3 @@
-from operator import xor
 from typing import (Callable,
                     Iterable)
 
