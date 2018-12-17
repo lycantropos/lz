@@ -56,7 +56,7 @@ def iterable_starts_with(iterable: Iterable[Any],
         except StopIteration:
             return False
         else:
-            if prefix_element != element:
+            if not are_objects_similar(prefix_element, element):
                 return False
     return True
 
