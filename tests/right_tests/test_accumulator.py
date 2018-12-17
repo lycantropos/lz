@@ -1,3 +1,4 @@
+from operator import xor
 from typing import (Callable,
                     Iterable)
 
@@ -7,6 +8,7 @@ from lz.hints import (Domain,
 from lz.iterating import (first,
                           last)
 from lz.replication import duplicate
+from tests.utils import are_objects_similar
 
 
 def test_first(projector: Callable[[Domain, Range], Range],
@@ -29,4 +31,4 @@ def test_last(projector: Callable[[Domain, Range], Range],
     result = accumulate(first_target)
     fold_result = fold(second_target)
 
-    assert last(result) == fold_result
+    assert are_objects_similar(last(result), fold_result)
