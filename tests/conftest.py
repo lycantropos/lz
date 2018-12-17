@@ -3,6 +3,8 @@ import pkgutil
 import sys
 from functools import partial
 from typing import (Any,
+                    Dict,
+                    Hashable,
                     Iterable)
 
 import pytest
@@ -91,3 +93,11 @@ def patch_sized_replication() -> None:
     replicate.register(list, replicate_sized)
     replicate.register(set, replicate_sized)
     replicate.register(tuple, replicate_sized)
+
+    def replicate_dicts(object_: Dict[Hashable, Any],
+                        *,
+                        count: int) -> Iterable[Dict[Hashable, Any]]:
+        yield from map(dict, replicate_iterable(object_.items(),
+                                                count=count))
+
+    replicate.register(dict, replicate_dicts)
