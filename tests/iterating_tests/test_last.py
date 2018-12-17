@@ -1,16 +1,14 @@
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import (first,
-                          last,
-                          reverse)
-from lz.replication import duplicate
-from tests.utils import are_objects_similar
+from lz import right
+from lz.iterating import last
 
 
-def test_basic(non_empty_iterable: Iterable[Any]) -> None:
-    original, target = duplicate(non_empty_iterable)
+def test_basic(iterable: Iterable[Any],
+               object_: Any) -> None:
+    attach = right.attacher(object_)
 
-    result = last(target)
+    result = last(attach(iterable))
 
-    assert are_objects_similar(result, first(reverse(original)))
+    assert result is object_
