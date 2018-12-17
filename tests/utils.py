@@ -94,38 +94,49 @@ def are_mappings_similar(object_: Mapping[Hashable, Any],
                          *rest: Mapping[Hashable, Any]) -> bool:
     if not rest:
         return True
+    if not all(isinstance(candidate, abc.Mapping)
+               for candidate in rest):
+        return False
     rest = tuple(map(dict, map(methodcaller('items'), rest)))
     for key, value in object_.items():
-        rest_values = []
         for next_mapping in rest:
             try:
                 next_value = next_mapping[key]
             except KeyError:
                 if not isinstance(key, abc.Iterable):
                     raise
-                candidates_keys = [key
+                candidates_keys = (key
                                    for key in next_mapping.keys()
-                                   if isinstance(key, abc.Iterable)]
+                                   if isinstance(key, abc.Iterable))
                 for candidate_key in candidates_keys:
                     key, key_copy = duplicate(key)
-                    candidate_value = next_mapping.pop(candidate_key)
+                    value, value_copy = duplicate(value)
+                    (candidate_value,
+                     candidate_value_copy) = duplicate(next_mapping
+                                                       .pop(candidate_key))
                     (candidate_key,
                      candidate_key_copy) = duplicate(candidate_key)
-                    if are_iterables_similar(key_copy, candidate_key_copy):
-                        next_value = candidate_value
+                    if (are_objects_similar(key_copy,
+                                            candidate_key_copy)
+                            and are_objects_similar(value_copy,
+                                                    candidate_value_copy)):
                         break
                     else:
                         next_mapping[candidate_key] = candidate_value
                 else:
                     return False
-            rest_values.append(next_value)
-        if not are_objects_similar(value, *rest_values):
-            return False
+            else:
+                value, value_copy = duplicate(value)
+                if not are_objects_similar(value, next_value):
+                    return False
     return True
 
 
 @are_objects_similar.register(abc.Set)
 def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
+    if not all(isinstance(candidate, abc.Set)
+               for candidate in rest):
+        return False
     for next_set in rest:
         object_, object_copy = map(set, duplicate(object_))
         symmetric_difference = object_copy ^ next_set
@@ -141,7 +152,7 @@ def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
             for candidate in candidates:
                 target, target_copy = duplicate(target)
                 candidate, candidate_copy = duplicate(candidate)
-                if are_iterables_similar(target_copy, candidate_copy):
+                if are_objects_similar(target_copy, candidate_copy):
                     symmetric_difference.update(candidates)
                     break
                 else:
