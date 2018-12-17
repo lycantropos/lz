@@ -44,13 +44,12 @@ def test_step_left_total_capacity(iterable: Iterable[Any],
 def test_step_left_elementwise_capacity(iterable: Iterable[Any],
                                         object_: Any,
                                         slider_size: int) -> None:
-    original, target = duplicate(iterable)
     slide = slider(slider_size)
     attach = left.attacher(object_)
 
-    result = slide(attach(target))
+    result = slide(attach(iterable))
 
-    assert all(0 <= capacity(element) <= slider_size
+    assert all(0 <= capacity(element) <= max(slider_size, 1)
                for element in result)
 
 
@@ -80,13 +79,12 @@ def test_step_right_total_capacity(iterable: Iterable[Any],
 def test_step_right_elementwise_capacity(iterable: Iterable[Any],
                                          object_: Any,
                                          slider_size: int) -> None:
-    original, target = duplicate(iterable)
     slide = slider(slider_size)
     attach = right.attacher(object_)
 
-    result = slide(attach(target))
+    result = slide(attach(iterable))
 
-    assert all(0 <= capacity(element) <= slider_size
+    assert all(0 <= capacity(element) <= max(slider_size, 1)
                for element in result)
 
 
