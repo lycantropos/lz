@@ -1,6 +1,7 @@
 from typing import (Any,
                     BinaryIO,
                     Iterable,
+                    Set,
                     TextIO)
 
 from lz import (left,
@@ -76,5 +77,9 @@ def test_text_stream(encoding: str,
 
 def are_byte_substrings(byte_strings: Iterable[bytes],
                         target_string: bytes) -> bool:
-    return all(set(target_string) >= set(line)
+    def to_tolerance_level(unique_characters: Set[int]) -> float:
+        return 0.8 * max(len(unique_characters) - 1, 0)
+
+    return all(len(set(target_string) & set(line))
+               >= to_tolerance_level(set(target_string))
                for line in byte_strings)
