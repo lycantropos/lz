@@ -84,8 +84,8 @@ def patch_sized_replication() -> None:
     def replicate_sized(object_: Any,
                         *,
                         count: int) -> Iterable[Any]:
-        return map(type(object_), replicate_iterable(object_,
-                                                     count=count))
+        yield from map(type(object_), replicate_iterable(object_,
+                                                         count=count))
 
     replicate.register(frozenset, replicate_sized)
     replicate.register(list, replicate_sized)
