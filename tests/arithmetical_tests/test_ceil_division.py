@@ -9,4 +9,7 @@ def test_basic(real_number: Real,
 
     quotient = real_number // non_zero_real_number
 
-    assert quotient <= result <= quotient + 1
+    if isinstance(real_number, int) and isinstance(non_zero_real_number, int):
+        assert quotient <= result <= quotient + 1
+    else:
+        assert quotient <= result <= quotient + 2
