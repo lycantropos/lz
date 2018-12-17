@@ -29,5 +29,5 @@ def chopper_size() -> int:
 
 
 @pytest.fixture(scope='function')
-def slider_size(min_iterables_size: int) -> int:
-    return find(strategies.to_integers(0, min_iterables_size))
+def slider_size() -> int:
+    return find(strategies.non_negative_indices)
