@@ -10,6 +10,7 @@ from typing import (Any,
                     Hashable,
                     Iterable,
                     Mapping,
+                    Set,
                     Sized)
 
 from hypothesis import (Phase,
@@ -20,6 +21,7 @@ from hypothesis.errors import (NoSuchExample,
 from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import Domain
+from lz.replication import duplicate
 
 
 def find(strategy: SearchStrategy[Domain]) -> Domain:
@@ -93,6 +95,33 @@ def are_mappings_similar(object_: Mapping[Hashable, Any],
     for key, value in object_.items():
         if not are_objects_similar(value, *map(itemgetter(key), rest)):
             return False
+    return True
+
+
+@are_objects_similar.register(abc.Set)
+def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
+    for next_set in rest:
+        object_, object_copy = map(set, duplicate(object_))
+        symmetric_difference = object_copy ^ next_set
+        if not symmetric_difference:
+            return True
+        if not all(isinstance(element, abc.Iterable)
+                   for element in symmetric_difference):
+            return False
+        while symmetric_difference:
+            target = symmetric_difference.pop()
+            candidates = iter(symmetric_difference)
+            symmetric_difference = set()
+            for candidate in candidates:
+                target, target_copy = duplicate(target)
+                candidate, candidate_copy = duplicate(candidate)
+                if are_iterables_similar(target_copy, candidate_copy):
+                    symmetric_difference.update(candidates)
+                    break
+                else:
+                    symmetric_difference.add(candidate)
+            else:
+                return False
     return True
 
 
