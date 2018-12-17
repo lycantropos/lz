@@ -7,6 +7,7 @@ from lz.hints import (Domain,
 from lz.iterating import grabber
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
+                         are_objects_similar,
                          capacity)
 
 
@@ -20,7 +21,7 @@ def test_basic(iterable: Iterable[Domain]) -> None:
     for result_element, original_element in zip(result_iterator, original):
         if not original_element:
             break
-        assert result_element is original_element
+        assert are_objects_similar(result_element, original_element)
 
     with pytest.raises(StopIteration):
         next(result_iterator)
