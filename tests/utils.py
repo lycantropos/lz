@@ -5,8 +5,11 @@ from collections import (abc,
 from functools import singledispatch
 from itertools import (starmap,
                        zip_longest)
+from operator import itemgetter
 from typing import (Any,
+                    Hashable,
                     Iterable,
+                    Mapping,
                     Sized)
 
 from hypothesis import (Phase,
@@ -73,15 +76,23 @@ def are_objects_similar(object_: Any, *rest: Any) -> bool:
 
 
 @are_objects_similar.register(object)
-@are_objects_similar.register(abc.Mapping)
-@are_objects_similar.register(abc.Sequence)
-@are_objects_similar.register(abc.Set)
+@are_objects_similar.register(bytes)
+@are_objects_similar.register(str)
 def are_objects_equal(object_: Any, *rest: Any) -> bool:
     previous_object = object_
     for next_object in rest:
         if next_object != previous_object:
             return False
         previous_object = next_object
+    return True
+
+
+@are_objects_similar.register(abc.Mapping)
+def are_mappings_similar(object_: Mapping[Hashable, Any],
+                         *rest: Mapping[Hashable, Any]) -> bool:
+    for key, value in object_.items():
+        if not are_objects_similar(value, *map(itemgetter(key), rest)):
+            return False
     return True
 
 
