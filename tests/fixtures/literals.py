@@ -10,6 +10,7 @@ import pytest
 from hypothesis.searchstrategy import SearchStrategy
 
 from tests import strategies
+from tests.configs import MAX_ITERABLES_SIZE
 from tests.utils import find
 
 
@@ -43,7 +44,7 @@ def keyword_arguments() -> Dict[str, Any]:
 
 @pytest.fixture(scope='function')
 def min_iterables_size() -> int:
-    return find(strategies.to_integers(0, 10))
+    return find(strategies.iterables_sizes)
 
 
 @pytest.fixture(scope='function')

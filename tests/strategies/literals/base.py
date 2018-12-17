@@ -22,6 +22,7 @@ from .factories import (to_byte_sequences,
                         to_homogeneous_lists,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
+                        to_integers,
                         to_strings)
 
 Serializable = Union[None, bool, float, int, str]
@@ -124,3 +125,5 @@ keywords_arguments = to_dictionaries(strings, objects)
 sortable_domains = [byte_sequences, real_numbers, sets, strings]
 sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
                                             sortable_domains))
+
+iterables_sizes = to_integers(0, MAX_ITERABLES_SIZE)
