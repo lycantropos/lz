@@ -31,4 +31,4 @@ def test_step(projector: Callable[[Domain, Range], Range],
     next_result = fold(attach(second_target))
 
     assert are_objects_similar(next_result,
-                               projector(result, projector_domain_element))
+                               projector(projector_domain_element, result))
