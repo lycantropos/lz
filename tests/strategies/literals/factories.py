@@ -125,8 +125,7 @@ def to_byte_strings(encoding: str,
     min_characters_count = (min_size + length - 1) // length
     max_characters_count = max_size
     if max_characters_count is not None:
-        max_characters_count //= length
-
+        max_characters_count = (max_characters_count + length - 1) // length
     return (strategies.lists(to_characters_bytes(encoding),
                              min_size=min_characters_count,
                              max_size=max_characters_count)
