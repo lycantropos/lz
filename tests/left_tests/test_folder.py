@@ -6,6 +6,7 @@ from lz import (left,
 from lz.hints import (Domain,
                       Range)
 from lz.replication import duplicate
+from tests.utils import are_objects_similar
 
 
 def test_base_case(projector: Callable[[Range, Domain], Range],
@@ -29,4 +30,5 @@ def test_step(projector: Callable[[Range, Domain], Range],
     result = fold(first_target)
     next_result = fold(attach(second_target))
 
-    assert next_result == projector(result, projector_domain_element)
+    assert are_objects_similar(next_result,
+                               projector(result, projector_domain_element))
