@@ -1,5 +1,6 @@
 from functools import partial
 from numbers import Real
+from operator import gt
 from typing import (Any,
                     Dict,
                     Hashable,
@@ -10,7 +11,7 @@ import pytest
 from hypothesis.searchstrategy import SearchStrategy
 
 from tests import strategies
-from tests.configs import MAX_ITERABLES_SIZE
+from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import find
 
 
@@ -44,7 +45,8 @@ def keyword_arguments() -> Dict[str, Any]:
 
 @pytest.fixture(scope='function')
 def min_iterables_size() -> int:
-    return find(strategies.iterables_sizes)
+    return find(strategies.iterables_sizes
+                .filter(partial(gt, MAX_MIN_ITERABLES_SIZE)))
 
 
 @pytest.fixture(scope='function')
