@@ -5,7 +5,7 @@ from collections import (abc,
 from functools import singledispatch
 from itertools import (starmap,
                        zip_longest)
-from operator import itemgetter
+from operator import methodcaller
 from typing import (Any,
                     Hashable,
                     Iterable,
@@ -92,8 +92,34 @@ def are_objects_equal(object_: Any, *rest: Any) -> bool:
 @are_objects_similar.register(abc.Mapping)
 def are_mappings_similar(object_: Mapping[Hashable, Any],
                          *rest: Mapping[Hashable, Any]) -> bool:
+    if not rest:
+        return True
+    rest = tuple(map(dict, map(methodcaller('items'), rest)))
     for key, value in object_.items():
-        if not are_objects_similar(value, *map(itemgetter(key), rest)):
+        rest_values = []
+        for next_mapping in rest:
+            try:
+                next_value = next_mapping[key]
+            except KeyError:
+                if not isinstance(key, abc.Iterable):
+                    raise
+                candidates_keys = [key
+                                   for key in next_mapping.keys()
+                                   if isinstance(key, abc.Iterable)]
+                for candidate_key in candidates_keys:
+                    key, key_copy = duplicate(key)
+                    candidate_value = next_mapping.pop(candidate_key)
+                    (candidate_key,
+                     candidate_key_copy) = duplicate(candidate_key)
+                    if are_iterables_similar(key_copy, candidate_key_copy):
+                        next_value = candidate_value
+                        break
+                    else:
+                        next_mapping[candidate_key] = candidate_value
+                else:
+                    return False
+            rest_values.append(next_value)
+        if not are_objects_similar(value, *rest_values):
             return False
     return True
 
@@ -128,6 +154,9 @@ def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
 @are_objects_similar.register(abc.Iterable)
 def are_iterables_similar(object_: Iterable[Any],
                           *rest: Iterable[Any]) -> bool:
+    if any(not isinstance(candidate, abc.Iterable)
+           for candidate in rest):
+        return False
     return all(starmap(are_objects_similar,
                        zip_longest(object_, *rest,
                                    # we're assuming that ``object()``
