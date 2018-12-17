@@ -7,6 +7,7 @@ from lz.hints import (Domain,
 from lz.iterating import kicker
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
+                         are_objects_similar,
                          capacity)
 
 
@@ -16,14 +17,16 @@ def test_basic(iterable: Iterable[Domain]) -> None:
 
     result = kick(target)
     result_iterator = iter(result)
+    original_iterator = iter(original)
 
-    for original_element in original:
+    for original_element in original_iterator:
         if not original_element:
-            assert original_element is next(result_iterator)
+            assert are_objects_similar(original_element, next(result_iterator))
             break
 
-    for result_element, original_element in zip(result_iterator, original):
-        assert result_element is original_element
+    for result_element, original_element in zip(result_iterator,
+                                                original_iterator):
+        assert are_objects_similar(result_element, original_element)
 
     with pytest.raises(StopIteration):
         next(result_iterator)
