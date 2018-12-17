@@ -5,7 +5,8 @@ from lz import left
 from lz.iterating import (first,
                           interleave)
 from lz.replication import duplicate
-from tests.utils import are_iterables_similar
+from tests.utils import (are_iterables_similar,
+                         are_objects_similar)
 
 
 def test_basic(empty_iterable: Iterable[Any],
@@ -23,4 +24,4 @@ def test_step(non_empty_iterable: Iterable[Any],
 
     result = interleave(left.attacher(target)(nested_iterable))
 
-    assert first(result) == first(original)
+    assert are_objects_similar(first(result), first(original))
