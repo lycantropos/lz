@@ -19,6 +19,7 @@ from .factories import (to_byte_sequences,
                         to_dictionaries,
                         to_homogeneous_frozensets,
                         to_homogeneous_iterables,
+                        to_homogeneous_iterators,
                         to_homogeneous_lists,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
@@ -80,11 +81,13 @@ built_in_classes = strategies.sampled_from(module_to_classes(builtins))
 classes = abstract_base_classes | built_in_classes
 
 deferred_hashables = strategies.deferred(lambda: hashables)
+deferred_objects = strategies.deferred(lambda: objects)
 hashables = (scalars
              | byte_strings
              | strings
              | classes
              | to_homogeneous_frozensets(deferred_hashables)
+             | to_homogeneous_iterators(deferred_objects)
              | to_homogeneous_tuples(deferred_hashables))
 indices = strategies.integers(-MAX_ITERABLES_SIZE, MAX_ITERABLES_SIZE - 1)
 slices_fields = strategies.none() | indices
@@ -92,7 +95,6 @@ slices = strategies.builds(slice,
                            slices_fields,
                            slices_fields,
                            slices_fields)
-deferred_objects = strategies.deferred(lambda: objects)
 byte_sequences = encodings.flatmap(to_byte_sequences)
 any_strings = strings | byte_sequences
 iterables = (any_strings
