@@ -7,6 +7,7 @@ from lz.hints import (Domain,
 from lz.iterating import (first,
                           last)
 from lz.replication import duplicate
+from tests.utils import are_objects_similar
 
 
 def test_first(projector: Callable[[Range, Domain], Range],
@@ -29,4 +30,4 @@ def test_last(projector: Callable[[Range, Domain], Range],
     result = accumulate(first_target)
     fold_result = fold(second_target)
 
-    assert last(result) == fold_result
+    assert are_objects_similar(last(result), fold_result)
