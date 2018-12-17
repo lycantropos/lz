@@ -18,12 +18,12 @@ def test_base_case(object_: Any,
 
 def test_step(object_: Any,
               iterable: Iterable[Any],
-              positive_replicator_size: int) -> None:
-    replicate = replicator(positive_replicator_size)
+              replicator_size: int) -> None:
+    replicate = replicator(replicator_size + 1)
     for target in (object_, iterable):
         result = replicate(target)
         result_iterator = iter(result)
 
-        assert are_iterables_similar(replicator(positive_replicator_size - 1)
+        assert are_iterables_similar(replicator(replicator_size)
                                      (first(result_iterator)),
                                      result_iterator)
