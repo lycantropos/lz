@@ -24,11 +24,12 @@ def test_step(projector: Callable[[Range, Domain], Range],
               projector_iterable: Iterable[Domain],
               projector_domain_element: Domain) -> None:
     first_target, second_target = duplicate(projector_iterable)
+    original, target = duplicate(projector_domain_element)
     fold = left.folder(projector, projector_initial)
-    attach = right.attacher(projector_domain_element)
+    attach = right.attacher(target)
 
     result = fold(first_target)
     next_result = fold(attach(second_target))
 
     assert are_objects_similar(next_result,
-                               projector(result, projector_domain_element))
+                               projector(result, original))
