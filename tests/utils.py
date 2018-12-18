@@ -140,8 +140,6 @@ def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
     for next_set in rest:
         object_, object_copy = map(set, duplicate(object_))
         symmetric_difference = object_copy ^ next_set
-        if not symmetric_difference:
-            return True
         if not all(isinstance(element, abc.Iterable)
                    for element in symmetric_difference):
             return False
