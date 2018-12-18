@@ -71,6 +71,31 @@ def iterable_ends_with(iterable: Iterable[Any],
     return are_iterables_similar(end_elements, suffix)
 
 
+def iterables_has_same_elements(left_iterable: Iterable[Any],
+                                right_iterable: Iterable[Any]) -> bool:
+    (left_iterable_first_copy,
+     left_iterable_second_copy) = duplicate(left_iterable)
+    (right_iterable_first_copy,
+     right_iterable_second_copy) = duplicate(right_iterable)
+    return (is_iterable_subset_of(left_iterable_first_copy,
+                                  right_iterable_first_copy)
+            and is_iterable_subset_of(right_iterable_second_copy,
+                                      left_iterable_second_copy))
+
+
+def is_iterable_subset_of(iterable: Iterable[Any],
+                          target: Iterable[Any]) -> bool:
+    for element in iterable:
+        target, target_copy = duplicate(target)
+        for target_element in target_copy:
+            element, element_copy = duplicate(element)
+            if are_objects_similar(element_copy, target_element):
+                break
+        else:
+            return False
+    return True
+
+
 @singledispatch
 def are_objects_similar(object_: Any, *rest: Any) -> bool:
     raise TypeError('Unsupported object type: {type}.'

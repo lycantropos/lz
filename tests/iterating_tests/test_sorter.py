@@ -5,7 +5,8 @@ from lz.iterating import (slider,
                           sorter)
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
-                         capacity)
+                         capacity,
+                         iterables_has_same_elements)
 
 
 def test_order(sortable_iterable: Iterable[Domain]) -> None:
@@ -45,10 +46,8 @@ def test_elements(sortable_iterable: Iterable[Domain]) -> None:
     sort = sorter()
 
     result = sort(target)
-    original_list = list(original)
 
-    assert all(element in original_list
-               for element in result)
+    assert iterables_has_same_elements(result, original)
 
 
 def test_idempotency(sortable_iterable: Iterable[Domain]) -> None:
