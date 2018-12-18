@@ -22,7 +22,6 @@ from .functional import (false_predicates,
                          transparent_functions,
                          true_predicates)
 from .iterating import (groupers_keys,
-                        non_negative_indices,
                         non_negative_slices)
 from .literals import empty
 from .literals.base import (any_strings,
