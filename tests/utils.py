@@ -130,9 +130,9 @@ def are_mappings_similar(object_: Mapping[Hashable, Any],
             except KeyError:
                 if not isinstance(key, abc.Iterable):
                     raise
-                candidates_keys = (key
+                candidates_keys = [key
                                    for key in next_mapping.keys()
-                                   if isinstance(key, abc.Iterable))
+                                   if isinstance(key, abc.Iterable)]
                 for candidate_key in candidates_keys:
                     key, key_copy = duplicate(key)
                     value, value_copy = duplicate(value)
@@ -141,13 +141,12 @@ def are_mappings_similar(object_: Mapping[Hashable, Any],
                                                        .pop(candidate_key))
                     (candidate_key,
                      candidate_key_copy) = duplicate(candidate_key)
+                    next_mapping[candidate_key] = candidate_value
                     if (are_objects_similar(key_copy,
                                             candidate_key_copy)
                             and are_objects_similar(value_copy,
                                                     candidate_value_copy)):
                         break
-                    else:
-                        next_mapping[candidate_key] = candidate_value
                 else:
                     return False
             else:
