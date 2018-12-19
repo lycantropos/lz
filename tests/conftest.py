@@ -2,16 +2,23 @@ import os
 import pkgutil
 import sys
 from functools import partial
-from typing import Iterator
+from typing import (Any,
+                    Dict,
+                    Hashable,
+                    Iterable)
 
+import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.python import Metafunc
+
+from lz.replication import (replicate,
+                            replicate_iterable)
 
 base_directory_path = os.path.dirname(__file__)
 sys.path.append(base_directory_path)
 
 
-def explore_pytest_plugins(package_path: str) -> Iterator[str]:
+def explore_pytest_plugins(package_path: str) -> Iterable[str]:
     directories = find_directories(package_path)
     packages_paths = [
         file_finder.path
@@ -31,7 +38,7 @@ def explore_pytest_plugins(package_path: str) -> Iterator[str]:
                                           module=module_name)
 
 
-def find_directories(root: str) -> Iterator[str]:
+def find_directories(root: str) -> Iterable[str]:
     if not os.path.isdir(root):
         return
     yield root
@@ -71,3 +78,27 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
     # @pytest.mark.parametrize('tmp_ct', range(count))
     # def test_foo(): pass
     metafunc.parametrize('tmp_ct', range(count))
+
+
+@pytest.fixture(scope='session',
+                autouse=True)
+def patch_sized_replication() -> None:
+    def replicate_sized(object_: Any,
+                        *,
+                        count: int) -> Iterable[Any]:
+        yield from map(type(object_), replicate_iterable(object_,
+                                                         count=count))
+
+    replicate.register(bytearray, replicate_sized)
+    replicate.register(frozenset, replicate_sized)
+    replicate.register(list, replicate_sized)
+    replicate.register(set, replicate_sized)
+    replicate.register(tuple, replicate_sized)
+
+    def replicate_dictionary(object_: Dict[Hashable, Any],
+                             *,
+                             count: int) -> Iterable[Dict[Hashable, Any]]:
+        yield from map(dict, replicate_iterable(object_.items(),
+                                                count=count))
+
+    replicate.register(dict, replicate_dictionary)

@@ -1,9 +1,9 @@
-from itertools import tee
 from typing import (Any,
                     Iterable)
 
 from lz.iterating import (chopper,
                           flatten)
+from lz.replication import duplicate
 from tests.utils import are_iterables_similar
 
 
@@ -19,7 +19,7 @@ def test_size(iterable: Iterable[Any],
 
 def test_elements(iterable: Iterable[Any],
                   chopper_size: int) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
     chop = chopper(chopper_size)
 
     result = chop(target)

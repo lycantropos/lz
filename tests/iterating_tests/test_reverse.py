@@ -1,7 +1,7 @@
-from itertools import tee
 from typing import (Any,
                     BinaryIO,
                     Iterable,
+                    Set,
                     TextIO)
 
 from lz import (left,
@@ -9,6 +9,7 @@ from lz import (left,
 from lz.iterating import (first,
                           last,
                           reverse)
+from lz.replication import duplicate
 from lz.textual import encoder
 from tests.utils import (are_iterables_similar,
                          is_empty)
@@ -39,7 +40,7 @@ def test_step_left(iterable: Iterable[Any],
 
 
 def test_involution(iterable: Iterable[Any]) -> None:
-    original, target = tee(iterable)
+    original, target = duplicate(iterable)
 
     result = reverse(reverse(target))
 
@@ -76,5 +77,9 @@ def test_text_stream(encoding: str,
 
 def are_byte_substrings(byte_strings: Iterable[bytes],
                         target_string: bytes) -> bool:
-    return all(set(target_string) >= set(line)
+    def to_tolerance_level(unique_characters: Set[int]) -> float:
+        return 0.8 * max(len(unique_characters) - 1, 0)
+
+    return all(len(set(target_string) & set(line))
+               >= to_tolerance_level(set(target_string))
                for line in byte_strings)

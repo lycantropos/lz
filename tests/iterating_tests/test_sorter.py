@@ -1,11 +1,12 @@
-from itertools import tee
 from typing import Iterable
 
 from lz.hints import Domain
 from lz.iterating import (slider,
                           sorter)
+from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
-                         capacity)
+                         capacity,
+                         iterables_has_same_elements)
 
 
 def test_order(sortable_iterable: Iterable[Domain]) -> None:
@@ -32,7 +33,7 @@ def objects_are_partially_ordered(left_object: Domain,
 
 
 def test_capacity(sortable_iterable: Iterable[Domain]) -> None:
-    original, target = tee(sortable_iterable)
+    original, target = duplicate(sortable_iterable)
     sort = sorter()
 
     result = sort(target)
@@ -41,18 +42,16 @@ def test_capacity(sortable_iterable: Iterable[Domain]) -> None:
 
 
 def test_elements(sortable_iterable: Iterable[Domain]) -> None:
-    original, target = tee(sortable_iterable)
+    original, target = duplicate(sortable_iterable)
     sort = sorter()
 
     result = sort(target)
-    original_list = list(original)
 
-    assert all(element in original_list
-               for element in result)
+    assert iterables_has_same_elements(result, original)
 
 
 def test_idempotency(sortable_iterable: Iterable[Domain]) -> None:
-    first_target, second_target = tee(sortable_iterable)
+    first_target, second_target = duplicate(sortable_iterable)
     sort = sorter()
 
     sorted_result = sort(first_target)

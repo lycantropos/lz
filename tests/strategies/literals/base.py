@@ -1,5 +1,6 @@
 import builtins
 import inspect
+import platform
 import string
 import sys
 from collections import abc
@@ -18,9 +19,11 @@ from .factories import (to_byte_sequences,
                         to_dictionaries,
                         to_homogeneous_frozensets,
                         to_homogeneous_iterables,
+                        to_homogeneous_iterators,
                         to_homogeneous_lists,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
+                        to_integers,
                         to_strings)
 
 Serializable = Union[None, bool, float, int, str]
@@ -61,7 +64,7 @@ encodings = ['ascii', 'big5', 'big5hkscs', 'cp037', 'cp1006',
              'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213',
              'utf_16', 'utf_16_be', 'utf_16_le', 'utf_32',
              'utf_32_be', 'utf_32_le', 'utf_8', 'utf_8_sig']
-if sys.platform == 'win32':
+if sys.platform == 'win32' and platform.python_implementation() != 'PyPy':
     encodings.append('cp65001')
 encodings = strategies.sampled_from(encodings)
 byte_strings = encodings.flatmap(to_byte_strings)
@@ -78,11 +81,13 @@ built_in_classes = strategies.sampled_from(module_to_classes(builtins))
 classes = abstract_base_classes | built_in_classes
 
 deferred_hashables = strategies.deferred(lambda: hashables)
+deferred_objects = strategies.deferred(lambda: objects)
 hashables = (scalars
              | byte_strings
              | strings
              | classes
              | to_homogeneous_frozensets(deferred_hashables)
+             | to_homogeneous_iterators(deferred_objects)
              | to_homogeneous_tuples(deferred_hashables))
 indices = strategies.integers(-MAX_ITERABLES_SIZE, MAX_ITERABLES_SIZE - 1)
 slices_fields = strategies.none() | indices
@@ -90,7 +95,6 @@ slices = strategies.builds(slice,
                            slices_fields,
                            slices_fields,
                            slices_fields)
-deferred_objects = strategies.deferred(lambda: objects)
 byte_sequences = encodings.flatmap(to_byte_sequences)
 any_strings = strings | byte_sequences
 iterables = (any_strings
@@ -123,3 +127,5 @@ keywords_arguments = to_dictionaries(strings, objects)
 sortable_domains = [byte_sequences, real_numbers, sets, strings]
 sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
                                             sortable_domains))
+
+iterables_sizes = to_integers(0, MAX_ITERABLES_SIZE)

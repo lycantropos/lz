@@ -1,4 +1,3 @@
-from itertools import tee
 from typing import (Callable,
                     Iterable)
 
@@ -6,6 +5,8 @@ from lz import (left,
                 right)
 from lz.hints import (Domain,
                       Range)
+from lz.replication import duplicate
+from tests.utils import are_objects_similar
 
 
 def test_base_case(projector: Callable[[Domain, Range], Range],
@@ -22,11 +23,13 @@ def test_step(projector: Callable[[Domain, Range], Range],
               projector_initial: Range,
               projector_iterable: Iterable[Domain],
               projector_domain_element: Domain) -> None:
-    first_target, second_target = tee(projector_iterable)
+    first_target, second_target = duplicate(projector_iterable)
+    original, target = duplicate(projector_domain_element)
     fold = right.folder(projector, projector_initial)
-    attach = left.attacher(projector_domain_element)
+    attach = left.attacher(target)
 
     result = fold(first_target)
     next_result = fold(attach(second_target))
 
-    assert next_result == projector(projector_domain_element, result)
+    assert are_objects_similar(next_result,
+                               projector(original, result))

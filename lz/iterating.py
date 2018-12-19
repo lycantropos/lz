@@ -6,7 +6,8 @@ import sys
 from collections import (abc,
                          defaultdict,
                          deque)
-from operator import (methodcaller,
+from operator import (is_not,
+                      methodcaller,
                       sub)
 from typing import (Any,
                     AnyStr,
@@ -24,8 +25,7 @@ from typing import (Any,
                     overload)
 
 from .arithmetical import ceil_division
-from .functional import (cleave,
-                         combine,
+from .functional import (combine,
                          compose)
 from .hints import (Domain,
                     Map,
@@ -33,6 +33,7 @@ from .hints import (Domain,
                     Predicate,
                     Range,
                     Sortable)
+from .replication import duplicate
 from .textual import (decoder,
                       read_batch_from_end,
                       split)
@@ -75,7 +76,7 @@ def separator(predicate: Predicate = None
     """
     return compose(tuple,
                    combine([scavenger(predicate), sifter(predicate)]),
-                   copier(2))
+                   duplicate)
 
 
 def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
@@ -121,14 +122,23 @@ def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
     return cut
 
 
-def chopper(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
+def chopper(size: int) -> Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
     """
     Returns function that splits iterable into chunks of given size.
     """
-    cut = compose(tuple, cutter(slice(size)))
-    return compose(grabber(),
-                   cleave(itertools.repeat(cut)),
-                   iter)
+
+    @functools.singledispatch
+    def chop(iterable: Iterable[Domain]) -> Iterable[Sequence[Domain]]:
+        iterator = iter(iterable)
+        yield from iter(lambda: tuple(itertools.islice(iterator, size)), ())
+
+    @chop.register(abc.Sequence)
+    def chop_sequence(iterable: Sequence[Domain]
+                      ) -> Iterable[Sequence[Domain]]:
+        for start in range(0, len(iterable), size):
+            yield iterable[start:start + size]
+
+    return chop
 
 
 def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
@@ -138,13 +148,13 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
 
     def slide(iterable: Iterable[Domain]) -> Iterable[Tuple[Domain, ...]]:
         iterator = iter(iterable)
-        result = tuple(itertools.islice(iterator, size))
+        initial = tuple(itertools.islice(iterator, size))
 
         def shift(previous: Tuple[Domain, ...],
                   element: Domain) -> Tuple[Domain, ...]:
             return previous[1:] + (element,)
 
-        yield from itertools.accumulate(itertools.chain([result], iterator),
+        yield from itertools.accumulate(itertools.chain([initial], iterator),
                                         shift)
 
     return slide
@@ -320,6 +330,20 @@ def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     yield from itertools.chain.from_iterable(iterable)
 
 
+def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
+    iterators = itertools.cycle(map(iter, iterable))
+    while True:
+        try:
+            for iterator in iterators:
+                yield next(iterator)
+        except StopIteration:
+            is_not_exhausted = functools.partial(is_not, iterator)
+            iterators = itertools.cycle(itertools.takewhile(is_not_exhausted,
+                                                            iterators))
+        else:
+            return
+
+
 def flatmapper(map_: Map[Domain, Iterable[Range]]
                ) -> Map[Iterable[Domain], Iterable[Range]]:
     """
@@ -329,22 +353,12 @@ def flatmapper(map_: Map[Domain, Iterable[Range]]
     return compose(flatten, mapper(map_))
 
 
-def copier(count: int) -> Map[Iterable[Domain], Iterable[Iterable[Domain]]]:
+def header(size: int) -> Operator[Iterable[Domain]]:
     """
-    Returns function that creates independent copies of iterable.
+    Returns function that selects elements from the beginning of iterable.
+    Resulted iterable will have size not greater than given one.
     """
-    min_count = 0
-    if count < min_count:
-        raise ValueError('Count should be '
-                         'not less than {min_count}, '
-                         'but found {actual_count}.'
-                         .format(min_count=min_count,
-                                 actual_count=count))
-
-    def copy(iterable: Iterable[Domain]) -> Iterable[Iterable[Domain]]:
-        yield from itertools.tee(iterable, count)
-
-    return copy
+    return cutter(slice(size))
 
 
 first = compose(next, iter)
@@ -361,5 +375,5 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
                                      maxlen=size))
 
 
-last = compose(first, trailer(1))
+last = compose(next, trailer(1))
 last.__doc__ = 'Returns last element of iterable.'

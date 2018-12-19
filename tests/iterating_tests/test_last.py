@@ -1,15 +1,14 @@
-from itertools import tee
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import (first,
-                          last,
-                          reverse)
+from lz import right
+from lz.iterating import last
 
 
-def test_basic(non_empty_iterable: Iterable[Any]) -> None:
-    original, target = tee(non_empty_iterable)
+def test_basic(iterable: Iterable[Any],
+               object_: Any) -> None:
+    attach = right.attacher(object_)
 
-    result = last(target)
+    result = last(attach(iterable))
 
-    assert result is first(reverse(original))
+    assert result is object_

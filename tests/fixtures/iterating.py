@@ -14,8 +14,8 @@ def grouper_key() -> Map[Any, Hashable]:
 
 
 @pytest.fixture(scope='function')
-def copier_size() -> int:
-    return find(strategies.to_integers(1, 100))
+def replicator_size() -> int:
+    return find(strategies.to_integers(0, 100))
 
 
 @pytest.fixture(scope='function')
@@ -25,9 +25,14 @@ def cutter_slice() -> slice:
 
 @pytest.fixture(scope='function')
 def chopper_size() -> int:
-    return find(strategies.non_negative_indices)
+    return find(strategies.to_integers(1))
 
 
 @pytest.fixture(scope='function')
-def slider_size(min_iterables_size: int) -> int:
-    return find(strategies.to_integers(0, min_iterables_size))
+def slider_size() -> int:
+    return find(strategies.to_integers(0))
+
+
+@pytest.fixture(scope='function')
+def positive_slider_size() -> int:
+    return find(strategies.to_integers(1))
