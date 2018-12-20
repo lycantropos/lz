@@ -24,10 +24,5 @@ def cutter_slice() -> slice:
 
 
 @pytest.fixture(scope='function')
-def chopper_size() -> int:
-    return find(strategies.non_negative_indices)
-
-
-@pytest.fixture(scope='function')
-def slider_size() -> int:
+def size() -> int:
     return find(strategies.non_negative_indices)

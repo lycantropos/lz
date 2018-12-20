@@ -51,16 +51,6 @@ def min_iterables_size() -> int:
 
 
 @pytest.fixture(scope='function')
-def natural_number() -> int:
-    return find(strategies.to_integers(0))
-
-
-@pytest.fixture(scope='function')
-def non_positive_natural_number() -> int:
-    return find(strategies.to_integers(max_value=0))
-
-
-@pytest.fixture(scope='function')
 def empty_iterable() -> Iterable[Any]:
     return find(strategies.empty.iterables)
 
@@ -69,6 +59,32 @@ def empty_iterable() -> Iterable[Any]:
 def iterable(iterables_strategy: SearchStrategy[Iterable[Any]]
              ) -> Iterable[Any]:
     return find(iterables_strategy)
+
+
+@pytest.fixture(scope='function')
+def hashables_iterable(min_iterables_size: int) -> Iterable[Hashable]:
+    return find(strategies.to_homogeneous_iterables(
+            strategies.hashables,
+            min_size=min_iterables_size))
+
+
+@pytest.fixture(scope='function')
+def sortable_iterable() -> Iterable[Any]:
+    return find(strategies.sortable_iterables)
+
+
+@pytest.fixture(scope='function')
+def non_empty_iterable() -> Iterable[Any]:
+    limit_min_size = partial(partial,
+                             min_size=1)
+    return find(
+            strategies.encodings.flatmap(limit_min_size(strategies
+                                                        .to_byte_iterables))
+            | limit_min_size(strategies
+                             .to_homogeneous_iterables)(strategies.objects)
+            | limit_min_size(strategies.to_strings)(strategies.to_characters())
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_text_streams)))
 
 
 @pytest.fixture(scope='function')
@@ -115,29 +131,3 @@ def zip_elements_strategy(min_iterables_size: int
                           ) -> SearchStrategy[Tuple[Any, ...]]:
     return strategies.to_tuples(*repeat(strategies.objects,
                                         min_iterables_size))
-
-
-@pytest.fixture(scope='function')
-def non_empty_iterable() -> Iterable[Any]:
-    limit_min_size = partial(partial,
-                             min_size=1)
-    return find(
-            strategies.encodings.flatmap(limit_min_size(strategies
-                                                        .to_byte_iterables))
-            | limit_min_size(strategies
-                             .to_homogeneous_iterables)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies.to_characters())
-            | strategies.encodings.flatmap(limit_min_size(strategies
-                                                          .to_text_streams)))
-
-
-@pytest.fixture(scope='function')
-def hashables_iterable(min_iterables_size: int) -> Iterable[Hashable]:
-    return find(strategies.to_homogeneous_iterables(
-            strategies.hashables,
-            min_size=min_iterables_size))
-
-
-@pytest.fixture(scope='function')
-def sortable_iterable() -> Iterable[Any]:
-    return find(strategies.sortable_iterables)

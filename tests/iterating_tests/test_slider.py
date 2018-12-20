@@ -36,39 +36,39 @@ def test_base_case_by_size_elements(iterable: Iterable[Any]) -> None:
 
 
 def test_step_by_size_total_capacity(iterable: Iterable[Any],
-                                     slider_size: int) -> None:
+                                     size: int) -> None:
     original, target = duplicate(iterable)
-    slide = slider(slider_size + 1)
+    slide = slider(size + 1)
 
     result = slide(target)
 
-    assert 0 <= capacity(result) - capacity(slider(slider_size)(original)) <= 1
+    assert 0 <= capacity(result) - capacity(slider(size)(original)) <= 1
 
 
 def test_step_by_size_elementwise_capacity(iterable: Iterable[Any],
-                                           slider_size: int) -> None:
-    slide = slider(slider_size + 1)
+                                           size: int) -> None:
+    slide = slider(size + 1)
 
     result = slide(iterable)
 
-    assert all(0 <= capacity(element) <= slider_size + 1
+    assert all(0 <= capacity(element) <= size + 1
                for element in result)
 
 
 def test_step_by_size_elements(iterable: Iterable[Any],
-                               slider_size: int) -> None:
+                               size: int) -> None:
     original, target = duplicate(iterable)
-    slide = slider(slider_size + 1)
+    slide = slider(size + 1)
 
     result = slide(target)
 
     assert are_iterables_similar(first(result),
-                                 islice(original, slider_size + 1))
+                                 islice(original, size + 1))
 
 
 def test_base_case_by_iterable_capacity(empty_iterable: Iterable[Any],
-                                        slider_size: int) -> None:
-    slide = slider(slider_size + 1)
+                                        size: int) -> None:
+    slide = slider(size + 1)
 
     result = slide(empty_iterable)
 
@@ -76,8 +76,8 @@ def test_base_case_by_iterable_capacity(empty_iterable: Iterable[Any],
 
 
 def test_base_case_by_iterable_elements(empty_iterable: Iterable[Any],
-                                        slider_size: int) -> None:
-    slide = slider(slider_size + 1)
+                                        size: int) -> None:
+    slide = slider(size + 1)
 
     result = slide(empty_iterable)
 
@@ -86,9 +86,9 @@ def test_base_case_by_iterable_elements(empty_iterable: Iterable[Any],
 
 def test_step_left_by_iterable_total_capacity(iterable: Iterable[Any],
                                               object_: Any,
-                                              slider_size: int) -> None:
+                                              size: int) -> None:
     original, target = duplicate(iterable)
-    slide = slider(slider_size + 1)
+    slide = slider(size + 1)
     attach = left.attacher(object_)
 
     result = slide(attach(target))
@@ -98,20 +98,20 @@ def test_step_left_by_iterable_total_capacity(iterable: Iterable[Any],
 
 def test_step_left_by_iterable_elementwise_capacity(iterable: Iterable[Any],
                                                     object_: Any,
-                                                    slider_size: int) -> None:
-    slide = slider(slider_size + 1)
+                                                    size: int) -> None:
+    slide = slider(size + 1)
     attach = left.attacher(object_)
 
     result = slide(attach(iterable))
 
-    assert all(0 <= capacity(element) <= slider_size + 1
+    assert all(0 <= capacity(element) <= size + 1
                for element in result)
 
 
 def test_step_left_by_iterable_elements(iterable: Iterable[Any],
                                         object_: Any,
-                                        slider_size: int) -> None:
-    slide = slider(slider_size + 1)
+                                        size: int) -> None:
+    slide = slider(size + 1)
     attach = left.attacher(object_)
 
     result = slide(attach(iterable))
@@ -121,9 +121,9 @@ def test_step_left_by_iterable_elements(iterable: Iterable[Any],
 
 def test_step_right_by_iterable_total_capacity(iterable: Iterable[Any],
                                                object_: Any,
-                                               slider_size: int) -> None:
+                                               size: int) -> None:
     original, target = duplicate(iterable)
-    slide = slider(slider_size + 1)
+    slide = slider(size + 1)
     attach = right.attacher(object_)
 
     result = slide(attach(target))
@@ -133,20 +133,20 @@ def test_step_right_by_iterable_total_capacity(iterable: Iterable[Any],
 
 def test_step_right_by_iterable_elementwise_capacity(iterable: Iterable[Any],
                                                      object_: Any,
-                                                     slider_size: int) -> None:
-    slide = slider(slider_size + 1)
+                                                     size: int) -> None:
+    slide = slider(size + 1)
     attach = right.attacher(object_)
 
     result = slide(attach(iterable))
 
-    assert all(0 <= capacity(element) <= slider_size + 1
+    assert all(0 <= capacity(element) <= size + 1
                for element in result)
 
 
 def test_step_right_by_iterable_elements(iterable: Iterable[Any],
                                          object_: Any,
-                                         slider_size: int) -> None:
-    slide = slider(slider_size + 1)
+                                         size: int) -> None:
+    slide = slider(size + 1)
     attach = right.attacher(object_)
 
     result = slide(attach(iterable))
