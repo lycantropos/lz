@@ -9,7 +9,7 @@ from typing import (Any,
                     Tuple)
 
 import pytest
-from hypothesis.searchstrategy import SearchStrategy
+from hypothesis.searchstrategy import SearchStrategy as Strategy
 
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
@@ -56,8 +56,7 @@ def empty_iterable() -> Iterable[Any]:
 
 
 @pytest.fixture(scope='function')
-def iterable(iterables_strategy: SearchStrategy[Iterable[Any]]
-             ) -> Iterable[Any]:
+def iterable(iterables_strategy: Strategy[Iterable[Any]]) -> Iterable[Any]:
     return find(iterables_strategy)
 
 
@@ -89,7 +88,7 @@ def non_empty_iterable() -> Iterable[Any]:
 
 @pytest.fixture(scope='function')
 def nested_iterable(min_iterables_size: int,
-                    iterables_strategy: SearchStrategy[Iterable[Any]]
+                    iterables_strategy: Strategy[Iterable[Any]]
                     ) -> Iterable[Iterable[Any]]:
     limit_min_size = partial(partial,
                              min_size=min_iterables_size)
@@ -102,7 +101,7 @@ def nested_iterable(min_iterables_size: int,
 
 
 @pytest.fixture(scope='function')
-def iterables_strategy(min_iterables_size: int) -> SearchStrategy:
+def iterables_strategy(min_iterables_size: int) -> Strategy[Iterable[Any]]:
     limit_min_size = partial(partial,
                              min_size=min_iterables_size)
     return (strategies.encodings.flatmap(limit_min_size(strategies
@@ -115,19 +114,22 @@ def iterables_strategy(min_iterables_size: int) -> SearchStrategy:
 
 
 @pytest.fixture(scope='function')
-def zip_iterable(zip_elements_strategy: SearchStrategy[Tuple[Any, ...]]
-                 ) -> Iterable[Tuple[Any, ...]]:
-    return find(strategies.to_homogeneous_iterables(zip_elements_strategy))
+def transposable_iterable(
+        transposable_iterable_elements_strategy: Strategy[Tuple[Any, ...]]
+) -> Iterable[Tuple[Any, ...]]:
+    return find(strategies.to_homogeneous_iterables
+                (transposable_iterable_elements_strategy))
 
 
 @pytest.fixture(scope='function')
-def zip_iterable_element(zip_elements_strategy: SearchStrategy[Tuple[Any, ...]]
-                         ) -> Tuple[Any, ...]:
-    return find(zip_elements_strategy)
+def transposable_iterable_element(
+        transposable_iterable_elements_strategy: Strategy[Tuple[Any, ...]]
+) -> Tuple[Any, ...]:
+    return find(transposable_iterable_elements_strategy)
 
 
 @pytest.fixture(scope='function')
-def zip_elements_strategy(min_iterables_size: int
-                          ) -> SearchStrategy[Tuple[Any, ...]]:
+def transposable_iterable_elements_strategy(min_iterables_size: int
+                                            ) -> Strategy[Tuple[Any, ...]]:
     return strategies.to_tuples(*repeat(strategies.objects,
                                         min_iterables_size))

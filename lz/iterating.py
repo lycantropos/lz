@@ -349,9 +349,10 @@ def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
             return
 
 
-def unzip(iterable: Iterable[Iterable[Domain]]) -> Iterable[Iterable[Domain]]:
+def transpose(iterable: Iterable[Iterable[Domain]]
+              ) -> Iterable[Iterable[Domain]]:
     """
-    Unzips given iterable of finite iterables into separate iterables.
+    Transposes given iterable of finite iterables.
     """
     iterator = iter(iterable)
     try:
