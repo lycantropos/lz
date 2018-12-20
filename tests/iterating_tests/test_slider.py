@@ -42,7 +42,7 @@ def test_step_by_size_total_capacity(iterable: Iterable[Any],
 
     result = slide(target)
 
-    assert 0 <= capacity(result) - capacity(slider(size)(original)) <= 1
+    assert 0 <= capacity(slider(size)(original)) - capacity(result) <= 1
 
 
 def test_step_by_size_elementwise_capacity(iterable: Iterable[Any],
