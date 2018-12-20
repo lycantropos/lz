@@ -310,3 +310,6 @@ def to_text_streams(encoding: str,
                                              min_size=byte_stream_min_size,
                                              max_size=byte_stream_max_size),
                              encoding=strategies.just(encoding))
+
+
+to_tuples = strategies.tuples
