@@ -46,6 +46,15 @@ def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     return functools.partial(map, map_)
 
 
+def flatmapper(map_: Map[Domain, Iterable[Range]]
+               ) -> Map[Iterable[Domain], Iterable[Range]]:
+    """
+    Returns function that applies map to the each element of iterable
+    and flattens results.
+    """
+    return compose(flatten, mapper(map_))
+
+
 def sifter(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from iterable
@@ -323,13 +332,6 @@ def expand(object_: Domain) -> Iterable[Domain]:
     yield object_
 
 
-def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
-    """
-    Returns plain iterable from iterable of iterables.
-    """
-    yield from itertools.chain.from_iterable(iterable)
-
-
 def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     iterators = itertools.cycle(map(iter, iterable))
     while True:
@@ -344,13 +346,11 @@ def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
             return
 
 
-def flatmapper(map_: Map[Domain, Iterable[Range]]
-               ) -> Map[Iterable[Domain], Iterable[Range]]:
+def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     """
-    Returns function that applies map to the each element of iterable
-    and flattens results.
+    Returns plain iterable from iterable of iterables.
     """
-    return compose(flatten, mapper(map_))
+    yield from itertools.chain.from_iterable(iterable)
 
 
 def header(size: int) -> Operator[Iterable[Domain]]:
