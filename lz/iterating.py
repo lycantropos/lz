@@ -333,6 +333,9 @@ def expand(object_: Domain) -> Iterable[Domain]:
 
 
 def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
+    """
+    Interleaves elements from given iterable of iterables.
+    """
     iterators = itertools.cycle(map(iter, iterable))
     while True:
         try:
@@ -347,6 +350,9 @@ def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
 
 
 def unzip(iterable: Iterable[Iterable[Domain]]) -> Iterable[Iterable[Domain]]:
+    """
+    Unzips given iterable of finite iterables into separate iterables.
+    """
     iterator = iter(iterable)
     try:
         first_elements = next(iterator)
