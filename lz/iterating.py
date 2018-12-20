@@ -349,33 +349,6 @@ def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
             return
 
 
-def transpose(iterable: Iterable[Iterable[Domain]]
-              ) -> Iterable[Iterable[Domain]]:
-    """
-    Transposes given iterable of finite iterables.
-    """
-    iterator = iter(iterable)
-    try:
-        first_elements = next(iterator)
-    except StopIteration:
-        return
-    queues = [deque([element])
-              for element in first_elements]
-
-    def coordinate(queue: deque) -> Iterable[Domain]:
-        while True:
-            if not queue:
-                try:
-                    elements = next(iterator)
-                except StopIteration:
-                    return
-                for sub_queue, element in zip(queues, elements):
-                    sub_queue.append(element)
-            yield queue.popleft()
-
-    yield from map(coordinate, queues)
-
-
 def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     """
     Returns plain iterable from iterable of iterables.

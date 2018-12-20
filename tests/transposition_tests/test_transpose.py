@@ -4,8 +4,8 @@ from typing import (Any,
 
 from lz import (left,
                 right)
-from lz.iterating import transpose
 from lz.replication import duplicate
+from lz.transposition import transpose
 from tests.utils import (is_empty,
                          iterable_ends_with,
                          iterable_starts_with)

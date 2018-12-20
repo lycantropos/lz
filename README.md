@@ -179,9 +179,9 @@ Usage
     [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 5, 15, 6, 16, 7, 17, 8, 18, 9, 19]
     ```
 
-14. iterables [transposition](https://en.wikipedia.org/wiki/Transpose)
+14. iterable [transposition](https://en.wikipedia.org/wiki/Transpose)
     ```python
-    >>> from lz.iterating import transpose
+    >>> from lz.transposition import transpose
     >>> list(map(tuple, transpose(zip(range(10), range(10, 20)))))
     [(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), (10, 11, 12, 13, 14, 15, 16, 17, 18, 19)]
     ```
