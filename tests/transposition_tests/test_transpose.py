@@ -1,9 +1,9 @@
 from typing import (Any,
-                    Iterable,
-                    Tuple)
+                    Iterable)
 
 from lz import (left,
                 right)
+from lz.hints import FiniteIterable
 from lz.replication import duplicate
 from lz.transposition import transpose
 from tests.utils import (is_empty,
@@ -17,8 +17,8 @@ def test_base_case(empty_iterable: Iterable[Any]) -> None:
     assert is_empty(result)
 
 
-def test_step_left(transposable_iterable: Iterable[Tuple[Any, ...]],
-                   transposable_iterable_element: Tuple[Any, ...]) -> None:
+def test_step_left(transposable_iterable: Iterable[FiniteIterable[Any]],
+                   transposable_iterable_element: FiniteIterable[Any]) -> None:
     original_element, target_element = duplicate(transposable_iterable_element)
 
     result = transpose(left.attacher(target_element)(transposable_iterable))
@@ -27,8 +27,9 @@ def test_step_left(transposable_iterable: Iterable[Tuple[Any, ...]],
                for iterable, coordinate in zip(result, original_element))
 
 
-def test_step_right(transposable_iterable: Iterable[Tuple[Any, ...]],
-                    transposable_iterable_element: Tuple[Any, ...]) -> None:
+def test_step_right(transposable_iterable: Iterable[FiniteIterable[Any]],
+                    transposable_iterable_element: FiniteIterable[Any]
+                    ) -> None:
     original_element, target_element = duplicate(transposable_iterable_element)
 
     result = transpose(right.attacher(target_element)(transposable_iterable))

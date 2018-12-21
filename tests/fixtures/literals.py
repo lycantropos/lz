@@ -11,6 +11,7 @@ from typing import (Any,
 import pytest
 from hypothesis.searchstrategy import SearchStrategy as Strategy
 
+from lz.hints import FiniteIterable
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import find
@@ -115,21 +116,21 @@ def iterables_strategy(min_iterables_size: int) -> Strategy[Iterable[Any]]:
 
 @pytest.fixture(scope='function')
 def transposable_iterable(
-        transposable_iterable_elements_strategy: Strategy[Tuple[Any, ...]]
-) -> Iterable[Tuple[Any, ...]]:
+        transposable_iterable_elements_strategy: Strategy[FiniteIterable[Any]]
+) -> Iterable[FiniteIterable[Any]]:
     return find(strategies.to_homogeneous_iterables
                 (transposable_iterable_elements_strategy))
 
 
 @pytest.fixture(scope='function')
 def transposable_iterable_element(
-        transposable_iterable_elements_strategy: Strategy[Tuple[Any, ...]]
-) -> Tuple[Any, ...]:
+        transposable_iterable_elements_strategy: Strategy[FiniteIterable[Any]]
+) -> FiniteIterable[Any]:
     return find(transposable_iterable_elements_strategy)
 
 
 @pytest.fixture(scope='function')
-def transposable_iterable_elements_strategy(min_iterables_size: int
-                                            ) -> Strategy[Tuple[Any, ...]]:
-    return strategies.to_tuples(*repeat(strategies.objects,
-                                        min_iterables_size))
+def transposable_iterable_elements_strategy(size: int
+                                            ) -> Strategy[FiniteIterable[Any]]:
+    return strategies.to_tuples(strategies.objects,
+                                size=size)

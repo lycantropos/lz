@@ -2,6 +2,7 @@ import io
 import sys
 from collections import defaultdict
 from functools import wraps
+from itertools import repeat
 from operator import methodcaller
 from typing import (AnyStr,
                     BinaryIO,
@@ -312,4 +313,13 @@ def to_text_streams(encoding: str,
                              encoding=strategies.just(encoding))
 
 
-to_tuples = strategies.tuples
+def to_tuples(elements: Optional[SearchStrategy[Domain]] = None,
+              *,
+              size: int = 0) -> SearchStrategy[Tuple[Domain, ...]]:
+    if size > MAX_ITERABLES_SIZE:
+        raise ValueError('Size should not be greater than {limit}.'
+                         .format(limit=MAX_ITERABLES_SIZE))
+    if size > 0 and elements is None:
+        raise ValueError('Either size should be zero '
+                         'or elements should be specified.')
+    return strategies.tuples(*repeat(elements, size))
