@@ -123,6 +123,17 @@ def transposable_iterable(
 
 
 @pytest.fixture(scope='function')
+def non_empty_transposable_iterable(
+        transposable_iterable_elements_strategy: Strategy[FiniteIterable[Any]],
+        size: int) -> Iterable[FiniteIterable[Any]]:
+    limit_min_size = partial(partial,
+                             min_size=1)
+    return find(limit_min_size(strategies.to_homogeneous_iterables)
+                (strategies.to_tuples(strategies.objects,
+                                      size=size + 1)))
+
+
+@pytest.fixture(scope='function')
 def transposable_iterable_element(
         transposable_iterable_elements_strategy: Strategy[FiniteIterable[Any]]
 ) -> FiniteIterable[Any]:
