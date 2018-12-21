@@ -2,10 +2,24 @@ import functools
 from collections import (abc,
                          deque)
 from typing import (Iterable,
-                    Sequence)
+                    overload)
 
-from .hints import (Domain,
+from .hints import (Collection,
+                    Domain,
+                    FiniteIterable,
                     Range)
+
+
+@overload
+def transpose(object_: Iterable[FiniteIterable[Domain]]
+              ) -> FiniteIterable[Iterable[Domain]]:
+    pass
+
+
+@overload
+def transpose(object_: FiniteIterable[Iterable[Domain]]
+              ) -> Iterable[FiniteIterable[Domain]]:
+    pass
 
 
 @functools.singledispatch
@@ -18,8 +32,8 @@ def transpose(object_: Domain) -> Range:
 
 
 @transpose.register(abc.Iterable)
-def transpose_iterable(object_: Iterable[Iterable[Domain]]
-                       ) -> Iterable[Iterable[Domain]]:
+def transpose_finite_iterables(object_: Iterable[FiniteIterable[Domain]]
+                               ) -> FiniteIterable[Iterable[Domain]]:
     """
     Transposes given iterable of finite iterables.
     """
@@ -27,7 +41,7 @@ def transpose_iterable(object_: Iterable[Iterable[Domain]]
     try:
         first_elements = next(iterator)
     except StopIteration:
-        return
+        return ()
     queues = [deque([element])
               for element in first_elements]
 
@@ -42,13 +56,13 @@ def transpose_iterable(object_: Iterable[Iterable[Domain]]
                     sub_queue.append(element)
             yield queue.popleft()
 
-    yield from map(coordinate, queues)
+    return tuple(map(coordinate, queues))
 
 
-@transpose.register(abc.Sequence)
-def transpose_sequence(iterable: Sequence[Iterable[Domain]]
-                       ) -> Iterable[Sequence[Domain]]:
+@transpose.register(Collection)
+def transpose_finite_iterable(object_: FiniteIterable[Iterable[Domain]]
+                              ) -> Iterable[FiniteIterable[Domain]]:
     """
-    Transposes given sequence of iterables.
+    Transposes given finite iterable of iterables.
     """
-    yield from zip(*iterable)
+    yield from zip(*object_)
