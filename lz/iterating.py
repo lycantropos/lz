@@ -31,8 +31,7 @@ from .hints import (Domain,
                     Map,
                     Operator,
                     Predicate,
-                    Range,
-                    Sortable)
+                    Range)
 from .replication import duplicate
 from .textual import (decoder,
                       read_batch_from_end,
@@ -167,18 +166,6 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
                                         shift)
 
     return slide
-
-
-def sorter(key: Map[Domain, Sortable] = None) -> Operator[Iterable[Domain]]:
-    """
-    Returns function that generates sorted iterable by given key.
-    """
-
-    def sort(iterable: Iterable[Domain]) -> Iterable[Domain]:
-        yield from sorted(iterable,
-                          key=key)
-
-    return sort
 
 
 Group = Tuple[Hashable, Iterable[Domain]]

@@ -1,15 +1,16 @@
 from typing import Iterable
 
-from lz.hints import Domain
-from lz.iterating import (slider,
-                          sorter)
+from lz.functional import identity
+from lz.hints import Sortable
+from lz.iterating import slider
 from lz.replication import duplicate
+from lz.sorting import sorter
 from tests.utils import (are_iterables_similar,
                          capacity,
                          iterables_has_same_elements)
 
 
-def test_order(sortable_iterable: Iterable[Domain]) -> None:
+def test_order(sortable_iterable: Iterable[Sortable]) -> None:
     sort = sorter()
 
     result = sort(sortable_iterable)
@@ -27,12 +28,12 @@ def test_order(sortable_iterable: Iterable[Domain]) -> None:
                for element, next_element in elements_pairs)
 
 
-def objects_are_partially_ordered(left_object: Domain,
-                                  right_object: Domain) -> bool:
+def objects_are_partially_ordered(left_object: Sortable,
+                                  right_object: Sortable) -> bool:
     return left_object < right_object or not (right_object < left_object)
 
 
-def test_capacity(sortable_iterable: Iterable[Domain]) -> None:
+def test_capacity(sortable_iterable: Iterable[Sortable]) -> None:
     original, target = duplicate(sortable_iterable)
     sort = sorter()
 
@@ -41,7 +42,7 @@ def test_capacity(sortable_iterable: Iterable[Domain]) -> None:
     assert capacity(result) == capacity(original)
 
 
-def test_elements(sortable_iterable: Iterable[Domain]) -> None:
+def test_elements(sortable_iterable: Iterable[Sortable]) -> None:
     original, target = duplicate(sortable_iterable)
     sort = sorter()
 
@@ -50,7 +51,16 @@ def test_elements(sortable_iterable: Iterable[Domain]) -> None:
     assert iterables_has_same_elements(result, original)
 
 
-def test_idempotency(sortable_iterable: Iterable[Domain]) -> None:
+def test_identity_key(sortable_iterable: Iterable[Sortable]) -> None:
+    original, target = duplicate(sortable_iterable)
+    sort = sorter(key=identity)
+
+    result = sort(target)
+
+    assert are_iterables_similar(result, sorter()(original))
+
+
+def test_idempotency(sortable_iterable: Iterable[Sortable]) -> None:
     first_target, second_target = duplicate(sortable_iterable)
     sort = sorter()
 

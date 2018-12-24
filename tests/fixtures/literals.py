@@ -1,5 +1,4 @@
 from functools import partial
-from itertools import repeat
 from numbers import Real
 from operator import gt
 from typing import (Any,
@@ -11,7 +10,8 @@ from typing import (Any,
 import pytest
 from hypothesis.searchstrategy import SearchStrategy as Strategy
 
-from lz.hints import FiniteIterable
+from lz.hints import (FiniteIterable,
+                      Sortable)
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import find
@@ -69,7 +69,7 @@ def hashables_iterable(min_iterables_size: int) -> Iterable[Hashable]:
 
 
 @pytest.fixture(scope='function')
-def sortable_iterable() -> Iterable[Any]:
+def sortable_iterable() -> Iterable[Sortable]:
     return find(strategies.sortable_iterables)
 
 
