@@ -67,8 +67,8 @@ def heapsort(iterable: Iterable[Domain]) -> Iterable[Domain]:
 
 
 def sorter(*,
-           key: Map[Domain, Sortable] = None,
-           algorithm: str = DEFAULT_ALGORITHM) -> Operator[Iterable[Domain]]:
+           algorithm: str = DEFAULT_ALGORITHM,
+           key: Map[Domain, Sortable] = None) -> Operator[Iterable[Domain]]:
     """
     Returns function that generates sorted iterable
     by given key with specified algorithm.
