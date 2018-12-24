@@ -1,12 +1,13 @@
 from hypothesis import strategies
 
 from lz.functional import identity
-from lz.sorting import (DEFAULT_ALGORITHM,
-                        implementations)
+from lz.sorting import (implementations,
+                        stable_implementations)
 from .literals.factories import to_strings
 
 sorting_keys = strategies.just(identity) | strategies.none()
-registered_stable_sorting_algorithms = strategies.just(DEFAULT_ALGORITHM)
+registered_stable_sorting_algorithms = (
+    strategies.sampled_from(list(stable_implementations)))
 registered_sorting_algorithms = strategies.sampled_from(list(implementations))
 
 

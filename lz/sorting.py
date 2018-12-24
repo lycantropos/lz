@@ -1,6 +1,7 @@
 import functools
 import heapq
 import itertools
+from collections import ChainMap
 from operator import itemgetter
 from typing import (Callable,
                     Iterable,
@@ -16,7 +17,10 @@ from .hints import (Domain,
 Key = Optional[Map[Domain, Sortable]]
 Implementation = Callable[..., Iterable[Domain]]
 
-implementations = {}
+stable_implementations = {}
+unstable_implementations = {}
+implementations = ChainMap(stable_implementations,
+                           unstable_implementations)
 
 
 def search_implementation(algorithm: str) -> Implementation:
@@ -32,17 +36,24 @@ def search_implementation(algorithm: str) -> Implementation:
 
 
 def register_implementation(algorithm: str,
-                            implementation: Optional[Implementation] = None
+                            implementation: Optional[Implementation] = None,
+                            *,
+                            stable: bool = False
                             ) -> Union[Operator[Implementation],
                                        Implementation]:
     if implementation is None:
-        return functools.partial(register_implementation, algorithm)
-    implementations[algorithm] = implementation
+        return functools.partial(register_implementation, algorithm,
+                                 stable=stable)
+    if stable:
+        stable_implementations[algorithm] = implementation
+    else:
+        unstable_implementations[algorithm] = implementation
     return implementation
 
 
 DEFAULT_ALGORITHM = 'TIMSORT'
-register_implementation(DEFAULT_ALGORITHM, sorted)
+register_implementation(DEFAULT_ALGORITHM, sorted,
+                        stable=True)
 
 
 def with_key(plain: Operator[Iterable[Sortable]]) -> Implementation:
