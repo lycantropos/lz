@@ -45,3 +45,5 @@ from .literals.factories import (to_any_streams,
                                  to_strings,
                                  to_text_streams,
                                  to_tuples)
+from .sorting import (registered_sorting_algorithms,
+                      unregistered_sorting_algorithms)
