@@ -5,6 +5,7 @@ from operator import itemgetter
 from typing import (Callable,
                     Iterable,
                     Optional,
+                    Sequence,
                     Union)
 
 from .hints import (Domain,
@@ -65,6 +66,48 @@ def heapsort(iterable: Iterable[Domain]) -> Iterable[Domain]:
     heapq.heapify(heap)
     for _ in itertools.repeat(None, len(heap)):
         yield heapq.heappop(heap)
+
+
+@register_implementation('QUICKSORT')
+@with_key
+def quicksort(iterable: Iterable[Domain]) -> Iterable[Domain]:
+    def sort_in_place(sequence: Sequence[Domain],
+                      *,
+                      start_index: int,
+                      stop_index: int) -> None:
+        if start_index >= stop_index:
+            return
+        pivot_index = partition(sequence,
+                                start_index=start_index,
+                                stop_index=stop_index)
+        sort_in_place(sequence,
+                      start_index=start_index,
+                      stop_index=pivot_index - 1)
+        sort_in_place(sequence,
+                      start_index=pivot_index + 1,
+                      stop_index=stop_index)
+
+    def partition(sequence: Sequence[Domain],
+                  *,
+                  start_index: int,
+                  stop_index: int) -> int:
+        pivot_index = start_index
+        start_element = sequence[start_index]
+        for index in range(start_index + 1, stop_index + 1):
+            if sequence[index] > start_element:
+                continue
+            pivot_index += 1
+            sequence[index], sequence[pivot_index] = (sequence[pivot_index],
+                                                      sequence[index])
+        sequence[pivot_index], sequence[start_index] = (sequence[start_index],
+                                                        sequence[pivot_index])
+        return pivot_index
+
+    result = list(iterable)
+    sort_in_place(result,
+                  start_index=0,
+                  stop_index=len(result) - 1)
+    return result
 
 
 def sorter(*,
