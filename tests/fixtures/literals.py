@@ -10,8 +10,12 @@ from typing import (Any,
 import pytest
 from hypothesis.searchstrategy import SearchStrategy as Strategy
 
+from lz.functional import identity
 from lz.hints import (FiniteIterable,
                       Sortable)
+from lz.sorting import (Implementation,
+                        implementations,
+                        with_key)
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import find
@@ -43,6 +47,20 @@ def positional_arguments() -> Tuple[Any, ...]:
 @pytest.fixture(scope='function')
 def keyword_arguments() -> Dict[str, Any]:
     return find(strategies.keywords_arguments)
+
+
+@pytest.fixture(scope='function')
+def unregistered_sorting_algorithm() -> str:
+    def is_algorithm_unregistered(algorithm: str) -> bool:
+        return algorithm not in implementations
+
+    return find(strategies.to_strings(min_size=1)
+                .filter(is_algorithm_unregistered))
+
+
+@pytest.fixture(scope='function')
+def sorting_implementation() -> Implementation:
+    return with_key(identity)
 
 
 @pytest.fixture(scope='function')
