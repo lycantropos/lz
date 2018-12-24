@@ -74,9 +74,5 @@ def sorter(*,
     by given key with specified algorithm.
     """
     implementation = search_implementation(algorithm)
-
-    def sort(iterable: Iterable[Domain]) -> Iterable[Domain]:
-        yield from implementation(iterable,
-                                  key=key)
-
-    return sort
+    return functools.partial(implementation,
+                             key=key)
