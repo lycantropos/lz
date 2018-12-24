@@ -50,6 +50,7 @@ def with_key(plain: Operator[Iterable[Sortable]]) -> Implementation:
                        key: Key = None) -> Iterable[Domain]:
         if key is None:
             yield from plain(iterable)
+            return
         yield from map(itemgetter(2),
                        plain((key(element), index, element)
                              for index, element in enumerate(iterable)))
