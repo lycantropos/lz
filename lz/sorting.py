@@ -79,6 +79,43 @@ def heapsort(iterable: Iterable[Domain]) -> Iterable[Domain]:
         yield heapq.heappop(heap)
 
 
+@register_implementation('MERGESORT',
+                         stable=True)
+@with_key
+def mergesort(iterable: Iterable[Domain]) -> Iterable[Domain]:
+    def sort_in_place(sequence: MutableSequence[Domain]) -> None:
+        if len(sequence) <= 1:
+            return
+        mid_index = len(sequence) // 2
+        left, right = sequence[:mid_index], sequence[mid_index:]
+        sort_in_place(left)
+        sort_in_place(right)
+        sequence[:] = merge(left, right)
+
+    def merge(left_half: MutableSequence[Domain],
+              right_half: MutableSequence[Domain]) -> Iterable[Domain]:
+        left_index = 0
+        right_index = 0
+        while True:
+            try:
+                right_element = right_half[right_index]
+                left_element = left_half[left_index]
+            except IndexError:
+                break
+            if left_element < right_element:
+                yield left_element
+                left_index += 1
+            else:
+                yield right_element
+                right_index += 1
+        yield from left_half[left_index:]
+        yield from right_half[right_index:]
+
+    result = list(iterable)
+    sort_in_place(result)
+    return result
+
+
 @register_implementation('QUICKSORT')
 @with_key
 def quicksort(iterable: Iterable[Domain]) -> Iterable[Domain]:
