@@ -60,9 +60,8 @@ def with_key(plain: Operator[Iterable[Sortable]]) -> Implementation:
 @register_implementation('HEAPSORT')
 @with_key
 def heapsort(iterable: Iterable[Domain]) -> Iterable[Domain]:
-    heap = []
-    for element in iterable:
-        heapq.heappush(heap, element)
+    heap = list(iterable)
+    heapq.heapify(heap)
     for _ in itertools.repeat(None, len(heap)):
         yield heapq.heappop(heap)
 
