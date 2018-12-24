@@ -10,8 +10,9 @@ from tests.utils import (are_iterables_similar,
                          iterables_has_same_elements)
 
 
-def test_order(sortable_iterable: Iterable[Sortable]) -> None:
-    sort = sorter()
+def test_order(sortable_iterable: Iterable[Sortable],
+               registered_sorting_algorithm: str) -> None:
+    sort = sorter(algorithm=registered_sorting_algorithm)
 
     result = sort(sortable_iterable)
 
@@ -33,36 +34,41 @@ def objects_are_partially_ordered(left_object: Sortable,
     return left_object < right_object or not (right_object < left_object)
 
 
-def test_capacity(sortable_iterable: Iterable[Sortable]) -> None:
+def test_capacity(sortable_iterable: Iterable[Sortable],
+                  registered_sorting_algorithm: str) -> None:
     original, target = duplicate(sortable_iterable)
-    sort = sorter()
+    sort = sorter(algorithm=registered_sorting_algorithm)
 
     result = sort(target)
 
     assert capacity(result) == capacity(original)
 
 
-def test_elements(sortable_iterable: Iterable[Sortable]) -> None:
+def test_elements(sortable_iterable: Iterable[Sortable],
+                  registered_sorting_algorithm: str) -> None:
     original, target = duplicate(sortable_iterable)
-    sort = sorter()
+    sort = sorter(algorithm=registered_sorting_algorithm)
 
     result = sort(target)
 
     assert iterables_has_same_elements(result, original)
 
 
-def test_identity_key(sortable_iterable: Iterable[Sortable]) -> None:
+def test_identity_key(sortable_iterable: Iterable[Sortable],
+                      registered_sorting_algorithm: str) -> None:
     original, target = duplicate(sortable_iterable)
-    sort = sorter(key=identity)
+    sort = sorter(algorithm=registered_sorting_algorithm,
+                  key=identity)
 
     result = sort(target)
 
     assert are_iterables_similar(result, sorter()(original))
 
 
-def test_idempotency(sortable_iterable: Iterable[Sortable]) -> None:
+def test_idempotency(sortable_iterable: Iterable[Sortable],
+                     registered_sorting_algorithm: str) -> None:
     first_target, second_target = duplicate(sortable_iterable)
-    sort = sorter()
+    sort = sorter(algorithm=registered_sorting_algorithm)
 
     sorted_result = sort(first_target)
     double_sorted_result = sort(sort(second_target))
