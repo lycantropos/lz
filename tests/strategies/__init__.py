@@ -46,4 +46,6 @@ from .literals.factories import (to_any_streams,
                                  to_text_streams,
                                  to_tuples)
 from .sorting import (registered_sorting_algorithms,
+                      registered_stable_sorting_algorithms,
+                      sorting_keys,
                       unregistered_sorting_algorithms)

@@ -14,6 +14,7 @@ from lz.functional import identity
 from lz.hints import (FiniteIterable,
                       Sortable)
 from lz.sorting import (Implementation,
+                        Key,
                         with_key)
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
@@ -54,6 +55,11 @@ def registered_sorting_algorithm() -> str:
 
 
 @pytest.fixture(scope='function')
+def registered_stable_sorting_algorithm() -> str:
+    return find(strategies.registered_stable_sorting_algorithms)
+
+
+@pytest.fixture(scope='function')
 def unregistered_sorting_algorithm() -> str:
     return find(strategies.unregistered_sorting_algorithms)
 
@@ -61,6 +67,11 @@ def unregistered_sorting_algorithm() -> str:
 @pytest.fixture(scope='function')
 def sorting_implementation() -> Implementation:
     return with_key(identity)
+
+
+@pytest.fixture(scope='function')
+def sorting_key() -> Key:
+    return find(strategies.sorting_keys)
 
 
 @pytest.fixture(scope='function')
