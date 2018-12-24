@@ -5,8 +5,8 @@ from collections import ChainMap
 from operator import itemgetter
 from typing import (Callable,
                     Iterable,
+                    MutableSequence,
                     Optional,
-                    Sequence,
                     Union)
 
 from .hints import (Domain,
@@ -82,7 +82,7 @@ def heapsort(iterable: Iterable[Domain]) -> Iterable[Domain]:
 @register_implementation('QUICKSORT')
 @with_key
 def quicksort(iterable: Iterable[Domain]) -> Iterable[Domain]:
-    def sort_in_place(sequence: Sequence[Domain],
+    def sort_in_place(sequence: MutableSequence[Domain],
                       *,
                       start_index: int,
                       stop_index: int) -> None:
@@ -98,7 +98,7 @@ def quicksort(iterable: Iterable[Domain]) -> Iterable[Domain]:
                       start_index=pivot_index + 1,
                       stop_index=stop_index)
 
-    def partition(sequence: Sequence[Domain],
+    def partition(sequence: MutableSequence[Domain],
                   *,
                   start_index: int,
                   stop_index: int) -> int:
