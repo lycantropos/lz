@@ -71,3 +71,4 @@ def replicator(count: int) -> Map[Domain, Iterable[Domain]]:
 
 
 duplicate = replicator(2)
+duplicate.__doc__ = 'Duplicates given object.'
