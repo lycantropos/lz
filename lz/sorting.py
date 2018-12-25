@@ -57,6 +57,7 @@ register_implementation(DEFAULT_ALGORITHM, sorted,
 
 
 def with_key(plain: Operator[Iterable[Sortable]]) -> Implementation:
+    @functools.wraps(plain)
     def implementation(iterable: Iterable[Domain],
                        *,
                        key: Key = None) -> Iterable[Domain]:
