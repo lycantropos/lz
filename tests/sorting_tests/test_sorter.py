@@ -5,8 +5,7 @@ from lz.iterating import slider
 from lz.replication import duplicate
 from lz.sorting import (Key,
                         sorter)
-from tests.utils import (are_iterables_similar,
-                         capacity,
+from tests.utils import (capacity,
                          iterables_has_same_elements)
 
 
@@ -58,16 +57,3 @@ def test_elements(sortable_iterable: Iterable[Sortable],
     result = sort(target)
 
     assert iterables_has_same_elements(result, original)
-
-
-def test_stability(sortable_iterable: Iterable[Sortable],
-                   registered_stable_sorting_algorithm: str,
-                   sorting_key: Key) -> None:
-    first_target, second_target = duplicate(sortable_iterable)
-    sort = sorter(algorithm=registered_stable_sorting_algorithm,
-                  key=sorting_key)
-
-    sorted_result = sort(first_target)
-    double_sorted_result = sort(sort(second_target))
-
-    assert are_iterables_similar(double_sorted_result, sorted_result)

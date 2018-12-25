@@ -55,11 +55,6 @@ def registered_sorting_algorithm() -> str:
 
 
 @pytest.fixture(scope='function')
-def registered_stable_sorting_algorithm() -> str:
-    return find(strategies.registered_stable_sorting_algorithms)
-
-
-@pytest.fixture(scope='function')
 def unregistered_sorting_algorithm() -> str:
     return find(strategies.unregistered_sorting_algorithms)
 
