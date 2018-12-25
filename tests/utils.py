@@ -129,7 +129,7 @@ def are_mappings_similar(object_: Mapping[Hashable, Any],
                 next_value = next_mapping[key]
             except KeyError:
                 if not isinstance(key, abc.Iterable):
-                    raise
+                    return False
                 candidates_keys = [key
                                    for key in next_mapping.keys()
                                    if isinstance(key, abc.Iterable)]

@@ -8,22 +8,22 @@ from tests.utils import (capacity,
 
 
 def test_capacity(non_empty_iterable: Iterable[Any],
-                  natural_number: int) -> None:
+                  size: int) -> None:
     original, target = duplicate(non_empty_iterable)
-    head = header(natural_number)
+    head = header(size)
 
     result = head(target)
 
-    if capacity(original) < natural_number:
-        assert capacity(result) < natural_number
+    if capacity(original) < size:
+        assert capacity(result) < size
     else:
-        assert capacity(result) == natural_number
+        assert capacity(result) == size
 
 
 def test_elements(non_empty_iterable: Iterable[Any],
-                  natural_number: int) -> None:
+                  size: int) -> None:
     original, target = duplicate(non_empty_iterable)
-    head = header(natural_number)
+    head = header(size)
 
     result = head(target)
 

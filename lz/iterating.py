@@ -31,8 +31,7 @@ from .hints import (Domain,
                     Map,
                     Operator,
                     Predicate,
-                    Range,
-                    Sortable)
+                    Range)
 from .replication import duplicate
 from .textual import (decoder,
                       read_batch_from_end,
@@ -44,6 +43,15 @@ def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     Returns function that applies given map to the each element of iterable.
     """
     return functools.partial(map, map_)
+
+
+def flatmapper(map_: Map[Domain, Iterable[Range]]
+               ) -> Map[Iterable[Domain], Iterable[Range]]:
+    """
+    Returns function that applies map to the each element of iterable
+    and flattens results.
+    """
+    return compose(flatten, mapper(map_))
 
 
 def sifter(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
@@ -158,18 +166,6 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
                                         shift)
 
     return slide
-
-
-def sorter(key: Map[Domain, Sortable] = None) -> Operator[Iterable[Domain]]:
-    """
-    Returns function that generates sorted iterable by given key.
-    """
-
-    def sort(iterable: Iterable[Domain]) -> Iterable[Domain]:
-        yield from sorted(iterable,
-                          key=key)
-
-    return sort
 
 
 Group = Tuple[Hashable, Iterable[Domain]]
@@ -323,14 +319,10 @@ def expand(object_: Domain) -> Iterable[Domain]:
     yield object_
 
 
-def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
-    """
-    Returns plain iterable from iterable of iterables.
-    """
-    yield from itertools.chain.from_iterable(iterable)
-
-
 def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
+    """
+    Interleaves elements from given iterable of iterables.
+    """
     iterators = itertools.cycle(map(iter, iterable))
     while True:
         try:
@@ -344,13 +336,11 @@ def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
             return
 
 
-def flatmapper(map_: Map[Domain, Iterable[Range]]
-               ) -> Map[Iterable[Domain], Iterable[Range]]:
+def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     """
-    Returns function that applies map to the each element of iterable
-    and flattens results.
+    Returns plain iterable from iterable of iterables.
     """
-    return compose(flatten, mapper(map_))
+    yield from itertools.chain.from_iterable(iterable)
 
 
 def header(size: int) -> Operator[Iterable[Domain]]:

@@ -22,6 +22,7 @@ from .functional import (false_predicates,
                          transparent_functions,
                          true_predicates)
 from .iterating import (groupers_keys,
+                        non_negative_indices,
                         non_negative_slices)
 from .literals import empty
 from .literals.base import (any_strings,
@@ -42,4 +43,8 @@ from .literals.factories import (to_any_streams,
                                  to_homogeneous_iterables,
                                  to_integers,
                                  to_strings,
-                                 to_text_streams)
+                                 to_text_streams,
+                                 to_tuples)
+from .sorting import (registered_sorting_algorithms,
+                      sorting_keys,
+                      unregistered_sorting_algorithms)

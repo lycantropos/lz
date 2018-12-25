@@ -8,19 +8,19 @@ from tests.utils import are_iterables_similar
 
 
 def test_size(iterable: Iterable[Any],
-              chopper_size: int) -> None:
-    chop = chopper(chopper_size)
+              size: int) -> None:
+    chop = chopper(size)
 
     result = chop(iterable)
 
-    assert all(len(element) <= chopper_size
+    assert all(len(element) <= size
                for element in result)
 
 
 def test_elements(iterable: Iterable[Any],
-                  chopper_size: int) -> None:
+                  size: int) -> None:
     original, target = duplicate(iterable)
-    chop = chopper(chopper_size)
+    chop = chopper(size)
 
     result = chop(target)
 
