@@ -192,8 +192,8 @@ Usage
 15. iterable duplication
     ```python
     >>> from lz.replication import duplicate
-    >>> list(map(list, duplicate(range(10))))
-    [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+    >>> list(map(tuple, duplicate(range(10))))
+    [(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)]
     ```
 
 and many more.
