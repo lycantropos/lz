@@ -149,9 +149,9 @@ Usage
     False
     ```
 
-10. reversing iterable
+10. reversing finite iterable
     ```python
-    >>> from lz.iterating import reverse
+    >>> from lz.reversal import reverse
     >>> list(reverse(range(10)))
     [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     ```
