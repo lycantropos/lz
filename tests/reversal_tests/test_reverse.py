@@ -1,15 +1,14 @@
 from typing import (Any,
                     BinaryIO,
                     Iterable,
-                    Set,
                     TextIO)
 
 from lz import (left,
                 right)
 from lz.iterating import (first,
-                          last,
-                          reverse)
+                          last)
 from lz.replication import duplicate
+from lz.reversal import reverse
 from lz.textual import encoder
 from tests.utils import (are_iterables_similar,
                          is_empty)

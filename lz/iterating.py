@@ -1,30 +1,16 @@
 import functools
-import io
 import itertools
-import os
-import sys
 from collections import (abc,
                          defaultdict,
                          deque)
-from operator import (is_not,
-                      methodcaller,
-                      sub)
-from typing import (Any,
-                    AnyStr,
-                    BinaryIO,
-                    Hashable,
-                    IO,
+from operator import is_not
+from typing import (Hashable,
                     Iterable,
-                    Iterator,
                     List,
                     Mapping,
-                    Optional,
                     Sequence,
-                    TextIO,
-                    Tuple,
-                    overload)
+                    Tuple)
 
-from .arithmetical import ceil_division
 from .functional import (combine,
                          compose)
 from .hints import (Domain,
@@ -33,9 +19,6 @@ from .hints import (Domain,
                     Predicate,
                     Range)
 from .replication import duplicate
-from .textual import (decoder,
-                      read_batch_from_end,
-                      split)
 
 
 def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
@@ -184,132 +167,6 @@ def grouper(key: Map[Domain, Hashable]
         yield from groups.items()
 
     return group_by
-
-
-@overload
-def reverse(iterable: Iterator[Domain]) -> Iterable[Domain]:
-    pass
-
-
-@overload
-def reverse(iterable: Sequence[Domain]) -> Iterable[Domain]:
-    pass
-
-
-@overload
-def reverse(iterable: IO[AnyStr],
-            *,
-            batch_size: Optional[int] = ...,
-            lines_separator: Optional[AnyStr] = ...,
-            keep_lines_separator: bool = ...) -> Iterable[AnyStr]:
-    pass
-
-
-if sys.version_info >= (3, 6):
-    from typing import Reversible
-
-
-    @overload
-    def reverse(iterable: Reversible[Domain]) -> Iterable[Domain]:
-        pass
-
-
-@overload
-def reverse(iterable: Iterable[Domain]) -> Iterable[Domain]:
-    pass
-
-
-@functools.singledispatch
-def reverse(object_: Iterable[Domain],
-            **_: Any) -> Iterable[Domain]:
-    """
-    Returns iterable with reversed elements order.
-    """
-    raise TypeError('Unsupported iterable type: {type}.'
-                    .format(type=type(object_)))
-
-
-@reverse.register(abc.Iterator)
-def reverse_iterator(iterable: Iterator[Domain]) -> Iterable[Domain]:
-    yield from reversed(list(iterable))
-
-
-@reverse.register(abc.Sequence)
-def reverse_sequence(iterable: Sequence[Domain]) -> Iterable[Domain]:
-    return iterable[::-1]
-
-
-if sys.version_info >= (3, 6):
-    from typing import Reversible
-
-
-    @reverse.register(abc.Reversible)
-    def reverse_reversible(iterable: Reversible[Domain]) -> Iterable[Domain]:
-        yield from reversed(iterable)
-
-
-@reverse.register(io.TextIOWrapper)
-def reverse_file(iterable: TextIO,
-                 *,
-                 batch_size: Optional[int] = None,
-                 lines_separator: Optional[str] = None,
-                 keep_lines_separator: bool = True) -> Iterable[str]:
-    encoding = iterable.encoding
-    if lines_separator is not None:
-        lines_separator = lines_separator.encode(encoding)
-    yield from map(decoder(encoding),
-                   reverse(iterable.buffer,
-                           batch_size=batch_size,
-                           lines_separator=lines_separator,
-                           keep_lines_separator=keep_lines_separator))
-
-
-@reverse.register(io.BufferedReader)
-@reverse.register(io.BytesIO)
-def reverse_binary_stream(iterable: BinaryIO,
-                          *,
-                          batch_size: Optional[int] = None,
-                          lines_separator: Optional[bytes] = None,
-                          keep_lines_separator: bool = True
-                          ) -> Iterable[bytes]:
-    if lines_separator is None:
-        lines_separator = (b'\r', b'\n', b'\r\n')
-        lines_splitter = methodcaller(str.splitlines.__name__,
-                                      keep_lines_separator)
-    else:
-        lines_splitter = functools.partial(split,
-                                           separator=lines_separator,
-                                           keep_separator=keep_lines_separator)
-    stream_size = iterable.seek(0, os.SEEK_END)
-    if batch_size is None:
-        batch_size = stream_size or 1
-    batches_count = ceil_division(stream_size, batch_size)
-    remaining_bytes_indicator = itertools.islice(
-            itertools.accumulate(itertools.chain([stream_size],
-                                                 itertools.repeat(batch_size)),
-                                 sub),
-            batches_count)
-    try:
-        remaining_bytes_count = next(remaining_bytes_indicator)
-    except StopIteration:
-        return
-    batch = read_batch_from_end(iterable,
-                                size=batch_size,
-                                end_position=remaining_bytes_count)
-    segment, *lines = lines_splitter(batch)
-    yield from reverse(lines)
-    for remaining_bytes_count in remaining_bytes_indicator:
-        batch = read_batch_from_end(iterable,
-                                    size=batch_size,
-                                    end_position=remaining_bytes_count)
-        lines = lines_splitter(batch)
-        if batch.endswith(lines_separator):
-            yield segment
-        else:
-            lines[-1] += segment
-        segment, *lines = lines
-        yield from reverse(lines)
-    yield segment
 
 
 def expand(object_: Domain) -> Iterable[Domain]:
