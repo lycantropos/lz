@@ -2,9 +2,9 @@ from typing import Iterable
 
 import pytest
 
+from lz.filtration import kicker
 from lz.hints import (Domain,
                       Predicate)
-from lz.iterating import kicker
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
                          are_objects_similar,

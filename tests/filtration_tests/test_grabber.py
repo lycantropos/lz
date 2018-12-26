@@ -2,9 +2,9 @@ from typing import Iterable
 
 import pytest
 
+from lz.filtration import grabber
 from lz.hints import (Domain,
                       Predicate)
-from lz.iterating import grabber
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
                          are_objects_similar,

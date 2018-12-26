@@ -1,8 +1,8 @@
 from typing import (Any,
                     Iterable)
 
+from lz.filtration import sifter
 from lz.hints import Predicate
-from lz.iterating import sifter
 
 
 def test_default_predicate(iterable: Iterable[Any]) -> None:
