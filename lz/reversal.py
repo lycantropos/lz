@@ -17,9 +17,7 @@ from typing import (Any,
                     overload)
 
 from .arithmetical import ceil_division
-from .hints import (Collection,
-                    Domain,
-                    FiniteIterable,
+from .hints import (Domain,
                     Range)
 from .textual import (decoder,
                       read_batch_from_end,
@@ -27,12 +25,7 @@ from .textual import (decoder,
 
 
 @overload
-def reverse(object_: FiniteIterable[Domain]) -> Iterable[Domain]:
-    pass
-
-
-@overload
-def reverse(object_: Sequence[Domain]) -> Iterable[Domain]:
+def reverse(object_: Sequence[Domain]) -> Sequence[Domain]:
     pass
 
 
@@ -66,12 +59,6 @@ def reverse(object_: Domain, **_: Any) -> Range:
     """
     raise TypeError('Unsupported object type: {type}.'
                     .format(type=type(object_)))
-
-
-@reverse.register(Collection)
-def reverse_finite_iterable(object_: FiniteIterable[Domain]
-                            ) -> Iterable[Domain]:
-    return list(object_)[::-1]
 
 
 @reverse.register(abc.Sequence)

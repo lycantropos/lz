@@ -1,11 +1,7 @@
 from functools import partial
 from numbers import Real
 from operator import gt
-from typing import (Any,
-                    Dict,
-                    Hashable,
-                    Iterable,
-                    Tuple)
+from typing import (Any, Dict, Hashable, Iterable, Sequence, Tuple)
 
 import pytest
 from hypothesis.searchstrategy import SearchStrategy as Strategy
@@ -81,6 +77,11 @@ def empty_iterable() -> Iterable[Any]:
 
 
 @pytest.fixture(scope='function')
+def empty_sequence() -> Iterable[Any]:
+    return find(strategies.empty.sequences)
+
+
+@pytest.fixture(scope='function')
 def iterable(iterables_strategy: Strategy[Iterable[Any]]) -> Iterable[Any]:
     return find(iterables_strategy)
 
@@ -98,17 +99,44 @@ def sortable_iterable() -> Iterable[Sortable]:
 
 
 @pytest.fixture(scope='function')
+def sequence(min_iterables_size: int) -> Iterable[Any]:
+    limit_min_size = partial(partial,
+                             min_size=min_iterables_size)
+    return find(
+            strategies.encodings.flatmap(limit_min_size(strategies
+                                                        .to_byte_sequences))
+            | limit_min_size(strategies
+                             .to_homogeneous_sequences)(strategies.objects)
+            | limit_min_size(strategies.to_strings)(strategies
+                                                    .to_characters()))
+
+
+@pytest.fixture(scope='function')
 def non_empty_iterable() -> Iterable[Any]:
     limit_min_size = partial(partial,
                              min_size=1)
     return find(
             strategies.encodings.flatmap(limit_min_size(strategies
-                                                        .to_byte_iterables))
+                                                        .to_any_streams))
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_byte_sequences))
             | limit_min_size(strategies
                              .to_homogeneous_iterables)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies.to_characters())
-            | strategies.encodings.flatmap(limit_min_size(strategies
-                                                          .to_text_streams)))
+            | limit_min_size(strategies.to_strings)(strategies
+                                                    .to_characters()))
+
+
+@pytest.fixture(scope='function')
+def non_empty_sequence() -> Sequence[Any]:
+    limit_min_size = partial(partial,
+                             min_size=1)
+    return find(
+            strategies.encodings.flatmap(limit_min_size(strategies
+                                                        .to_byte_sequences))
+            | limit_min_size(strategies
+                             .to_homogeneous_sequences)(strategies.objects)
+            | limit_min_size(strategies.to_strings)(strategies
+                                                    .to_characters()))
 
 
 @pytest.fixture(scope='function')
@@ -130,12 +158,13 @@ def iterables_strategy(min_iterables_size: int) -> Strategy[Iterable[Any]]:
     limit_min_size = partial(partial,
                              min_size=min_iterables_size)
     return (strategies.encodings.flatmap(limit_min_size(strategies
-                                                        .to_byte_iterables))
+                                                        .to_any_streams))
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_byte_sequences))
             | limit_min_size(strategies
                              .to_homogeneous_iterables)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies.to_characters())
-            | strategies.encodings.flatmap(limit_min_size(strategies
-                                                          .to_text_streams)))
+            | limit_min_size(strategies.to_strings)(strategies
+                                                    .to_characters()))
 
 
 @pytest.fixture(scope='function')

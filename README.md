@@ -149,11 +149,14 @@ Usage
     False
     ```
 
-10. reversing finite iterable
+10. reversing sequences and any string streams
     ```python
     >>> from lz.reversal import reverse
     >>> list(reverse(range(10)))
     [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    >>> import io
+    >>> list(reverse(io.BytesIO(b'Hello\nWorld!')))
+    [b'World!', b'Hello\n']
     ```
 
 11. chunking iterable

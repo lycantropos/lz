@@ -15,5 +15,7 @@ strings = strategies.just('')
 text_streams = strategies.builds(io.TextIOWrapper,
                                  byte_streams)
 tuples = strategies.tuples()
-sequences = byte_arrays | byte_strings | lists | strings | tuples
-iterables = byte_streams | iterators | sequences | text_streams
+byte_sequences = byte_arrays | byte_strings
+sequences = byte_sequences | lists | strings | tuples
+finite_iterables = dictionaries | sequences | sets
+iterables = byte_streams | finite_iterables | iterators | text_streams

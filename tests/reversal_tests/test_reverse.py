@@ -1,45 +1,48 @@
+from functools import partial
 from typing import (Any,
                     BinaryIO,
                     Iterable,
+                    Sequence,
                     TextIO)
 
-from lz import (left,
-                right)
 from lz.iterating import (first,
                           last)
 from lz.replication import duplicate
 from lz.reversal import reverse
 from lz.textual import encoder
 from tests.utils import (are_iterables_similar,
+                         are_objects_similar,
                          is_empty)
 
 
-def test_base_case(empty_iterable: Iterable[Any]) -> None:
-    result = reverse(empty_iterable)
+def test_empty(empty_sequence: Sequence[Any]) -> None:
+    result = reverse(empty_sequence)
 
     assert is_empty(result)
 
 
-def test_step_right(iterable: Iterable[Any],
-                    object_: Any) -> None:
-    attach = right.attacher(object_)
-
-    result = reverse(attach(iterable))
-
-    assert first(result) is object_
+limit_min_size = partial(partial,
+                         min_size=1)
 
 
-def test_step_left(iterable: Iterable[Any],
-                   object_: Any) -> None:
-    attach = left.attacher(object_)
+def test_non_empty_left_end(non_empty_sequence: Sequence[Any]) -> None:
+    original, target = duplicate(non_empty_sequence)
 
-    result = reverse(attach(iterable))
+    result = reverse(target)
 
-    assert last(result) is object_
+    assert are_objects_similar(last(result), first(original))
 
 
-def test_involution(iterable: Iterable[Any]) -> None:
-    original, target = duplicate(iterable)
+def test_non_empty_right_end(non_empty_sequence: Sequence[Any]) -> None:
+    original, target = duplicate(non_empty_sequence)
+
+    result = reverse(target)
+
+    assert are_objects_similar(first(result), last(original))
+
+
+def test_involution(sequence: Sequence[Any]) -> None:
+    original, target = duplicate(sequence)
 
     result = reverse(reverse(target))
 

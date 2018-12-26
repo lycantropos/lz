@@ -62,21 +62,6 @@ def to_byte_arrays(encoding: str,
 
 
 @limit_max_size
-def to_byte_iterables(encoding: str,
-                      *,
-                      min_size: int = 0,
-                      max_size: Optional[int] = None
-                      ) -> SearchStrategy[Union[bytes,
-                                                Iterable[bytes]]]:
-    return (to_byte_sequences(encoding,
-                              min_size=min_size,
-                              max_size=max_size)
-            | to_byte_streams(encoding,
-                              min_size=min_size,
-                              max_size=max_size))
-
-
-@limit_max_size
 def to_byte_sequences(encoding: str,
                       *,
                       min_size: int = 0,
