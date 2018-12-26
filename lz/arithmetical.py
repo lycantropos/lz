@@ -7,6 +7,11 @@ def ceil_division(left_number: int, right_number: int) -> int:
     pass
 
 
+@overload
+def ceil_division(left_number: Real, right_number: Real) -> Real:
+    pass
+
+
 def ceil_division(left_number: Real, right_number: Real) -> Real:
     """
     Divides given numbers with ceiling.
