@@ -36,15 +36,6 @@ def reverse(object_: Sequence[Domain]) -> Iterable[Domain]:
     pass
 
 
-@overload
-def reverse(object_: IO[AnyStr],
-            *,
-            batch_size: Optional[int] = ...,
-            lines_separator: Optional[AnyStr] = ...,
-            keep_lines_separator: bool = ...) -> Iterable[AnyStr]:
-    pass
-
-
 if sys.version_info >= (3, 6):
     from typing import Reversible
 
@@ -52,6 +43,15 @@ if sys.version_info >= (3, 6):
     @overload
     def reverse(object_: Reversible[Domain]) -> Iterable[Domain]:
         pass
+
+
+@overload
+def reverse(object_: IO[AnyStr],
+            *,
+            batch_size: Optional[int] = ...,
+            lines_separator: Optional[AnyStr] = ...,
+            keep_lines_separator: bool = ...) -> Iterable[AnyStr]:
+    pass
 
 
 @overload
