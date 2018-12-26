@@ -143,7 +143,7 @@ def quicksort(iterable: Iterable[Domain]) -> Iterable[Domain]:
         pivot_index = start_index
         start_element = sequence[start_index]
         for index in range(start_index + 1, stop_index + 1):
-            if sequence[index] > start_element:
+            if start_element < sequence[index]:
                 continue
             pivot_index += 1
             sequence[index], sequence[pivot_index] = (sequence[pivot_index],
