@@ -1,5 +1,5 @@
 from typing import (Callable,
-                    Iterable)
+                    Sequence)
 
 from lz import (left,
                 right)
@@ -11,19 +11,19 @@ from tests.utils import are_objects_similar
 
 def test_base_case(projector: Callable[[Domain, Range], Range],
                    projector_initial: Range,
-                   empty_iterable: Iterable[Domain]) -> None:
+                   empty_sequence: Sequence[Domain]) -> None:
     fold = right.folder(projector, projector_initial)
 
-    result = fold(empty_iterable)
+    result = fold(empty_sequence)
 
     assert result is projector_initial
 
 
 def test_step(projector: Callable[[Domain, Range], Range],
               projector_initial: Range,
-              projector_iterable: Iterable[Domain],
+              projector_sequence: Sequence[Domain],
               projector_domain_element: Domain) -> None:
-    first_target, second_target = duplicate(projector_iterable)
+    first_target, second_target = duplicate(projector_sequence)
     original, target = duplicate(projector_domain_element)
     fold = right.folder(projector, projector_initial)
     attach = left.attacher(target)
