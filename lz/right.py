@@ -9,8 +9,8 @@ from .functional import (ApplierBase,
 from .hints import (Domain,
                     Map,
                     Range)
-from .iterating import (expand,
-                        reverse)
+from .iterating import expand
+from .reversal import reverse
 
 
 def accumulator(function: Callable[[Domain, Range], Range],
