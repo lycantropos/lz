@@ -1,7 +1,9 @@
 import functools
 import itertools
 from typing import (Callable,
-                    Iterable)
+                    Iterable,
+                    List,
+                    Tuple)
 
 from .functional import ApplierBase
 from .hints import (Domain,
@@ -29,11 +31,26 @@ def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
     """
     Returns function that prepends given object to iterable.
     """
+    return functools.partial(attach,
+                             object_=object_)
 
-    def attach(iterable: Iterable[Domain]) -> Iterable[Domain]:
-        yield from itertools.chain(expand(object_), iterable)
 
-    return attach
+@functools.singledispatch
+def attach(iterable: Iterable[Domain],
+           object_: Domain) -> Iterable[Domain]:
+    yield from itertools.chain(expand(object_), iterable)
+
+
+@attach.register(list)
+def attach_to_list(iterable: List[Domain],
+                   object_: Domain) -> List[Domain]:
+    return [object_] + iterable
+
+
+@attach.register(tuple)
+def attach_to_tuple(iterable: Tuple[Domain, ...],
+                    object_: Domain) -> Tuple[Domain, ...]:
+    return (object_,) + iterable
 
 
 def folder(function: Callable[[Range, Domain], Range],
