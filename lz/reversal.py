@@ -11,14 +11,15 @@ from typing import (Any,
                     BinaryIO,
                     IO,
                     Iterable,
-                    Iterator,
                     Optional,
                     Sequence,
                     TextIO,
                     overload)
 
 from .arithmetical import ceil_division
-from .hints import (Domain,
+from .hints import (Collection,
+                    Domain,
+                    FiniteIterable,
                     Range)
 from .textual import (decoder,
                       read_batch_from_end,
@@ -26,7 +27,7 @@ from .textual import (decoder,
 
 
 @overload
-def reverse(object_: Iterator[Domain]) -> Iterable[Domain]:
+def reverse(object_: FiniteIterable[Domain]) -> Iterable[Domain]:
     pass
 
 
@@ -67,9 +68,10 @@ def reverse(object_: Domain, **_: Any) -> Range:
                     .format(type=type(object_)))
 
 
-@reverse.register(abc.Iterator)
-def reverse_iterator(object_: Iterator[Domain]) -> Iterable[Domain]:
-    yield from reversed(list(object_))
+@reverse.register(Collection)
+def reverse_finite_iterable(object_: FiniteIterable[Domain]
+                            ) -> Iterable[Domain]:
+    return list(object_)[::-1]
 
 
 @reverse.register(abc.Sequence)
