@@ -1,3 +1,4 @@
+import io
 import os
 import pkgutil
 import sys
@@ -5,7 +6,8 @@ from functools import partial
 from typing import (Any,
                     Dict,
                     Hashable,
-                    Iterable)
+                    Iterable,
+                    TextIO)
 
 import pytest
 from _pytest.config.argparsing import Parser
@@ -83,6 +85,32 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
 @pytest.fixture(scope='session',
                 autouse=True)
 def patch_sized_replication() -> None:
+    def replicate_byte_buffer(object_: io.BytesIO,
+                              *,
+                              count: int) -> Iterable[io.BytesIO]:
+        yield from map(io.BytesIO, replicate(object_.getvalue(),
+                                             count=count))
+
+    replicate.register(io.BytesIO, replicate_byte_buffer)
+
+    def replicate_byte_stream(object_: io.BufferedReader,
+                              *,
+                              count: int) -> Iterable[io.BufferedReader]:
+        yield from map(io.BufferedReader, replicate(object_.raw,
+                                                    count=count))
+
+    replicate.register(io.BufferedReader, replicate_byte_stream)
+
+    def replicate_text_stream(object_: TextIO,
+                              *,
+                              count: int) -> Iterable[TextIO]:
+        yield from map(partial(io.TextIOWrapper,
+                               encoding=object_.encoding),
+                       replicate(object_.buffer,
+                                 count=count))
+
+    replicate.register(io.TextIOWrapper, replicate_text_stream)
+
     def replicate_sized(object_: Any,
                         *,
                         count: int) -> Iterable[Any]:
