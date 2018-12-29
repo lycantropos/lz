@@ -21,7 +21,7 @@ tests_require = [
 ]
 
 setup(name='lz',
-      packages=find_packages(exclude=('tests',)),
+      packages=find_packages(exclude=('tests', 'tests.*',)),
       version=lz.__version__,
       description=lz.__doc__,
       long_description=Path('README.md').read_text(),
