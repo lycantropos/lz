@@ -5,10 +5,10 @@ import pytest
 from lz.filtration import grabber
 from lz.hints import (Domain,
                       Predicate)
-from lz.iterating import capacity
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
-                         are_objects_similar)
+                         are_objects_similar,
+                         is_empty)
 
 
 def test_basic(iterable: Iterable[Domain]) -> None:
@@ -31,9 +31,9 @@ def test_false_predicate(iterable: Iterable[Domain],
                          false_predicate: Predicate) -> None:
     skip_all = grabber(false_predicate)
 
-    skip_all_result = skip_all(iterable)
+    result = skip_all(iterable)
 
-    assert capacity(skip_all_result) == 0
+    assert is_empty(result)
 
 
 def test_true_predicate(iterable: Iterable[Domain],
@@ -41,6 +41,6 @@ def test_true_predicate(iterable: Iterable[Domain],
     original, target = duplicate(iterable)
     grab_all = grabber(true_predicate)
 
-    grab_all_result = grab_all(target)
+    result = grab_all(target)
 
-    assert are_iterables_similar(grab_all_result, original)
+    assert are_iterables_similar(result, original)
