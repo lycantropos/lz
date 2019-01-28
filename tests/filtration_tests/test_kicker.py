@@ -5,10 +5,10 @@ import pytest
 from lz.filtration import kicker
 from lz.hints import (Domain,
                       Predicate)
-from lz.iterating import capacity
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
-                         are_objects_similar)
+                         are_objects_similar,
+                         is_empty)
 
 
 def test_basic(iterable: Iterable[Domain]) -> None:
@@ -37,15 +37,15 @@ def test_false_predicate(iterable: Iterable[Domain],
     original, target = duplicate(iterable)
     keep_all = kicker(false_predicate)
 
-    keep_all_result = keep_all(target)
+    result = keep_all(target)
 
-    assert are_iterables_similar(keep_all_result, original)
+    assert are_iterables_similar(result, original)
 
 
 def test_true_predicate(iterable: Iterable[Domain],
                         true_predicate: Predicate) -> None:
     kick_all = kicker(true_predicate)
 
-    kick_all_result = kick_all(iterable)
+    result = kick_all(iterable)
 
-    assert capacity(kick_all_result) == 0
+    assert is_empty(result)
