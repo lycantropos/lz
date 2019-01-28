@@ -3,12 +3,15 @@ import itertools
 from collections import (abc,
                          defaultdict,
                          deque)
+from functools import singledispatch
 from operator import is_not
-from typing import (Hashable,
+from typing import (Any,
+                    Hashable,
                     Iterable,
                     List,
                     Mapping,
                     Sequence,
+                    Sized,
                     Tuple)
 
 from .functional import compose
@@ -164,3 +167,13 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
 
 last = compose(next, trailer(1))
 last.__doc__ = 'Returns last element of iterable.'
+
+
+@singledispatch
+def capacity(iterable: Iterable[Any]) -> int:
+    return sum(1 for _ in iterable)
+
+
+@capacity.register(abc.Sized)
+def sized_capacity(iterable: Sized) -> int:
+    return len(iterable)

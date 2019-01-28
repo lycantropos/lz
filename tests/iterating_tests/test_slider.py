@@ -4,13 +4,13 @@ from typing import (Any,
 
 from lz import (left,
                 right)
-from lz.iterating import (first,
+from lz.iterating import (capacity,
+                          first,
                           flatten,
                           last,
                           slider)
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
-                         capacity,
                          is_empty)
 
 

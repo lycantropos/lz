@@ -2,11 +2,11 @@ from itertools import islice
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import cutter
+from lz.iterating import (capacity,
+                          cutter)
 from lz.replication import duplicate
 from tests.configs import MAX_ITERABLES_SIZE
-from tests.utils import (are_iterables_similar,
-                         capacity)
+from tests.utils import are_iterables_similar
 
 
 def test_capacity(iterable: Iterable[Any],

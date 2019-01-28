@@ -3,7 +3,7 @@ from typing import (Any,
                     Tuple)
 
 from lz.functional import arguments_to_strings
-from tests.utils import capacity
+from lz.iterating import capacity
 
 
 def test_capacity(positional_arguments: Tuple[Any, ...],

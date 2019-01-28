@@ -1,12 +1,12 @@
 from typing import Iterable
 
 from lz.hints import Sortable
-from lz.iterating import slider
+from lz.iterating import (capacity,
+                          slider)
 from lz.replication import duplicate
 from lz.sorting import (Key,
                         sorter)
-from tests.utils import (capacity,
-                         iterables_has_same_elements)
+from tests.utils import iterables_has_same_elements
 
 
 def test_order(sortable_iterable: Iterable[Sortable],

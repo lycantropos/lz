@@ -3,7 +3,7 @@ from typing import List
 from lz.functional import combine
 from lz.hints import (Domain,
                       Map)
-from tests.utils import capacity
+from lz.iterating import capacity
 
 
 def test_capacity(maps: List[Map],

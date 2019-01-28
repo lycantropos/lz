@@ -10,8 +10,7 @@ from typing import (Any,
                     Hashable,
                     Iterable,
                     Mapping,
-                    Set,
-                    Sized)
+                    Set)
 
 from hypothesis import (Phase,
                         core,
@@ -205,16 +204,6 @@ def is_empty(iterable: Iterable[Any]) -> bool:
         return True
     else:
         return False
-
-
-@singledispatch
-def capacity(iterable: Iterable[Any]) -> int:
-    return sum(1 for _ in iterable)
-
-
-@capacity.register(abc.Sized)
-def sized_capacity(iterable: Sized) -> int:
-    return len(iterable)
 
 
 encoding_to_bom = (defaultdict(bytes,
