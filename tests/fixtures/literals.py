@@ -1,7 +1,12 @@
 from functools import partial
 from numbers import Real
 from operator import gt
-from typing import (Any, Dict, Hashable, Iterable, Sequence, Tuple)
+from typing import (Any,
+                    Dict,
+                    Hashable,
+                    Iterable,
+                    Sequence,
+                    Tuple)
 
 import pytest
 from hypothesis.searchstrategy import SearchStrategy as Strategy
