@@ -216,9 +216,15 @@ encodings_unsupported_code_points = defaultdict(
          'utf_16': range(0xd800, 0xe000),
          'utf_16_be': range(0xd800, 0xe000),
          'utf_16_le': range(0xd800, 0xe000),
-         'utf_32': range(0x110000, 256 ** encodings_lengths['utf_32']),
-         'utf_32_be': range(0x110000, 256 ** encodings_lengths['utf_32_be']),
-         'utf_32_le': range(0x110000, 256 ** encodings_lengths['utf_32_le']),
+         'utf_32': (set(range(0xd800, 0xe000))
+                    | set(range(0x110000,
+                                256 ** encodings_lengths['utf_32']))),
+         'utf_32_be': (set(range(0xd800, 0xe000))
+                       | set(range(0x110000,
+                                   256 ** encodings_lengths['utf_32_be']))),
+         'utf_32_le': (set(range(0xd800, 0xe000))
+                       | set(range(0x110000,
+                                   256 ** encodings_lengths['utf_32_le']))),
          'utf_8': range(128, 256),
          'utf_8_sig': range(128, 256),
          'cp65001': range(128, 256),
