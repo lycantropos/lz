@@ -5,6 +5,7 @@ from typing import (Any,
                     Dict,
                     Hashable,
                     Iterable,
+                    Sequence,
                     Tuple)
 
 import pytest
@@ -13,9 +14,11 @@ from hypothesis.searchstrategy import SearchStrategy as Strategy
 from lz.functional import identity
 from lz.hints import (FiniteIterable,
                       Sortable)
+from lz.reversal import reverse
 from lz.sorting import (Implementation,
                         Key,
                         with_key)
+from lz.transposition import transpose
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import find
@@ -81,6 +84,11 @@ def empty_iterable() -> Iterable[Any]:
 
 
 @pytest.fixture(scope='function')
+def empty_sequence() -> Iterable[Any]:
+    return find(strategies.empty.sequences)
+
+
+@pytest.fixture(scope='function')
 def iterable(iterables_strategy: Strategy[Iterable[Any]]) -> Iterable[Any]:
     return find(iterables_strategy)
 
@@ -98,17 +106,44 @@ def sortable_iterable() -> Iterable[Sortable]:
 
 
 @pytest.fixture(scope='function')
+def sequence(min_iterables_size: int) -> Iterable[Any]:
+    limit_min_size = partial(partial,
+                             min_size=min_iterables_size)
+    return find(
+            strategies.encodings.flatmap(limit_min_size(strategies
+                                                        .to_byte_sequences))
+            | limit_min_size(strategies
+                             .to_homogeneous_sequences)(strategies.objects)
+            | limit_min_size(strategies.to_strings)(strategies
+                                                    .to_characters()))
+
+
+@pytest.fixture(scope='function')
 def non_empty_iterable() -> Iterable[Any]:
     limit_min_size = partial(partial,
                              min_size=1)
     return find(
             strategies.encodings.flatmap(limit_min_size(strategies
-                                                        .to_byte_iterables))
+                                                        .to_any_streams))
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_byte_sequences))
             | limit_min_size(strategies
                              .to_homogeneous_iterables)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies.to_characters())
-            | strategies.encodings.flatmap(limit_min_size(strategies
-                                                          .to_text_streams)))
+            | limit_min_size(strategies.to_strings)(strategies
+                                                    .to_characters()))
+
+
+@pytest.fixture(scope='function')
+def non_empty_sequence() -> Sequence[Any]:
+    limit_min_size = partial(partial,
+                             min_size=1)
+    return find(
+            strategies.encodings.flatmap(limit_min_size(strategies
+                                                        .to_byte_sequences))
+            | limit_min_size(strategies
+                             .to_homogeneous_sequences)(strategies.objects)
+            | limit_min_size(strategies.to_strings)(strategies
+                                                    .to_characters()))
 
 
 @pytest.fixture(scope='function')
@@ -130,12 +165,21 @@ def iterables_strategy(min_iterables_size: int) -> Strategy[Iterable[Any]]:
     limit_min_size = partial(partial,
                              min_size=min_iterables_size)
     return (strategies.encodings.flatmap(limit_min_size(strategies
-                                                        .to_byte_iterables))
+                                                        .to_any_streams))
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_byte_sequences))
             | limit_min_size(strategies
                              .to_homogeneous_iterables)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies.to_characters())
-            | strategies.encodings.flatmap(limit_min_size(strategies
-                                                          .to_text_streams)))
+            | limit_min_size(strategies.to_strings)(strategies
+                                                    .to_characters()))
+
+
+@pytest.fixture(scope='function')
+def irreversible_object() -> Any:
+    def is_object_irreversible(object_: Any) -> bool:
+        return reverse.dispatch(type(object_)) is reverse.dispatch(object)
+
+    return find(strategies.objects.filter(is_object_irreversible))
 
 
 @pytest.fixture(scope='function')
@@ -169,3 +213,11 @@ def transposable_iterable_elements_strategy(size: int
                                             ) -> Strategy[FiniteIterable[Any]]:
     return strategies.to_tuples(strategies.objects,
                                 size=size)
+
+
+@pytest.fixture(scope='function')
+def untransposable_object() -> Any:
+    def is_untransposable_object(object_: Any) -> bool:
+        return transpose.dispatch(type(object_)) is transpose.dispatch(object)
+
+    return find(strategies.objects.filter(is_untransposable_object))

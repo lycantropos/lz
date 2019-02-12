@@ -1,6 +1,8 @@
 from typing import (Any,
                     Iterable)
 
+import pytest
+
 from lz import (left,
                 right)
 from lz.hints import FiniteIterable
@@ -47,3 +49,8 @@ def test_involution(
     result = transpose(transpose(target))
 
     assert are_iterables_similar(result, original)
+
+
+def test_unsupported_type(untransposable_object: Any) -> None:
+    with pytest.raises(TypeError):
+        transpose(untransposable_object)

@@ -2,25 +2,30 @@ from typing import Iterable
 
 import pytest
 
+from lz.filtration import kicker
 from lz.hints import (Domain,
                       Predicate)
-from lz.iterating import grabber
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
                          are_objects_similar,
-                         capacity)
+                         is_empty)
 
 
 def test_basic(iterable: Iterable[Domain]) -> None:
     original, target = duplicate(iterable)
-    grab = grabber()
+    kick = kicker()
 
-    result = grab(target)
+    result = kick(target)
     result_iterator = iter(result)
+    original_iterator = iter(original)
 
-    for result_element, original_element in zip(result_iterator, original):
+    for original_element in original_iterator:
         if not original_element:
+            assert are_objects_similar(original_element, next(result_iterator))
             break
+
+    for result_element, original_element in zip(result_iterator,
+                                                original_iterator):
         assert are_objects_similar(result_element, original_element)
 
     with pytest.raises(StopIteration):
@@ -29,18 +34,18 @@ def test_basic(iterable: Iterable[Domain]) -> None:
 
 def test_false_predicate(iterable: Iterable[Domain],
                          false_predicate: Predicate) -> None:
-    skip_all = grabber(false_predicate)
+    original, target = duplicate(iterable)
+    keep_all = kicker(false_predicate)
 
-    skip_all_result = skip_all(iterable)
+    result = keep_all(target)
 
-    assert capacity(skip_all_result) == 0
+    assert are_iterables_similar(result, original)
 
 
 def test_true_predicate(iterable: Iterable[Domain],
                         true_predicate: Predicate) -> None:
-    original, target = duplicate(iterable)
-    grab_all = grabber(true_predicate)
+    kick_all = kicker(true_predicate)
 
-    grab_all_result = grab_all(target)
+    result = kick_all(iterable)
 
-    assert are_iterables_similar(grab_all_result, original)
+    assert is_empty(result)

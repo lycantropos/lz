@@ -3,6 +3,7 @@ from typing import (Callable,
                     Dict,
                     Iterable,
                     List,
+                    Sequence,
                     Tuple)
 
 import pytest
@@ -60,6 +61,11 @@ def map_() -> Map:
 @pytest.fixture(scope='function')
 def map_argument() -> Domain:
     return find(strategies.maps_arguments)
+
+
+@pytest.fixture(scope='function')
+def map_arguments() -> Iterable[Domain]:
+    return find(strategies.to_homogeneous_iterables(strategies.maps_arguments))
 
 
 @pytest.fixture(scope='function')
@@ -197,4 +203,10 @@ def projector_initial(projector: Callable[[Domain, Domain], Domain],
 @pytest.fixture(scope='function')
 def projector_iterable(projector_domain: SearchStrategy) -> Iterable[Domain]:
     return find(strategies.to_homogeneous_iterables(projector_domain,
+                                                    min_size=1))
+
+
+@pytest.fixture(scope='function')
+def projector_sequence(projector_domain: SearchStrategy) -> Sequence[Domain]:
+    return find(strategies.to_homogeneous_sequences(projector_domain,
                                                     min_size=1))

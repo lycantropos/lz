@@ -1,10 +1,10 @@
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import header
+from lz.iterating import (capacity,
+                          header)
 from lz.replication import duplicate
-from tests.utils import (capacity,
-                         iterable_starts_with)
+from tests.utils import iterable_starts_with
 
 
 def test_capacity(non_empty_iterable: Iterable[Any],

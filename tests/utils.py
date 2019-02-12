@@ -10,8 +10,7 @@ from typing import (Any,
                     Hashable,
                     Iterable,
                     Mapping,
-                    Set,
-                    Sized)
+                    Set)
 
 from hypothesis import (Phase,
                         core,
@@ -158,20 +157,20 @@ def are_mappings_similar(object_: Mapping[Hashable, Any],
 
 @are_objects_similar.register(abc.Set)
 def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
-    if not all(isinstance(candidate, abc.Set)
-               for candidate in rest):
+    if not all(isinstance(next_set, abc.Set)
+               for next_set in rest):
         return False
     for next_set in rest:
         object_, object_copy = map(set, duplicate(object_))
         symmetric_difference = object_copy ^ next_set
-        if not all(isinstance(element, abc.Iterable)
-                   for element in symmetric_difference):
-            return False
         while symmetric_difference:
             target = symmetric_difference.pop()
             candidates = iter(symmetric_difference)
             symmetric_difference = set()
             for candidate in candidates:
+                if not has_similar_types(candidate, target):
+                    symmetric_difference.add(candidate)
+                    continue
                 target, target_copy = duplicate(target)
                 candidate, candidate_copy = duplicate(candidate)
                 if are_objects_similar(target_copy, candidate_copy):
@@ -182,6 +181,13 @@ def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
             else:
                 return False
     return True
+
+
+def has_similar_types(left_object: Any, right_object: Any) -> bool:
+    left_type = type(left_object)
+    right_type = type(right_object)
+    return (issubclass(left_type, right_type)
+            or issubclass(right_type, left_type))
 
 
 @are_objects_similar.register(abc.Iterable)
@@ -205,16 +211,6 @@ def is_empty(iterable: Iterable[Any]) -> bool:
         return True
     else:
         return False
-
-
-@singledispatch
-def capacity(iterable: Iterable[Any]) -> int:
-    return sum(1 for _ in iterable)
-
-
-@capacity.register(abc.Sized)
-def sized_capacity(iterable: Sized) -> int:
-    return len(iterable)
 
 
 encoding_to_bom = (defaultdict(bytes,

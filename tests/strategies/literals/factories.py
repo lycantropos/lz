@@ -7,6 +7,7 @@ from operator import methodcaller
 from typing import (AnyStr,
                     BinaryIO,
                     Callable,
+                    Container,
                     IO,
                     Iterable,
                     Optional,
@@ -59,21 +60,6 @@ def to_byte_arrays(encoding: str,
                             min_size=min_size,
                             max_size=max_size)
             .map(bytearray))
-
-
-@limit_max_size
-def to_byte_iterables(encoding: str,
-                      *,
-                      min_size: int = 0,
-                      max_size: Optional[int] = None
-                      ) -> SearchStrategy[Union[bytes,
-                                                Iterable[bytes]]]:
-    return (to_byte_sequences(encoding,
-                              min_size=min_size,
-                              max_size=max_size)
-            | to_byte_streams(encoding,
-                              min_size=min_size,
-                              max_size=max_size))
 
 
 @limit_max_size
@@ -166,6 +152,17 @@ encodings_lengths = defaultdict(lambda: 1,
                                  'utf_32': 4,
                                  'utf_32_be': 4,
                                  'utf_32_le': 4})
+
+
+class ContainersChain:
+    def __init__(self, *containers: Container[Domain]) -> None:
+        self.containers = containers
+
+    def __contains__(self, object_: Domain) -> bool:
+        return any(object_ in container
+                   for container in self.containers)
+
+
 encodings_unsupported_code_points = defaultdict(
         set,
         {'ascii': range(128, 256),
@@ -231,9 +228,15 @@ encodings_unsupported_code_points = defaultdict(
          'utf_16': range(0xd800, 0xe000),
          'utf_16_be': range(0xd800, 0xe000),
          'utf_16_le': range(0xd800, 0xe000),
-         'utf_32': range(0x110000, 256 ** encodings_lengths['utf_32']),
-         'utf_32_be': range(0x110000, 256 ** encodings_lengths['utf_32_be']),
-         'utf_32_le': range(0x110000, 256 ** encodings_lengths['utf_32_le']),
+         'utf_32': ContainersChain(
+                 range(0xd800, 0xe000),
+                 range(0x110000, 256 ** encodings_lengths['utf_32'])),
+         'utf_32_be': ContainersChain(
+                 range(0xd800, 0xe000),
+                 range(0x110000, 256 ** encodings_lengths['utf_32_be'])),
+         'utf_32_le': ContainersChain(
+                 range(0xd800, 0xe000),
+                 range(0x110000, 256 ** encodings_lengths['utf_32_le'])),
          'utf_8': range(128, 256),
          'utf_8_sig': range(128, 256),
          'cp65001': range(128, 256),

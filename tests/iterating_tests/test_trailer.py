@@ -1,10 +1,10 @@
 from typing import (Any,
                     Iterable)
 
-from lz.iterating import trailer
+from lz.iterating import (capacity,
+                          trailer)
 from lz.replication import duplicate
-from tests.utils import (capacity,
-                         iterable_ends_with)
+from tests.utils import iterable_ends_with
 
 
 def test_capacity(non_empty_iterable: Iterable[Any],

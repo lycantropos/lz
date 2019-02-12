@@ -3,8 +3,8 @@ from typing import (Any,
                     Iterable)
 
 from lz.hints import Map
-from lz.iterating import (duplicate,
-                          grouper)
+from lz.iterating import grouper
+from lz.replication import duplicate
 
 
 def test_basic(hashables_iterable: Iterable[Hashable],

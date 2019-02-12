@@ -1,46 +1,50 @@
+from functools import partial
 from typing import (Any,
                     BinaryIO,
                     Iterable,
-                    Set,
+                    Sequence,
                     TextIO)
 
-from lz import (left,
-                right)
+import pytest
+
 from lz.iterating import (first,
-                          last,
-                          reverse)
+                          last)
 from lz.replication import duplicate
+from lz.reversal import reverse
 from lz.textual import encoder
 from tests.utils import (are_iterables_similar,
+                         are_objects_similar,
                          is_empty)
 
 
-def test_base_case(empty_iterable: Iterable[Any]) -> None:
-    result = reverse(empty_iterable)
+def test_empty(empty_sequence: Sequence[Any]) -> None:
+    result = reverse(empty_sequence)
 
     assert is_empty(result)
 
 
-def test_step_right(iterable: Iterable[Any],
-                    object_: Any) -> None:
-    attach = right.attacher(object_)
-
-    result = reverse(attach(iterable))
-
-    assert first(result) is object_
+limit_min_size = partial(partial,
+                         min_size=1)
 
 
-def test_step_left(iterable: Iterable[Any],
-                   object_: Any) -> None:
-    attach = left.attacher(object_)
+def test_non_empty_left_end(non_empty_sequence: Sequence[Any]) -> None:
+    original, target = duplicate(non_empty_sequence)
 
-    result = reverse(attach(iterable))
+    result = reverse(target)
 
-    assert last(result) is object_
+    assert are_objects_similar(last(result), first(original))
 
 
-def test_involution(iterable: Iterable[Any]) -> None:
-    original, target = duplicate(iterable)
+def test_non_empty_right_end(non_empty_sequence: Sequence[Any]) -> None:
+    original, target = duplicate(non_empty_sequence)
+
+    result = reverse(target)
+
+    assert are_objects_similar(first(result), last(original))
+
+
+def test_involution(sequence: Sequence[Any]) -> None:
+    original, target = duplicate(sequence)
 
     result = reverse(reverse(target))
 
@@ -81,3 +85,8 @@ def are_byte_substrings(byte_strings: Iterable[bytes],
         return True
     return all(not line or set(line) & set(target_string)
                for line in byte_strings)
+
+
+def test_unsupported_type(irreversible_object: Any) -> None:
+    with pytest.raises(TypeError):
+        reverse(irreversible_object)

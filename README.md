@@ -149,11 +149,14 @@ Usage
     False
     ```
 
-10. reversing iterable
+10. reversing sequences and any string streams
     ```python
-    >>> from lz.iterating import reverse
+    >>> from lz.reversal import reverse
     >>> list(reverse(range(10)))
     [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    >>> import io
+    >>> list(reverse(io.BytesIO(b'Hello\nWorld!')))
+    [b'World!', b'Hello\n']
     ```
 
 11. chunking iterable
@@ -189,8 +192,8 @@ Usage
 15. iterable duplication
     ```python
     >>> from lz.replication import duplicate
-    >>> list(map(list, duplicate(range(10))))
-    [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+    >>> list(map(tuple, duplicate(range(10))))
+    [(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)]
     ```
 
 and many more.

@@ -2,8 +2,8 @@ from operator import not_
 from typing import (Any,
                     Iterable)
 
+from lz.filtration import scavenger
 from lz.hints import Predicate
-from lz.iterating import scavenger
 from lz.logical import negate
 
 

@@ -1,6 +1,9 @@
+import functools
 import itertools
 from typing import (Callable,
-                    Iterable)
+                    Iterable,
+                    List,
+                    Tuple)
 
 from . import left
 from .functional import (ApplierBase,
@@ -9,8 +12,8 @@ from .functional import (ApplierBase,
 from .hints import (Domain,
                     Map,
                     Range)
-from .iterating import (expand,
-                        reverse)
+from .iterating import expand
+from .reversal import reverse
 
 
 def accumulator(function: Callable[[Domain, Range], Range],
@@ -28,11 +31,26 @@ def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
     """
     Returns function that appends given object to iterable.
     """
+    return functools.partial(attach,
+                             object_=object_)
 
-    def attach(iterable: Iterable[Domain]) -> Iterable[Domain]:
-        yield from itertools.chain(iterable, expand(object_))
 
-    return attach
+@functools.singledispatch
+def attach(iterable: Iterable[Domain],
+           object_: Domain) -> Iterable[Domain]:
+    yield from itertools.chain(iterable, expand(object_))
+
+
+@attach.register(list)
+def attach_to_list(iterable: List[Domain],
+                   object_: Domain) -> List[Domain]:
+    return iterable + [object_]
+
+
+@attach.register(tuple)
+def attach_to_tuple(iterable: Tuple[Domain, ...],
+                    object_: Domain) -> Tuple[Domain, ...]:
+    return iterable + (object_,)
 
 
 def folder(function: Callable[[Domain, Range], Range],
