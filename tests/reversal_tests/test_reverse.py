@@ -5,6 +5,8 @@ from typing import (Any,
                     Sequence,
                     TextIO)
 
+import pytest
+
 from lz.iterating import (first,
                           last)
 from lz.replication import duplicate
@@ -83,3 +85,8 @@ def are_byte_substrings(byte_strings: Iterable[bytes],
         return True
     return all(not line or set(line) & set(target_string)
                for line in byte_strings)
+
+
+def test_unsupported_type(irreversible_object: Any) -> None:
+    with pytest.raises(TypeError):
+        reverse(irreversible_object)

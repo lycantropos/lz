@@ -14,6 +14,7 @@ from hypothesis.searchstrategy import SearchStrategy as Strategy
 from lz.functional import identity
 from lz.hints import (FiniteIterable,
                       Sortable)
+from lz.reversal import reverse
 from lz.sorting import (Implementation,
                         Key,
                         with_key)
@@ -171,6 +172,14 @@ def iterables_strategy(min_iterables_size: int) -> Strategy[Iterable[Any]]:
                              .to_homogeneous_iterables)(strategies.objects)
             | limit_min_size(strategies.to_strings)(strategies
                                                     .to_characters()))
+
+
+@pytest.fixture(scope='function')
+def irreversible_object() -> Any:
+    def is_object_irreversible(object_: Any) -> bool:
+        return reverse.dispatch(type(object_)) is reverse.dispatch(object)
+
+    return find(strategies.objects.filter(is_object_irreversible))
 
 
 @pytest.fixture(scope='function')
