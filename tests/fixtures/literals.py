@@ -17,6 +17,7 @@ from lz.hints import (FiniteIterable,
 from lz.sorting import (Implementation,
                         Key,
                         with_key)
+from lz.transposition import transpose
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import find
@@ -203,3 +204,11 @@ def transposable_iterable_elements_strategy(size: int
                                             ) -> Strategy[FiniteIterable[Any]]:
     return strategies.to_tuples(strategies.objects,
                                 size=size)
+
+
+@pytest.fixture(scope='function')
+def untransposable_object() -> Any:
+    def is_untransposable_object(object_: Any) -> bool:
+        return transpose.dispatch(type(object_)) is transpose.dispatch(object)
+
+    return find(strategies.objects.filter(is_untransposable_object))
