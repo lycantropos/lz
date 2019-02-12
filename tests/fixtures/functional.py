@@ -64,6 +64,11 @@ def map_argument() -> Domain:
 
 
 @pytest.fixture(scope='function')
+def map_arguments() -> Iterable[Domain]:
+    return find(strategies.to_homogeneous_iterables(strategies.maps_arguments))
+
+
+@pytest.fixture(scope='function')
 def maps() -> List[Map]:
     return find(strategies.maps_lists)
 
