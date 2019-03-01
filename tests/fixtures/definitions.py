@@ -34,6 +34,11 @@ def other_class() -> type:
 
 
 @pytest.fixture(scope='function')
+def another_class() -> type:
+    return find(strategies.classes)
+
+
+@pytest.fixture(scope='function')
 def classes() -> Sequence[type]:
     return find(strategies.to_homogeneous_sequences(strategies.classes))
 
