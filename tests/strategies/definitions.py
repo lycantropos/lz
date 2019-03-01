@@ -4,6 +4,11 @@ from types import ModuleType
 from typing import (Any,
                     Union)
 
+try:
+    from typing import Protocol
+except ImportError:
+    from typing import _Protocol as Protocol
+
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 from paradigm.definitions import (is_supported,
@@ -27,8 +32,15 @@ def flatten_module_or_class(object_: Union[ModuleType, type]
 
 modules_callables = (modules.flatmap(flatten_module_or_class)
                      .filter(callable))
+
+
+def is_not_protocol(class_: type) -> bool:
+    return issubclass(class_, Protocol)
+
+
 classes = (modules_callables.filter(inspect.isclass)
-           .filter(is_supported))
+           .filter(is_supported)
+           .filter(is_not_protocol))
 classes_callables = (classes.flatmap(flatten_module_or_class)
                      .filter(callable))
 methods = classes_callables.filter(inspect.isfunction)
