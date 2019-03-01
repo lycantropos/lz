@@ -2,7 +2,8 @@ from types import (BuiltinFunctionType,
                    FunctionType,
                    MethodType)
 from typing import (Any,
-                    Callable)
+                    Callable,
+                    Sequence)
 
 import pytest
 from paradigm.hints import (MethodDescriptorType,
@@ -25,6 +26,16 @@ def callable_() -> Callable[..., Any]:
 @pytest.fixture(scope='function')
 def class_() -> type:
     return find(strategies.classes)
+
+
+@pytest.fixture(scope='function')
+def other_class() -> type:
+    return find(strategies.classes)
+
+
+@pytest.fixture(scope='function')
+def classes() -> Sequence[type]:
+    return find(strategies.to_homogeneous_sequences(strategies.classes))
 
 
 @pytest.fixture(scope='function')
