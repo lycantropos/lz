@@ -35,7 +35,7 @@ modules_callables = (modules.flatmap(flatten_module_or_class)
 
 
 def is_not_protocol(class_: type) -> bool:
-    return issubclass(class_, Protocol)
+    return Protocol not in class_.__bases__
 
 
 classes = (modules_callables.filter(inspect.isclass)
