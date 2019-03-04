@@ -8,7 +8,7 @@ from lz.iterating import capacity
 
 def test_capacity(maps: List[Map],
                   map_argument: Domain) -> None:
-    cleft = cleave(maps)
+    cleft = cleave(*maps)
 
     result = cleft(map_argument)
 
@@ -17,7 +17,7 @@ def test_capacity(maps: List[Map],
 
 def test_elements(maps: List[Map],
                   map_argument: Domain) -> None:
-    cleft = cleave(maps)
+    cleft = cleave(*maps)
 
     result = cleft(map_argument)
 

@@ -166,8 +166,7 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     return flipped
 
 
-def cleave(functions: Iterable[Callable[..., Range]]
-           ) -> Callable[..., Iterable[Range]]:
+def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
     """
     Returns function that separately applies
     given functions to the same arguments.
