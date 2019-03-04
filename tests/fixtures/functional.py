@@ -2,7 +2,6 @@ import random
 from typing import (Callable,
                     Dict,
                     Iterable,
-                    List,
                     Sequence,
                     Tuple)
 
@@ -69,13 +68,16 @@ def map_arguments() -> Iterable[Domain]:
 
 
 @pytest.fixture(scope='function')
-def maps() -> List[Map]:
+def maps() -> Sequence[Map]:
     return find(strategies.maps_lists)
 
 
 @pytest.fixture(scope='function')
-def maps_arguments() -> List[Domain]:
-    return find(strategies.maps_lists_arguments)
+def maps_arguments(maps: Sequence[Map]) -> Sequence[Domain]:
+    maps_count = len(maps)
+    return find(strategies.to_homogeneous_sequences(strategies.maps_arguments,
+                                                    min_size=maps_count,
+                                                    max_size=maps_count))
 
 
 @pytest.fixture(scope='function')
