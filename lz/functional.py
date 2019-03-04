@@ -48,11 +48,9 @@ def compose(last_function: Map[Any, Range],
     functions_names = list(map(function_to_unique_name, functions))
 
     caller_frame_info = inspect.stack()[1]
-    col_offset = 0
-    lineno = caller_frame_info.lineno
     set_attributes = functools.partial(functools.partial,
-                                       lineno=lineno,
-                                       col_offset=col_offset)
+                                       lineno=caller_frame_info.lineno,
+                                       col_offset=0)
 
     variadic_positionals_name = 'args'
     variadic_keywords_name = 'kwargs'
