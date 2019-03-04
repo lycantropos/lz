@@ -165,7 +165,7 @@ def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
         return False
     for next_set in rest:
         object_, object_copy = map(set, duplicate(object_))
-        symmetric_difference = object_copy ^ next_set
+        symmetric_difference = set(object_copy ^ next_set)
         while symmetric_difference:
             target = symmetric_difference.pop()
             candidates = iter(symmetric_difference)
