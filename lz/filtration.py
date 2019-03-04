@@ -41,7 +41,7 @@ def separator(predicate: Predicate = None
     and second one consists of elements that satisfy given predicate.
     """
     return compose(tuple,
-                   combine([scavenger(predicate), sifter(predicate)]),
+                   combine(scavenger(predicate), sifter(predicate)),
                    duplicate)
 
 

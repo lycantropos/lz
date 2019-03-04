@@ -46,7 +46,7 @@ def compose(last_function: Map[Any, Range],
     return functools.reduce(binary_compose, functions)
 
 
-def combine(maps: Iterable[Map]) -> Map[Iterable[Domain], Iterable[Range]]:
+def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     """
     Returns function that applies each map to corresponding argument.
     """

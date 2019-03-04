@@ -8,7 +8,7 @@ from lz.iterating import capacity
 
 def test_capacity(maps: List[Map],
                   maps_arguments: List[Domain]) -> None:
-    combined = combine(maps)
+    combined = combine(*maps)
 
     result = combined(maps_arguments)
 
@@ -17,7 +17,7 @@ def test_capacity(maps: List[Map],
 
 def test_elements(maps: List[Map],
                   maps_arguments: List[Domain]) -> None:
-    combined = combine(maps)
+    combined = combine(*maps)
 
     result = combined(maps_arguments)
 
