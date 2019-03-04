@@ -5,8 +5,7 @@ import itertools
 import textwrap
 from collections import abc
 from contextlib import suppress
-from operator import (add,
-                      attrgetter)
+from operator import add
 from types import MappingProxyType
 from typing import (Any,
                     Callable,
@@ -32,12 +31,24 @@ def identity(argument: Domain) -> Domain:
     return argument
 
 
+def to_composition_name(*functions: Callable) -> str:
+    @functools.singledispatch
+    def function_to_name(function: Callable) -> str:
+        return function.__name__
+
+    @function_to_name.register(ApplierBase)
+    def applier_to_name(function: ApplierBase) -> str:
+        return function_to_name(function.func)
+
+    return 'composition_of_' + '_and_'.join(map(function_to_name, functions))
+
+
 def to_composition_docstring(*functions: Callable,
                              tab_size: int = 4,
                              name_wrapper: Operator[str] = '"{}"'.format
                              ) -> str:
     def function_to_sub_docstring(function: Callable) -> str:
-        view_name = function.__qualname__
+        view_name = function_to_view_name(function)
         try:
             docstring = function.__doc__
         except AttributeError:
@@ -48,6 +59,14 @@ def to_composition_docstring(*functions: Callable,
             return (name_wrapper(view_name) + ':\n'
                     + textwrap.indent(docstring,
                                       prefix=' ' * tab_size))
+
+    @functools.singledispatch
+    def function_to_view_name(function: Callable) -> str:
+        return function.__qualname__
+
+    @function_to_view_name.register(ApplierBase)
+    def applier_to_view_name(function: ApplierBase) -> str:
+        return function_to_view_name(function.func)
 
     sub_docstrings = itertools.starmap('{}. {}'.format,
                                        enumerate(map(function_to_sub_docstring,
@@ -61,6 +80,7 @@ def to_composition_docstring(*functions: Callable,
 
 def compose(last_function: Map[Any, Range],
             *front_functions: Callable[..., Any],
+            name_factory: Callable[..., str] = to_composition_name,
             docstring_factory: Callable[..., str] = to_composition_docstring
             ) -> Callable[..., Range]:
     """
@@ -71,10 +91,12 @@ def compose(last_function: Map[Any, Range],
 
     functions = (last_function,) + front_functions
 
-    def function_to_name(function: Callable) -> str:
+    def function_to_unique_name(function: Callable) -> str:
+        # we are not using ``__name__``/``__qualname__`` attributes
+        # due to their potential non-uniqueness
         return '_' + str(hash(function)).replace('-', '_')
 
-    functions_names = list(map(function_to_name, functions))
+    functions_names = list(map(function_to_unique_name, functions))
 
     caller_frame_info = inspect.stack()[1]
     col_offset = 0
@@ -106,8 +128,7 @@ def compose(last_function: Map[Any, Range],
     calls_node = functools.reduce(to_next_call_node,
                                   reversed_functions_names,
                                   calls_node)
-    function_name = ('composition_of_'
-                     + '_and_'.join(map(attrgetter('__name__'), functions)))
+    function_name = to_composition_name(*functions)
     function_definition_node = set_attributes(ast.FunctionDef)(
             function_name,
             ast.arguments([],
@@ -161,6 +182,9 @@ class ApplierBase(abc.Callable):
         cls = type(self)
         return (cls.__module__ + '.' + cls.__qualname__
                 + '(' + ', '.join(arguments_strings) + ')')
+
+
+ApplierBase.register(functools.partial)
 
 
 class Curry(ApplierBase):
