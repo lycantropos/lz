@@ -9,12 +9,12 @@ import pytest
 from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import (Domain,
-                      Intermediate,
                       Map,
                       Predicate,
                       Range)
 from tests import strategies
-from tests.utils import find
+from tests.utils import (Intermediate,
+                         find)
 
 
 @pytest.fixture(scope='session')

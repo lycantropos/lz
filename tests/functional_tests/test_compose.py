@@ -5,9 +5,9 @@ from typing import (Any,
 from lz.functional import (compose,
                            identity)
 from lz.hints import (Domain,
-                      Intermediate,
                       Map,
                       Range)
+from tests.utils import Intermediate
 
 
 def test_base_case(callable_: Callable[..., Any]) -> None:

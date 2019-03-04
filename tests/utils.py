@@ -10,7 +10,8 @@ from typing import (Any,
                     Hashable,
                     Iterable,
                     Mapping,
-                    Set)
+                    Set,
+                    TypeVar)
 
 from hypothesis import (Phase,
                         core,
@@ -21,6 +22,8 @@ from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import Domain
 from lz.replication import duplicate
+
+Intermediate = TypeVar('Intermediate')
 
 
 def find(strategy: SearchStrategy[Domain]) -> Domain:

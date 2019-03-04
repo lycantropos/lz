@@ -1,8 +1,12 @@
+import ast
 import functools
+import inspect
 import itertools
+import textwrap
 from collections import abc
 from contextlib import suppress
-from operator import add
+from operator import (add,
+                      attrgetter)
 from types import MappingProxyType
 from typing import (Any,
                     Callable,
@@ -10,12 +14,12 @@ from typing import (Any,
                     Iterable,
                     Optional,
                     Tuple,
+                    Type,
                     Union)
 
 from paradigm import signatures
 
 from .hints import (Domain,
-                    Intermediate,
                     Map,
                     Operator,
                     Range)
@@ -28,22 +32,102 @@ def identity(argument: Domain) -> Domain:
     return argument
 
 
+def to_composition_docstring(*functions: Callable,
+                             tab_size: int = 4,
+                             name_wrapper: Operator[str] = '"{}"'.format
+                             ) -> str:
+    def function_to_sub_docstring(function: Callable) -> str:
+        view_name = function.__qualname__
+        try:
+            docstring = function.__doc__
+        except AttributeError:
+            return name_wrapper(view_name)
+        else:
+            if docstring is None:
+                return name_wrapper(view_name)
+            return (name_wrapper(view_name) + ':\n'
+                    + textwrap.indent(docstring,
+                                      prefix=' ' * tab_size))
+
+    sub_docstrings = itertools.starmap('{}. {}'.format,
+                                       enumerate(map(function_to_sub_docstring,
+                                                     functions),
+                                                 start=1))
+    return ('Composition of next {count} functions:\n'
+            '{sub_docstrings}'
+            .format(count=len(functions),
+                    sub_docstrings='\n'.join(sub_docstrings)))
+
+
 def compose(last_function: Map[Any, Range],
-            *front_functions: Callable[..., Any]) -> Callable[..., Range]:
+            *front_functions: Callable[..., Any],
+            docstring_factory: Callable[..., str] = to_composition_docstring
+            ) -> Callable[..., Range]:
     """
     Returns functions composition.
     """
-
-    def binary_compose(left_function: Map[Intermediate, Range],
-                       right_function: Callable[..., Intermediate]
-                       ) -> Callable[..., Range]:
-        def composition(*args, **kwargs):
-            return left_function(right_function(*args, **kwargs))
-
-        return composition
+    if not front_functions:
+        return last_function
 
     functions = (last_function,) + front_functions
-    return functools.reduce(binary_compose, functions)
+
+    def function_to_name(function: Callable) -> str:
+        return '_' + str(hash(function)).replace('-', '_')
+
+    functions_names = list(map(function_to_name, functions))
+
+    caller_frame_info = inspect.stack()[1]
+    col_offset = 0
+    lineno = caller_frame_info.lineno
+    set_attributes = functools.partial(functools.partial,
+                                       lineno=lineno,
+                                       col_offset=col_offset)
+
+    variadic_positionals_name = 'args'
+    variadic_keywords_name = 'kwargs'
+
+    def to_next_call_node(node: ast.Call, name: str) -> ast.Call:
+        return set_attributes(ast.Call)(to_name_node(name), [node], [])
+
+    def to_name_node(name: str,
+                     *,
+                     context_factory: Type[ast.expr_context] = ast.Load
+                     ) -> ast.Name:
+        return set_attributes(ast.Name)(name, context_factory())
+
+    reversed_functions_names = reversed(functions_names)
+    calls_node = set_attributes(ast.Call)(
+            to_name_node(next(reversed_functions_names)),
+            [set_attributes(ast.Starred)(
+                    to_name_node(variadic_positionals_name),
+                    ast.Load())],
+            [ast.keyword(None,
+                         to_name_node(variadic_keywords_name))])
+    calls_node = functools.reduce(to_next_call_node,
+                                  reversed_functions_names,
+                                  calls_node)
+    function_name = ('composition_of_'
+                     + '_and_'.join(map(attrgetter('__name__'), functions)))
+    function_definition_node = set_attributes(ast.FunctionDef)(
+            function_name,
+            ast.arguments([],
+                          set_attributes(ast.arg)(variadic_positionals_name,
+                                                  None),
+                          [],
+                          [],
+                          set_attributes(ast.arg)(variadic_keywords_name,
+                                                  None),
+                          []),
+            [set_attributes(ast.Return)(calls_node)],
+            [],
+            None)
+    tree = ast.Module([function_definition_node])
+    code = compile(tree, caller_frame_info.filename, 'exec')
+    namespace = dict(zip(functions_names, functions))
+    exec(code, namespace)
+    result = namespace[function_name]
+    result.__doc__ = docstring_factory(*functions)
+    return result
 
 
 def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
