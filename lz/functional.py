@@ -30,22 +30,8 @@ def identity(argument: Domain) -> Domain:
     return argument
 
 
-def to_composition_name(*functions: Callable) -> str:
-    @functools.singledispatch
-    def function_to_name(function: Callable) -> str:
-        return function.__name__
-
-    @function_to_name.register(ApplierBase)
-    def applier_to_name(function: ApplierBase) -> str:
-        return function_to_name(function.func)
-
-    return 'composition_of_' + '_and_'.join(map(function_to_name, functions))
-
-
 def compose(last_function: Map[Any, Range],
-            *front_functions: Callable[..., Any],
-            name_factory: Callable[..., str] = to_composition_name
-            ) -> Callable[..., Range]:
+            *front_functions: Callable[..., Any]) -> Callable[..., Range]:
     """
     Returns functions composition.
     """
@@ -91,7 +77,7 @@ def compose(last_function: Map[Any, Range],
     calls_node = functools.reduce(to_next_call_node,
                                   reversed_functions_names,
                                   calls_node)
-    function_name = to_composition_name(*functions)
+    function_name = 'composed'
     function_definition_node = set_attributes(ast.FunctionDef)(
             function_name,
             ast.arguments([],
