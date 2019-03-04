@@ -116,9 +116,21 @@ class ApplierBase(abc.Callable):
             args = function.args + args
             kwargs = {**function.keywords, **kwargs}
             function = function.func
-        self.func = function
-        self.args = args
-        self.keywords = kwargs
+        self._function = function
+        self._args = args
+        self._kwargs = kwargs
+
+    @property
+    def func(self) -> Callable[..., Range]:
+        return self._function
+
+    @property
+    def args(self) -> Tuple[Domain, ...]:
+        return self._args
+
+    @property
+    def keywords(self) -> Dict[str, Domain]:
+        return self._kwargs
 
     def __repr__(self) -> str:
         arguments_strings = itertools.chain(
