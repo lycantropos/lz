@@ -222,3 +222,7 @@ encoding_to_bom = (defaultdict(bytes,
                                 'utf_32_be': codecs.BOM_UTF32_BE,
                                 'utf_32_le': codecs.BOM_UTF32_LE})
                    .__getitem__)
+
+
+def equivalence(left_statement: bool, right_statement: bool) -> bool:
+    return not left_statement ^ right_statement
