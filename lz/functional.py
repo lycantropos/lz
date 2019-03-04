@@ -2,7 +2,6 @@ import ast
 import functools
 import inspect
 import itertools
-import textwrap
 from collections import abc
 from contextlib import suppress
 from operator import add
@@ -43,45 +42,9 @@ def to_composition_name(*functions: Callable) -> str:
     return 'composition_of_' + '_and_'.join(map(function_to_name, functions))
 
 
-def to_composition_docstring(*functions: Callable,
-                             tab_size: int = 4,
-                             name_wrapper: Operator[str] = '"{}"'.format
-                             ) -> str:
-    def function_to_sub_docstring(function: Callable) -> str:
-        view_name = function_to_view_name(function)
-        try:
-            docstring = function.__doc__
-        except AttributeError:
-            return name_wrapper(view_name)
-        else:
-            if docstring is None:
-                return name_wrapper(view_name)
-            return (name_wrapper(view_name) + ':\n'
-                    + textwrap.indent(docstring,
-                                      prefix=' ' * tab_size))
-
-    @functools.singledispatch
-    def function_to_view_name(function: Callable) -> str:
-        return function.__qualname__
-
-    @function_to_view_name.register(ApplierBase)
-    def applier_to_view_name(function: ApplierBase) -> str:
-        return function_to_view_name(function.func)
-
-    sub_docstrings = itertools.starmap('{}. {}'.format,
-                                       enumerate(map(function_to_sub_docstring,
-                                                     functions),
-                                                 start=1))
-    return ('Composition of next {count} functions:\n'
-            '{sub_docstrings}'
-            .format(count=len(functions),
-                    sub_docstrings='\n'.join(sub_docstrings)))
-
-
 def compose(last_function: Map[Any, Range],
             *front_functions: Callable[..., Any],
-            name_factory: Callable[..., str] = to_composition_name,
-            docstring_factory: Callable[..., str] = to_composition_docstring
+            name_factory: Callable[..., str] = to_composition_name
             ) -> Callable[..., Range]:
     """
     Returns functions composition.
@@ -146,9 +109,7 @@ def compose(last_function: Map[Any, Range],
     code = compile(tree, caller_frame_info.filename, 'exec')
     namespace = dict(zip(functions_names, functions))
     exec(code, namespace)
-    result = namespace[function_name]
-    result.__doc__ = docstring_factory(*functions)
-    return result
+    return namespace[function_name]
 
 
 def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
