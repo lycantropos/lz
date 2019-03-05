@@ -2,17 +2,21 @@ import codecs
 from collections import (abc,
                          defaultdict,
                          deque)
+from contextlib import contextmanager
 from functools import singledispatch
 from itertools import (starmap,
                        zip_longest)
 from operator import methodcaller
 from typing import (Any,
+                    ContextManager,
                     Hashable,
                     Iterable,
                     Mapping,
                     Set,
+                    Type,
                     TypeVar)
 
+import pytest
 from hypothesis import (Phase,
                         core,
                         settings)
@@ -229,3 +233,11 @@ encoding_to_bom = (defaultdict(bytes,
 
 def equivalence(left_statement: bool, right_statement: bool) -> bool:
     return not left_statement ^ right_statement
+
+
+@contextmanager
+def not_raises(*exceptions_classes: Type[Exception]) -> ContextManager[None]:
+    try:
+        yield
+    except exceptions_classes as error:
+        raise pytest.fail('RAISED {}'.format(type(error)))
