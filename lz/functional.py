@@ -70,7 +70,7 @@ def compose(last_function: Map[Any, Range],
 
     caller_frame_info = inspect.stack()[1]
 
-    def _compose(*functions: Callable[..., Any]) -> Callable[..., Range]:
+    def _compose(*functions) -> Callable[..., Range]:
         def function_to_unique_name(function: Callable) -> str:
             # we are not using ``__name__``/``__qualname__`` attributes
             # due to their potential non-uniqueness
