@@ -8,13 +8,17 @@ from itertools import (starmap,
                        zip_longest)
 from operator import methodcaller
 from typing import (Any,
-                    ContextManager,
                     Hashable,
                     Iterable,
                     Mapping,
                     Set,
                     Type,
                     TypeVar)
+
+try:
+    from typing import ContextManager
+except ImportError:
+    from typing_extensions import ContextManager
 
 import pytest
 from hypothesis import (Phase,
