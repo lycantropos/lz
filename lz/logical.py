@@ -11,21 +11,21 @@ def conjoin(*predicates: Predicate) -> Predicate:
     """
     Returns conjunction of given predicates.
     """
-    return compose(all, cleave(predicates))
+    return compose(all, cleave(*predicates))
 
 
 def disjoin(*predicates: Predicate) -> Predicate:
     """
     Returns disjunction of given predicates.
     """
-    return compose(any, cleave(predicates))
+    return compose(any, cleave(*predicates))
 
 
 def exclusive_disjoin(*predicates: Predicate) -> Predicate:
     """
     Returns exclusive disjunction of given predicates.
     """
-    return compose(left.folder(xor, False), cleave(predicates))
+    return compose(left.folder(xor, False), cleave(*predicates))
 
 
 def negate(predicate: Predicate) -> Predicate:

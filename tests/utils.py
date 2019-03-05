@@ -2,6 +2,7 @@ import codecs
 from collections import (abc,
                          defaultdict,
                          deque)
+from contextlib import contextmanager
 from functools import singledispatch
 from itertools import (starmap,
                        zip_longest)
@@ -10,8 +11,16 @@ from typing import (Any,
                     Hashable,
                     Iterable,
                     Mapping,
-                    Set)
+                    Set,
+                    Type,
+                    TypeVar)
 
+try:
+    from typing import ContextManager
+except ImportError:
+    from typing_extensions import ContextManager
+
+import pytest
 from hypothesis import (Phase,
                         core,
                         settings)
@@ -21,6 +30,8 @@ from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import Domain
 from lz.replication import duplicate
+
+Intermediate = TypeVar('Intermediate')
 
 
 def find(strategy: SearchStrategy[Domain]) -> Domain:
@@ -162,7 +173,7 @@ def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
         return False
     for next_set in rest:
         object_, object_copy = map(set, duplicate(object_))
-        symmetric_difference = object_copy ^ next_set
+        symmetric_difference = set(object_copy ^ next_set)
         while symmetric_difference:
             target = symmetric_difference.pop()
             candidates = iter(symmetric_difference)
@@ -226,3 +237,11 @@ encoding_to_bom = (defaultdict(bytes,
 
 def equivalence(left_statement: bool, right_statement: bool) -> bool:
     return not left_statement ^ right_statement
+
+
+@contextmanager
+def not_raises(*exceptions_classes: Type[Exception]) -> ContextManager[None]:
+    try:
+        yield
+    except exceptions_classes as error:
+        raise pytest.fail('RAISED {}'.format(type(error)))

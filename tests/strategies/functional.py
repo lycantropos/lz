@@ -63,7 +63,6 @@ maps_lists = to_homogeneous_lists(maps)
 maps_arguments = (strategies.integers()
                   | strategies.floats(allow_nan=False,
                                       allow_infinity=False))
-maps_lists_arguments = to_homogeneous_lists(maps_arguments)
 
 
 @strategies.composite

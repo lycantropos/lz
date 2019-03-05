@@ -1,3 +1,6 @@
+import sys
+from functools import reduce
+from itertools import repeat
 from typing import (Any,
                     Callable,
                     Tuple)
@@ -5,9 +8,10 @@ from typing import (Any,
 from lz.functional import (compose,
                            identity)
 from lz.hints import (Domain,
-                      Intermediate,
                       Map,
                       Range)
+from tests.utils import (Intermediate,
+                         not_raises)
 
 
 def test_base_case(callable_: Callable[..., Any]) -> None:
@@ -50,3 +54,13 @@ def test_associativity(last_map: Map[Intermediate, Range],
     right_composition_result = right_composition(map_argument)
 
     assert left_composition_result == right_composition_result
+
+
+def test_nesting(object_: Any) -> None:
+    composition = reduce(compose,
+                         repeat(identity,
+                                times=sys.getrecursionlimit()),
+                         identity)
+
+    with not_raises(RecursionError):
+        composition(object_)

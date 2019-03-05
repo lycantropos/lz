@@ -66,7 +66,7 @@ def folder(function: Callable[[Range, Domain], Range],
     return fold
 
 
-Applier = ApplierBase.register(functools.partial)
+Applier = functools.partial
 
 
 def applier(function: Callable[..., Range],
