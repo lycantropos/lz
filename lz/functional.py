@@ -38,62 +38,95 @@ def compose(last_function: Map[Any, Range],
     if not front_functions:
         return last_function
 
-    functions = (last_function,) + front_functions
+    class Composition:
+        def __init__(self, *functions: Callable[..., Any]) -> None:
+            def flatten(function: Callable[..., Any]
+                        ) -> Iterable[Callable[..., Any]]:
+                if isinstance(function, type(self)):
+                    yield from function.functions
+                else:
+                    yield function
 
-    def function_to_unique_name(function: Callable) -> str:
-        # we are not using ``__name__``/``__qualname__`` attributes
-        # due to their potential non-uniqueness
-        return '_' + str(hash(function)).replace('-', '_')
+            self._functions = tuple(itertools.chain
+                                    .from_iterable(map(flatten, functions)))
+            self._function = None
 
-    functions_names = list(map(function_to_unique_name, functions))
+        @property
+        def functions(self) -> Tuple[Callable[..., Any], ...]:
+            return self._functions
+
+        @property
+        def function(self) -> Callable[..., Range]:
+            if self._function is None:
+                self._function = _compose(*self.functions)
+            return self._function
+
+        def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
+            return self.function(*args, **kwargs)
+
+        def __repr__(self) -> str:
+            return (compose.__qualname__
+                    + '(' + ', '.join(map(repr, self.functions)) + ')')
 
     caller_frame_info = inspect.stack()[1]
-    set_attributes = functools.partial(functools.partial,
-                                       lineno=caller_frame_info.lineno,
-                                       col_offset=0)
 
-    variadic_positionals_name = 'args'
-    variadic_keywords_name = 'kwargs'
+    def _compose(*functions: Callable[..., Any]) -> Callable[..., Range]:
+        def function_to_unique_name(function: Callable) -> str:
+            # we are not using ``__name__``/``__qualname__`` attributes
+            # due to their potential non-uniqueness
+            return '_' + str(hash(function)).replace('-', '_')
 
-    def to_next_call_node(node: ast.Call, name: str) -> ast.Call:
-        return set_attributes(ast.Call)(to_name_node(name), [node], [])
+        functions_names = list(map(function_to_unique_name, functions))
 
-    def to_name_node(name: str,
-                     *,
-                     context_factory: Type[ast.expr_context] = ast.Load
-                     ) -> ast.Name:
-        return set_attributes(ast.Name)(name, context_factory())
+        set_attributes = functools.partial(functools.partial,
+                                           lineno=caller_frame_info.lineno,
+                                           col_offset=0)
 
-    reversed_functions_names = reversed(functions_names)
-    calls_node = set_attributes(ast.Call)(
-            to_name_node(next(reversed_functions_names)),
-            [set_attributes(ast.Starred)(
-                    to_name_node(variadic_positionals_name),
-                    ast.Load())],
-            [ast.keyword(None,
-                         to_name_node(variadic_keywords_name))])
-    calls_node = functools.reduce(to_next_call_node,
-                                  reversed_functions_names,
-                                  calls_node)
-    function_name = 'composed'
-    function_definition_node = set_attributes(ast.FunctionDef)(
-            function_name,
-            ast.arguments([],
-                          set_attributes(ast.arg)(variadic_positionals_name,
-                                                  None),
-                          [],
-                          [],
-                          set_attributes(ast.arg)(variadic_keywords_name,
-                                                  None),
-                          []),
-            [set_attributes(ast.Return)(calls_node)],
-            [],
-            None)
-    tree = ast.Module([function_definition_node])
-    code = compile(tree, caller_frame_info.filename, 'exec')
-    namespace = dict(zip(functions_names, functions))
-    exec(code, namespace)
-    return namespace[function_name]
+        variadic_positionals_name = 'args'
+        variadic_keywords_name = 'kwargs'
+
+        def to_next_call_node(node: ast.Call, name: str) -> ast.Call:
+            return set_attributes(ast.Call)(to_name_node(name), [node], [])
+
+        def to_name_node(name: str,
+                         *,
+                         context_factory: Type[ast.expr_context] = ast.Load
+                         ) -> ast.Name:
+            return set_attributes(ast.Name)(name, context_factory())
+
+        reversed_functions_names = reversed(functions_names)
+        calls_node = set_attributes(ast.Call)(
+                to_name_node(next(reversed_functions_names)),
+                [set_attributes(ast.Starred)(
+                        to_name_node(variadic_positionals_name),
+                        ast.Load())],
+                [ast.keyword(None,
+                             to_name_node(variadic_keywords_name))])
+        calls_node = functools.reduce(to_next_call_node,
+                                      reversed_functions_names,
+                                      calls_node)
+        function_name = 'composed'
+        function_definition_node = set_attributes(ast.FunctionDef)(
+                function_name,
+                ast.arguments(
+                        [],
+                        set_attributes(ast.arg)(variadic_positionals_name,
+                                                None),
+                        [],
+                        [],
+                        set_attributes(ast.arg)(variadic_keywords_name,
+                                                None),
+                        []),
+                [set_attributes(ast.Return)(calls_node)],
+                [],
+                None)
+        tree = ast.Module([function_definition_node])
+        code = compile(tree, caller_frame_info.filename, 'exec')
+        namespace = dict(zip(functions_names, functions))
+        exec(code, namespace)
+        return namespace[function_name]
+
+    return Composition(last_function, *front_functions)
 
 
 def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
