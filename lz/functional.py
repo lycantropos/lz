@@ -1,4 +1,5 @@
 import ast
+import copy
 import functools
 import inspect
 import itertools
@@ -32,11 +33,10 @@ def identity(argument: Domain) -> Domain:
 
 class Composition:
     def __new__(cls,
-                last_function: Map[Any, Range],
-                *front_functions: Callable[..., Any],
+                *functions: Callable[..., Any],
                 **kwargs: Any) -> Union['Composition', Callable[..., Range]]:
-        if not front_functions:
-            return last_function
+        if len(functions) == 1:
+            return functions[0]
         return super().__new__(cls)
 
     def __init__(self,
