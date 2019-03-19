@@ -81,6 +81,11 @@ class Composition:
         return (type(self).__qualname__
                 + '(' + ', '.join(map(repr, self.functions)) + ')')
 
+    def __eq__(self, other: 'Composition') -> bool:
+        if not isinstance(other, Composition):
+            return NotImplemented
+        return self.functions == other.functions
+
 
 def _compose(*functions: Callable[..., Any],
              function_name: str,
