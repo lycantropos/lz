@@ -8,8 +8,7 @@ from operator import (add,
                       or_,
                       sub,
                       xor)
-from typing import (Any,
-                    Tuple)
+from typing import (Any, Sequence, Tuple)
 
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
@@ -75,6 +74,13 @@ def extend_suitable_maps(draw: Map[SearchStrategy, Any],
 
 suitable_maps = strategies.recursive(strategies.tuples(maps),
                                      extend_suitable_maps)
+
+
+def is_various(sequence: Sequence) -> bool:
+    return len(sequence) > 1
+
+
+various_suitable_maps = suitable_maps.filter(is_various)
 # "transparent" is an abbr. of "referential transparent"
 transparent_functions = strategies.sampled_from([bool, complex, float,
                                                  identity, int,
