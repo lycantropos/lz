@@ -73,6 +73,21 @@ def maps() -> Sequence[Map]:
 
 
 @pytest.fixture(scope='function')
+def suitable_maps() -> Sequence[Map]:
+    return find(strategies.suitable_maps)
+
+
+@pytest.fixture(scope='function')
+def other_suitable_maps() -> Sequence[Map]:
+    return find(strategies.suitable_maps)
+
+
+@pytest.fixture(scope='function')
+def another_suitable_maps() -> Sequence[Map]:
+    return find(strategies.suitable_maps)
+
+
+@pytest.fixture(scope='function')
 def maps_arguments(maps: Sequence[Map]) -> Sequence[Domain]:
     maps_count = len(maps)
     return find(strategies.to_homogeneous_sequences(strategies.maps_arguments,

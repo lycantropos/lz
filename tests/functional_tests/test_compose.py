@@ -3,6 +3,7 @@ from functools import reduce
 from itertools import repeat
 from typing import (Any,
                     Callable,
+                    Sequence,
                     Tuple)
 
 from lz.functional import (compose,
@@ -11,6 +12,7 @@ from lz.hints import (Domain,
                       Map,
                       Range)
 from tests.utils import (Intermediate,
+                         implication,
                          not_raises)
 
 
@@ -64,3 +66,41 @@ def test_nesting(object_: Any) -> None:
 
     with not_raises(RecursionError):
         composition(object_)
+
+
+def test_equality_base(suitable_maps: Sequence[Map],
+                       other_suitable_maps: Sequence[Map],
+                       map_argument: Domain) -> None:
+    composition = compose(*suitable_maps)
+    other_composition = compose(*other_suitable_maps)
+
+    assert implication(composition == other_composition,
+                       composition(map_argument)
+                       == other_composition(map_argument))
+
+
+def test_equality_reflexivity(suitable_maps: Sequence[Map]) -> None:
+    composition = compose(*suitable_maps)
+
+    assert composition == composition
+
+
+def test_equality_symmetry(suitable_maps: Sequence[Map],
+                           other_suitable_maps: Sequence[Map]) -> None:
+    composition = compose(*suitable_maps)
+    other_composition = compose(*other_suitable_maps)
+
+    assert implication(composition == other_composition,
+                       other_composition == composition)
+
+
+def test_equality_transitivity(suitable_maps: Sequence[Map],
+                               other_suitable_maps: Sequence[Map],
+                               another_suitable_maps: Sequence[Map]) -> None:
+    composition = compose(*suitable_maps)
+    other_composition = compose(*other_suitable_maps)
+    another_composition = compose(*another_suitable_maps)
+
+    assert implication(composition == other_composition
+                       and other_composition == another_composition,
+                       other_composition == another_composition)

@@ -239,6 +239,10 @@ def equivalence(left_statement: bool, right_statement: bool) -> bool:
     return not left_statement ^ right_statement
 
 
+def implication(antecedent: bool, consequent: bool) -> bool:
+    return not antecedent or consequent
+
+
 @contextmanager
 def not_raises(*exceptions_classes: Type[Exception]) -> ContextManager[None]:
     try:
