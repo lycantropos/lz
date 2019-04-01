@@ -68,7 +68,7 @@ class Composition:
     def function(self) -> Callable[..., Range]:
         if self._function is None:
             self._function = _compose(*self.functions,
-                                      function_name='composed',
+                                      function_name='composition',
                                       file_path=self._file_path,
                                       line_number=self._line_number,
                                       line_offset=self._line_offset)
