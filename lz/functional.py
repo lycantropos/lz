@@ -163,11 +163,11 @@ def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     Returns function that applies each map to corresponding argument.
     """
 
-    def combined(arguments: Iterable[Domain]) -> Iterable[Range]:
+    def combination(arguments: Iterable[Domain]) -> Iterable[Range]:
         yield from (map_(argument)
                     for map_, argument in zip(maps, arguments))
 
-    return combined
+    return combination
 
 
 class ApplierBase(abc.Callable):
