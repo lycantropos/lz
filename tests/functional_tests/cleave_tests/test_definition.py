@@ -14,9 +14,9 @@ from tests.utils import (are_iterables_similar,
 
 def test_base_case(positional_arguments: Tuple[Any, ...],
                    keyword_arguments: Dict[str, Any]) -> None:
-    cleft = cleave()
+    cleavage = cleave()
 
-    result = cleft(*positional_arguments, **keyword_arguments)
+    result = cleavage(*positional_arguments, **keyword_arguments)
 
     assert is_empty(result)
 
@@ -24,11 +24,11 @@ def test_base_case(positional_arguments: Tuple[Any, ...],
 def test_step_left(maps: Sequence[Map],
                    map_: Map,
                    map_argument: Domain) -> None:
-    cleft = cleave(*maps)
-    next_cleft = cleave(*left.attacher(map_)(maps))
+    cleavage = cleave(*maps)
+    next_cleavage = cleave(*left.attacher(map_)(maps))
 
-    result = cleft(map_argument)
-    next_result = next_cleft(map_argument)
+    result = cleavage(map_argument)
+    next_result = next_cleavage(map_argument)
 
     assert are_iterables_similar(next_result,
                                  left.attacher(map_(map_argument))(result))
@@ -37,11 +37,11 @@ def test_step_left(maps: Sequence[Map],
 def test_step_right(maps: Sequence[Map],
                     map_: Map,
                     map_argument: Domain) -> None:
-    cleft = cleave(*maps)
-    next_cleft = cleave(*right.attacher(map_)(maps))
+    cleavage = cleave(*maps)
+    next_cleavage = cleave(*right.attacher(map_)(maps))
 
-    result = cleft(map_argument)
-    next_result = next_cleft(map_argument)
+    result = cleavage(map_argument)
+    next_result = next_cleavage(map_argument)
 
     assert are_iterables_similar(next_result,
                                  right.attacher(map_(map_argument))(result))
