@@ -60,19 +60,30 @@ def chopper(size: int) -> Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
     """
     Returns function that splits iterable into chunks of given size.
     """
+    return functools.partial(chop,
+                             size=size)
 
-    @functools.singledispatch
-    def chop(iterable: Iterable[Domain]) -> Iterable[Sequence[Domain]]:
-        iterator = iter(iterable)
-        yield from iter(lambda: tuple(itertools.islice(iterator, size)), ())
 
-    @chop.register(abc.Sequence)
-    def chop_sequence(iterable: Sequence[Domain]
-                      ) -> Iterable[Sequence[Domain]]:
-        for start in range(0, len(iterable), size):
-            yield iterable[start:start + size]
+@functools.singledispatch
+def chop(iterable: Iterable[Domain],
+         *,
+         size: int) -> Iterable[Sequence[Domain]]:
+    """
+    Splits iterable into chunks of given size.
+    """
+    iterator = iter(iterable)
+    yield from iter(lambda: tuple(itertools.islice(iterator, size)), ())
 
-    return chop
+
+@chop.register(abc.Sequence)
+def chop_sequence(iterable: Sequence[Domain],
+                  *,
+                  size: int) -> Iterable[Sequence[Domain]]:
+    """
+    Splits sequence into chunks of given size.
+    """
+    for start in range(0, len(iterable), size):
+        yield iterable[start:start + size]
 
 
 def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
