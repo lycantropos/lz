@@ -31,7 +31,7 @@ def test_basic(built_in_function: BuiltinFunctionType,
 def test_call(callable_: Callable[..., Any]) -> None:
     curried_callable = curry(callable_)
 
-    if curried_callable.signature.has_unset_parameters():
+    if not curried_callable.signature.all_set():
         curried_callable_empty_call = curried_callable()
 
         assert isinstance(curried_callable_empty_call, Curry)

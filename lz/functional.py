@@ -222,7 +222,8 @@ class Curry(ApplierBase):
         try:
             return self.func(*args, **kwargs)
         except TypeError:
-            if not self.signature.has_unset_parameters(*args, **kwargs):
+            if (not self.signature.expects(*args, **kwargs)
+                    or self.signature.all_set(*args, **kwargs)):
                 raise
         return type(self)(self.func, self.signature, *args, **kwargs)
 
