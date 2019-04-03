@@ -272,17 +272,20 @@ def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
 
 def to_constant(object_: Domain) -> Callable[..., Domain]:
     """
-    Returns function that returns given object.
+    Returns function that always returns given object.
     """
+    return Constant(object_)
 
-    def constant(*_: Domain, **__: Domain) -> Domain:
-        return object_
 
-    object_repr = repr(object_)
-    constant.__name__ = object_repr + ' constant'
-    constant.__qualname__ = object_repr + ' constant'
-    constant.__doc__ = 'Returns {}.'.format(object_repr)
-    return constant
+class Constant:
+    def __init__(self, object_: Domain) -> None:
+        self.object_ = object_
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Domain:
+        return self.object_
+
+    def __repr__(self) -> str:
+        return type(self).__qualname__ + '(' + repr(self.object_) + ')'
 
 
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
