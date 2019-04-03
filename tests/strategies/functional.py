@@ -1,14 +1,16 @@
 import json
 import os
 import string
-from collections import OrderedDict
+from collections import (OrderedDict)
 from decimal import Decimal
 from operator import (add,
                       and_,
                       or_,
                       sub,
                       xor)
-from typing import (Any, Sequence, Tuple)
+from typing import (Any,
+                    Sequence,
+                    Tuple)
 
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
@@ -30,6 +32,7 @@ from .literals.base import (classes,
                             strings,
                             tuples)
 from .literals.factories import (to_homogeneous_lists,
+                                 to_homogeneous_tuples,
                                  to_strings)
 
 false_predicates = strategies.just(to_constant(False))
@@ -82,21 +85,31 @@ def is_various(sequence: Sequence) -> bool:
 
 various_suitable_maps = suitable_maps.filter(is_various)
 # "transparent" is an abbr. of "referential transparent"
-transparent_functions = strategies.sampled_from([bool, complex, float,
-                                                 identity, int,
-                                                 json.dumps, json.loads,
-                                                 os.path.join, str])
+non_variadic_transparent_functions = strategies.sampled_from([bool, complex,
+                                                              float, identity,
+                                                              int, json.dumps,
+                                                              json.loads, str])
+variadic_transparent_functions = strategies.just(os.path.join)
+transparent_functions = (non_variadic_transparent_functions
+                         | variadic_transparent_functions)
 paths_names_parts = to_strings(string.digits + string.ascii_letters + '_')
 transparent_functions_args = {
     bool: strategies.tuples(objects),
-    complex: strategies.tuples(numbers),
-    float: strategies.tuples(real_numbers),
-    identity: strategies.tuples(objects),
+    complex: strategies.tuples(
+            numbers),
+    float: strategies.tuples(
+            real_numbers),
+    identity: strategies.tuples(
+            objects),
     int: strategies.tuples(integers),
-    json.dumps: strategies.tuples(json_serializable_objects),
-    json.loads: strategies.tuples(json_serializable_objects.map(json.dumps)),
-    os.path.join: to_homogeneous_lists(paths_names_parts,
-                                       min_size=1).map(tuple),
+    json.dumps: strategies.tuples(
+            json_serializable_objects),
+    json.loads: strategies.tuples(
+            json_serializable_objects.map(
+                    json.dumps)),
+    os.path.join: to_homogeneous_tuples(
+            paths_names_parts,
+            min_size=1),
     str: strategies.tuples(objects),
 }
 transparent_functions_kwargs = {
@@ -105,15 +118,16 @@ transparent_functions_kwargs = {
     float: empty.dictionaries,
     identity: empty.dictionaries,
     int: empty.dictionaries,
-    json.dumps: strategies.fixed_dictionaries(
-            {'indent': strategies.integers(0, 10),
-             'sort_keys': strategies.booleans()}),
+    json.dumps: strategies.fixed_dictionaries({
+        'indent': strategies.integers(0, 10),
+        'sort_keys': strategies.booleans()}),
     json.loads: strategies.fixed_dictionaries({
-        'object_pairs_hook': strategies.none() | strategies.just(OrderedDict),
-        'parse_float': strategies.none() | strategies.sampled_from([float,
-                                                                    Decimal]),
-        'parse_int': strategies.none() | strategies.sampled_from([int,
-                                                                  float])}),
+        'object_pairs_hook': (strategies.none()
+                              | strategies.just(OrderedDict)),
+        'parse_float': (strategies.none()
+                        | strategies.sampled_from([float, Decimal])),
+        'parse_int': (strategies.none()
+                      | strategies.sampled_from([int, float]))}),
     os.path.join: empty.dictionaries,
     str: empty.dictionaries,
 }

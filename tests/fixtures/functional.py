@@ -12,6 +12,7 @@ from lz.hints import (Domain,
                       Map,
                       Predicate,
                       Range)
+from lz.logical import negate
 from tests import strategies
 from tests.utils import (Intermediate,
                          find)
@@ -192,6 +193,44 @@ def transparent_function_second_kwargs_part(
     return {key: value
             for key, value in transparent_function_kwargs.items()
             if key not in transparent_function_first_kwargs_part}
+
+
+@pytest.fixture(scope='function')
+def non_variadic_transparent_function() -> Callable[..., Range]:
+    return find(strategies.non_variadic_transparent_functions)
+
+
+@pytest.fixture(scope='function')
+def non_variadic_transparent_function_args(
+        non_variadic_transparent_function: Callable[..., Range]
+) -> Tuple[Domain, ...]:
+    return find(strategies.to_transparent_functions_args(
+            non_variadic_transparent_function))
+
+
+@pytest.fixture(scope='function')
+def non_variadic_transparent_function_invalid_args(
+        non_variadic_transparent_function_args: Tuple[Domain, ...]
+) -> Tuple[Domain, ...]:
+    return non_variadic_transparent_function_args + (None,)
+
+
+@pytest.fixture(scope='function')
+def non_variadic_transparent_function_kwargs(
+        non_variadic_transparent_function: Callable[..., Range]
+) -> Dict[str, Domain]:
+    return find(strategies.to_transparent_functions_kwargs(
+            non_variadic_transparent_function))
+
+
+@pytest.fixture(scope='function')
+def non_variadic_transparent_function_invalid_kwargs(
+        non_variadic_transparent_function_kwargs: Dict[str, Domain]
+) -> Dict[str, Domain]:
+    invalid_kwarg_name = find(strategies.identifiers.filter(negate(
+            non_variadic_transparent_function_kwargs.__contains__)))
+    return {**non_variadic_transparent_function_kwargs,
+            invalid_kwarg_name: None}
 
 
 @pytest.fixture(scope='function')

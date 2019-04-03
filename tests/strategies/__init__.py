@@ -9,6 +9,7 @@ from .functional import (false_predicates,
                          maps,
                          maps_arguments,
                          maps_lists,
+                         non_variadic_transparent_functions,
                          predicates,
                          predicates_arguments,
                          projectors,
@@ -49,3 +50,4 @@ from .literals.factories import (to_any_streams,
 from .sorting import (registered_sorting_algorithms,
                       sorting_keys,
                       unregistered_sorting_algorithms)
+from .utils import identifiers
