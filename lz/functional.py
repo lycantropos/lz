@@ -161,12 +161,20 @@ def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     """
     Returns function that applies each map to corresponding argument.
     """
+    return Combination(*maps)
 
-    def combination(arguments: Iterable[Domain]) -> Iterable[Range]:
+
+class Combination:
+    def __init__(self, *maps: Map) -> None:
+        self.maps = maps
+
+    def __call__(self, arguments: Iterable[Domain]) -> Iterable[Range]:
         yield from (map_(argument)
-                    for map_, argument in zip(maps, arguments))
+                    for map_, argument in zip(self.maps, arguments))
 
-    return combination
+    def __repr__(self) -> str:
+        return (type(self).__qualname__
+                + '(' + ', '.join(map(repr, self.maps)) + ')')
 
 
 class ApplierBase(abc.Callable):
