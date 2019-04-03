@@ -309,11 +309,20 @@ def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
     given functions to the same arguments.
     """
 
-    def cleft(*args, **kwargs) -> Range:
-        yield from (function(*args, **kwargs)
-                    for function in functions)
+    return Cleavage(*functions)
 
-    return cleft
+
+class Cleavage:
+    def __init__(self, *functions: Map) -> None:
+        self.functions = functions
+
+    def __call__(self, *args: Domain, **kwargs: Domain) -> Iterable[Range]:
+        yield from (function(*args, **kwargs)
+                    for function in self.functions)
+
+    def __repr__(self) -> str:
+        return (type(self).__qualname__
+                + '(' + ', '.join(map(repr, self.functions)) + ')')
 
 
 members_copiers = dict(itertools.chain(zip(functools.WRAPPER_ASSIGNMENTS,
