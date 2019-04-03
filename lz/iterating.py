@@ -94,19 +94,25 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
     """
     Returns function that slides over iterable with window of given size.
     """
+    return functools.partial(slide,
+                             size=size)
 
-    def slide(iterable: Iterable[Domain]) -> Iterable[Tuple[Domain, ...]]:
-        iterator = iter(iterable)
-        initial = tuple(itertools.islice(iterator, size))
 
-        def shift(previous: Tuple[Domain, ...],
-                  element: Domain) -> Tuple[Domain, ...]:
-            return previous[1:] + (element,)
+def slide(iterable: Iterable[Domain],
+          *,
+          size: int) -> Iterable[Tuple[Domain, ...]]:
+    """
+    Slides over iterable with window of given size.
+    """
+    iterator = iter(iterable)
+    initial = tuple(itertools.islice(iterator, size))
 
-        yield from itertools.accumulate(itertools.chain([initial], iterator),
-                                        shift)
+    def shift(previous: Tuple[Domain, ...],
+              element: Domain) -> Tuple[Domain, ...]:
+        return previous[1:] + (element,)
 
-    return slide
+    yield from itertools.accumulate(itertools.chain([initial], iterator),
+                                    shift)
 
 
 Group = Tuple[Hashable, Iterable[Domain]]
