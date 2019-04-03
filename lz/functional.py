@@ -257,17 +257,16 @@ def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
     Returns function that works with single iterable parameter
     by unpacking elements to given function.
     """
+    return functools.partial(apply, function)
 
-    def packed(args: Iterable[Domain],
-               kwargs: Dict[str, Any] = MappingProxyType({})) -> Range:
-        return function(*args, **kwargs)
 
-    members_factories = dict(members_copiers)
-    members_factories['__name__'] = functools.partial(add, 'packed ')
-    members_factories['__qualname__'] = functools.partial(add, 'packed ')
-    update_metadata(function, packed,
-                    members_factories=members_factories)
-    return packed
+def apply(function: Callable[..., Range],
+          args: Iterable[Domain],
+          kwargs: Dict[str, Any] = MappingProxyType({})) -> Range:
+    """
+    Calls given function with given positional and keyword arguments.
+    """
+    return function(*args, **kwargs)
 
 
 def to_constant(object_: Domain) -> Callable[..., Domain]:
