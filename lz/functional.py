@@ -291,16 +291,13 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
     """
+    return functools.partial(call_flipped, function)
 
-    def flipped(*args, **kwargs) -> Range:
-        return function(*args[::-1], **kwargs)
 
-    members_factories = dict(members_copiers)
-    members_factories['__name__'] = functools.partial(add, 'flipped ')
-    members_factories['__qualname__'] = functools.partial(add, 'flipped ')
-    update_metadata(function, flipped,
-                    members_factories=members_factories)
-    return flipped
+def call_flipped(function: Callable[..., Range],
+                 *args: Domain,
+                 **kwargs: Domain) -> Range:
+    return function(*args[::-1], **kwargs)
 
 
 def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
