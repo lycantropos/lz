@@ -3,8 +3,6 @@ import functools
 import inspect
 import itertools
 from collections import abc
-from contextlib import suppress
-from operator import add
 from types import MappingProxyType
 from typing import (Any,
                     Callable,
@@ -19,7 +17,6 @@ from paradigm import signatures
 
 from .hints import (Domain,
                     Map,
-                    Operator,
                     Range)
 
 
@@ -320,23 +317,3 @@ class Cleavage:
     def __repr__(self) -> str:
         return (type(self).__qualname__
                 + '(' + ', '.join(map(repr, self.functions)) + ')')
-
-
-members_copiers = dict(itertools.chain(zip(functools.WRAPPER_ASSIGNMENTS,
-                                           itertools.repeat(identity))))
-
-
-def update_metadata(source_function: Callable[..., Range],
-                    target_function: Callable[..., Range],
-                    *,
-                    members_factories: Dict[str, Operator]) -> None:
-    for member_name, member_factory in members_factories.items():
-        try:
-            source_member = getattr(source_function, member_name)
-        except AttributeError:
-            continue
-        else:
-            target_member = member_factory(source_member)
-            setattr(target_function, member_name, target_member)
-    with suppress(AttributeError):
-        target_function.__dict__.update(source_function.__dict__)
