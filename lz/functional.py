@@ -30,6 +30,18 @@ def identity(argument: Domain) -> Domain:
     return argument
 
 
+def compose(last_function: Map[Any, Range],
+            *front_functions: Callable[..., Any]) -> Callable[..., Range]:
+    """
+    Returns functions composition.
+    """
+    caller_frame_info = inspect.stack()[1]
+    return Composition(last_function, *front_functions,
+                       file_path=caller_frame_info.filename,
+                       line_number=caller_frame_info.lineno,
+                       line_offset=0)
+
+
 class Composition:
     def __new__(cls,
                 *functions: Callable[..., Any],
@@ -143,18 +155,6 @@ def _compose(*functions: Callable[..., Any],
     namespace = dict(zip(functions_names, functions))
     exec(code, namespace)
     return namespace[function_name]
-
-
-def compose(last_function: Map[Any, Range],
-            *front_functions: Callable[..., Any]) -> Callable[..., Range]:
-    """
-    Returns functions composition.
-    """
-    caller_frame_info = inspect.stack()[1]
-    return Composition(last_function, *front_functions,
-                       file_path=caller_frame_info.filename,
-                       line_number=caller_frame_info.lineno,
-                       line_offset=0)
 
 
 def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
