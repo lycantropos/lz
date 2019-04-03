@@ -1,13 +1,13 @@
-import pickle
 from typing import Sequence
 
 from lz.functional import compose
 from lz.hints import Map
+from tests.utils import round_trip_pickle
 
 
 def test_round_trip(various_suitable_maps: Sequence[Map]) -> None:
     composition = compose(*various_suitable_maps)
 
-    pickled = pickle.dumps(composition)
+    result = round_trip_pickle(composition)
 
-    assert pickle.loads(pickled) == composition
+    assert result == composition

@@ -1,4 +1,5 @@
 import codecs
+import pickle
 from collections import (abc,
                          defaultdict,
                          deque)
@@ -249,3 +250,7 @@ def not_raises(*exceptions_classes: Type[Exception]) -> ContextManager[None]:
         yield
     except exceptions_classes as error:
         raise pytest.fail('RAISED {}'.format(type(error)))
+
+
+def round_trip_pickle(object_: Any) -> Any:
+    return pickle.loads(pickle.dumps(object_))
