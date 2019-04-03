@@ -10,8 +10,9 @@ from lz.replication import duplicate
 def test_basic(hashables_iterable: Iterable[Hashable],
                grouper_key: Map[Any, Hashable]) -> None:
     original, target = duplicate(hashables_iterable)
+    group_by = grouper(grouper_key)
 
-    result = grouper(grouper_key)(target)
+    result = group_by(target)
     result_list = list(result)
 
     assert all(element in group

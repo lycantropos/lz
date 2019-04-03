@@ -101,6 +101,13 @@ def hashables_iterable(min_iterables_size: int) -> Iterable[Hashable]:
 
 
 @pytest.fixture(scope='function')
+def plain_hashables_iterable(min_iterables_size: int) -> Iterable[Hashable]:
+    return find(strategies.to_homogeneous_iterables(
+            strategies.plain_hashables,
+            min_size=min_iterables_size))
+
+
+@pytest.fixture(scope='function')
 def sortable_iterable() -> Iterable[Sortable]:
     return find(strategies.sortable_iterables)
 

@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Hashable
 
 from hypothesis import strategies
@@ -7,11 +8,14 @@ from lz.hints import Map
 from tests.configs import MAX_ITERABLES_SIZE
 
 
-def to_grouper_key(odd_order: int) -> Map[Hashable, Hashable]:
-    def grouper_key(object_: Hashable) -> Hashable:
-        return hash(object_) ** odd_order
+def grouper_key(object_: Hashable,
+                odd_order: int = 1) -> Hashable:
+    return hash(object_) ** odd_order
 
-    return grouper_key
+
+def to_grouper_key(odd_order: int) -> Map[Hashable, Hashable]:
+    return partial(grouper_key,
+                   odd_order=odd_order)
 
 
 def is_odd(number: int) -> bool:

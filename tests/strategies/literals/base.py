@@ -82,10 +82,11 @@ classes = abstract_base_classes | built_in_classes
 
 deferred_hashables = strategies.deferred(lambda: hashables)
 deferred_objects = strategies.deferred(lambda: objects)
-hashables = (scalars
-             | byte_strings
-             | strings
-             | classes
+plain_hashables = (scalars
+                   | byte_strings
+                   | strings
+                   | classes)
+hashables = (plain_hashables
              | to_homogeneous_frozensets(deferred_hashables)
              | to_homogeneous_iterators(deferred_objects)
              | to_homogeneous_tuples(deferred_hashables))

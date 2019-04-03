@@ -32,6 +32,7 @@ from .literals.base import (any_strings,
                             iterables_sizes,
                             keywords_arguments,
                             objects,
+                            plain_hashables,
                             positionals_arguments,
                             real_numbers,
                             sortable_iterables)
