@@ -40,20 +40,24 @@ def flatmapper(map_: Map[Domain, Iterable[Range]]
 def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from iterable based on given slice.
+    """
+    return functools.partial(cut,
+                             slice_=slice_)
+
+
+def cut(iterable: Iterable[Domain],
+        *,
+        slice_: slice) -> Iterable[Domain]:
+    """
+    Selects elements from iterable based on given slice.
 
     Slice fields supposed to be unset or non-negative
     since it is hard to evaluate negative indices/step for arbitrary iterable
     which may be potentially infinite
     or change previous elements if iterating made backwards.
     """
-    start = slice_.start
-    stop = slice_.stop
-    step = slice_.step
-
-    def cut(iterable: Iterable[Domain]) -> Iterable[Domain]:
-        yield from itertools.islice(iterable, start, stop, step)
-
-    return cut
+    yield from itertools.islice(iterable,
+                                slice_.start, slice_.stop, slice_.step)
 
 
 def chopper(size: int) -> Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
