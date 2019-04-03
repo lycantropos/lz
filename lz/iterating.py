@@ -117,14 +117,20 @@ def grouper(key: Map[Domain, Hashable]
     """
     Returns function that groups iterable elements based on given key.
     """
+    return functools.partial(group_by,
+                             key=key)
 
-    def group_by(iterable: Iterable[Domain]) -> Iterable[Group]:
-        groups = defaultdict(list)  # type: Mapping[Hashable, List[Domain]]
-        for element in iterable:
-            groups[key(element)].append(element)
-        yield from groups.items()
 
-    return group_by
+def group_by(iterable: Iterable[Domain],
+             *,
+             key: Map[Domain, Hashable]) -> Iterable[Group]:
+    """
+    Groups iterable elements based on given key.
+    """
+    groups = defaultdict(list)  # type: Mapping[Hashable, List[Domain]]
+    for element in iterable:
+        groups[key(element)].append(element)
+    yield from groups.items()
 
 
 def expand(object_: Domain) -> Iterable[Domain]:
