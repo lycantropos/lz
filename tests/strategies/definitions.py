@@ -1,5 +1,6 @@
 import importlib
 import inspect
+from functools import partial
 from types import ModuleType
 from typing import (Any,
                     Union)
@@ -69,3 +70,4 @@ callables = (built_in_functions
              | methods
              | methods_descriptors
              | wrappers_descriptors)
+partial_callables = callables.map(partial)

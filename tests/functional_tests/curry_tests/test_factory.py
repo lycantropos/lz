@@ -1,3 +1,4 @@
+from functools import partial
 from types import (BuiltinFunctionType,
                    FunctionType,
                    MethodType)
@@ -14,12 +15,14 @@ def test_basic(built_in_function: BuiltinFunctionType,
                function: FunctionType,
                method: MethodType,
                method_descriptor: MethodDescriptorType,
+               partial_callable: partial,
                wrapper_descriptor: WrapperDescriptorType) -> None:
     for callable_ in (built_in_function,
                       class_,
                       function,
                       method,
                       method_descriptor,
+                      partial_callable,
                       wrapper_descriptor):
         result = curry(callable_)
 

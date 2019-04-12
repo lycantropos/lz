@@ -1,3 +1,4 @@
+from functools import partial
 from types import (BuiltinFunctionType,
                    FunctionType,
                    MethodType)
@@ -56,6 +57,11 @@ def method() -> MethodType:
 @pytest.fixture(scope='function')
 def method_descriptor() -> MethodDescriptorType:
     return find(strategies.methods_descriptors)
+
+
+@pytest.fixture(scope='function')
+def partial_callable() -> partial:
+    return find(strategies.partial_callables)
 
 
 @pytest.fixture(scope='function')
