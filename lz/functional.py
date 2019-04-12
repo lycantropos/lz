@@ -286,6 +286,11 @@ class Constant:
     __repr__ = generate_repr(__init__)
 
 
+@signatures.factory.register(Constant)
+def _(object_: Constant) -> signatures.Base:
+    return signatures.factory(object_.__call__)
+
+
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
