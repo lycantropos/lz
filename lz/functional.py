@@ -322,3 +322,8 @@ class Cleavage:
                     for function in self.functions)
 
     __repr__ = generate_repr(__init__)
+
+
+@signatures.factory.register(Cleavage)
+def _(object_: Cleavage) -> signatures.Base:
+    return signatures.factory(object_.__call__)
