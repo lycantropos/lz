@@ -8,7 +8,7 @@ import lz
 project_base_url = 'https://github.com/lycantropos/lz/'
 
 install_requires = [
-    'paradigm>=0.1.1',
+    'paradigm>=0.2.0',
     'typing_extensions>=3.6.5',
 ]
 setup_requires = [
