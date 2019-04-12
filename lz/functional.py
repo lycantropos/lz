@@ -90,11 +90,6 @@ class Composition:
     __repr__ = generate_repr(__init__,
                              field_seeker=seekers.complex_)
 
-    def __eq__(self, other: 'Composition') -> bool:
-        if not isinstance(other, Composition):
-            return NotImplemented
-        return self.functions == other.functions
-
 
 @signatures.factory.register(Composition)
 def _(object_: Composition) -> signatures.Base:
