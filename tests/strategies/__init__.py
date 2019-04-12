@@ -20,6 +20,8 @@ from .functional import (false_predicates,
                          to_projectors_domains_initials,
                          to_transparent_functions_args,
                          to_transparent_functions_kwargs,
+                         to_unexpected_args,
+                         to_unexpected_kwargs,
                          transparent_functions,
                          true_predicates,
                          various_suitable_maps)

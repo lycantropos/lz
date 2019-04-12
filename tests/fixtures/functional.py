@@ -210,9 +210,10 @@ def non_variadic_transparent_function_args(
 
 @pytest.fixture(scope='function')
 def non_variadic_transparent_function_invalid_args(
-        non_variadic_transparent_function_args: Tuple[Domain, ...]
+        non_variadic_transparent_function: Callable[..., Range]
 ) -> Tuple[Domain, ...]:
-    return non_variadic_transparent_function_args + (None,)
+    return find(strategies
+                .to_unexpected_args(non_variadic_transparent_function))
 
 
 @pytest.fixture(scope='function')
@@ -225,12 +226,10 @@ def non_variadic_transparent_function_kwargs(
 
 @pytest.fixture(scope='function')
 def non_variadic_transparent_function_invalid_kwargs(
-        non_variadic_transparent_function_kwargs: Dict[str, Domain]
+        non_variadic_transparent_function: Callable[..., Range]
 ) -> Dict[str, Domain]:
-    invalid_kwarg_name = find(strategies.identifiers.filter(negate(
-            non_variadic_transparent_function_kwargs.__contains__)))
-    return {**non_variadic_transparent_function_kwargs,
-            invalid_kwarg_name: None}
+    return find(strategies
+                .to_unexpected_kwargs(non_variadic_transparent_function))
 
 
 @pytest.fixture(scope='function')

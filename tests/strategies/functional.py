@@ -1,24 +1,33 @@
 import json
 import os
 import string
-from collections import (OrderedDict)
+from collections import OrderedDict
 from decimal import Decimal
+from functools import (reduce,
+                       singledispatch)
 from operator import (add,
                       and_,
                       or_,
                       sub,
                       xor)
 from typing import (Any,
+                    Callable,
+                    Dict,
                     Sequence,
                     Tuple)
 
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
+from paradigm import (models,
+                      signatures)
 
 from lz.functional import (identity,
                            to_constant)
-from lz.hints import (Map,
-                      Predicate)
+from lz.hints import (Domain,
+                      Map,
+                      Predicate,
+                      Range)
+from lz.logical import negate
 from .literals import empty
 from .literals.base import (classes,
                             integers,
@@ -34,6 +43,7 @@ from .literals.base import (classes,
 from .literals.factories import (to_homogeneous_lists,
                                  to_homogeneous_tuples,
                                  to_strings)
+from .utils import identifiers
 
 false_predicates = strategies.just(to_constant(False))
 true_predicates = strategies.just(to_constant(True))
@@ -166,3 +176,77 @@ projectors_domains_initials = {
 }
 to_projectors_domains = projectors_domains.__getitem__
 to_projectors_domains_initials = projectors_domains_initials.__getitem__
+
+
+def to_unexpected_args(function: Callable[..., Any],
+                       *,
+                       values: SearchStrategy[Domain] = strategies.none()
+                       ) -> SearchStrategy[Tuple[Domain, ...]]:
+    signature = signatures.factory(function)
+    count = signature_to_max_positionals_count(signature) + 1
+    return to_homogeneous_tuples(values,
+                                 min_size=count)
+
+
+def to_unexpected_kwargs(function: Callable[..., Any],
+                         *,
+                         values: SearchStrategy[Domain] = strategies.none()
+                         ) -> SearchStrategy[Dict[str, Domain]]:
+    signature = signatures.factory(function)
+    keywords = signature_to_keywords_union(signature)
+    is_unexpected = negate(keywords.__contains__)
+    return (strategies.dictionaries(identifiers.filter(is_unexpected), values)
+            .filter(bool))
+
+
+@singledispatch
+def signature_to_max_positionals_count(signature: models.Base) -> int:
+    raise TypeError('Unsupported signature type: {type}.'
+                    .format(type=type(signature)))
+
+
+@signature_to_max_positionals_count.register(models.Plain)
+def plain_signature_to_max_positionals_count(signature: models.Plain) -> int:
+    positionals = (signature.parameters_by_kind[
+                       models.Parameter.Kind.POSITIONAL_ONLY]
+                   + signature.parameters_by_kind[
+                       models.Parameter.Kind.POSITIONAL_OR_KEYWORD])
+    return len(positionals)
+
+
+@signature_to_max_positionals_count.register(models.Overloaded)
+def overloaded_signature_to_max_positionals_count(signature: models.Overloaded
+                                                  ) -> int:
+    return max(map(signature_to_max_positionals_count, signature.signatures),
+               default=0)
+
+
+@singledispatch
+def signature_to_keywords_union(signature: models.Base
+                                ) -> Dict[str, models.Parameter]:
+    raise TypeError('Unsupported signature type: {type}.'
+                    .format(type=type(signature)))
+
+
+@signature_to_keywords_union.register(models.Plain)
+def plain_signature_to_keywords_union(signature: models.Plain
+                                      ) -> Dict[str, models.Parameter]:
+    keywords = (signature.parameters_by_kind[
+                    models.Parameter.Kind.POSITIONAL_OR_KEYWORD]
+                + signature.parameters_by_kind[
+                    models.Parameter.Kind.KEYWORD_ONLY])
+    return models.to_parameters_by_name(keywords)
+
+
+@signature_to_keywords_union.register(models.Overloaded)
+def overloaded_signature_to_keywords_union(signature: models.Overloaded
+                                           ) -> Dict[str, models.Parameter]:
+    if not signature.signatures:
+        return {}
+
+    def unite(left_dictionary: Dict[Domain, Range],
+              right_dictionary: Dict[Domain, Range]) -> Dict[Domain, Range]:
+        return {**left_dictionary, **right_dictionary}
+
+    return reduce(unite,
+                  map(signature_to_keywords_union, signature.signatures))
