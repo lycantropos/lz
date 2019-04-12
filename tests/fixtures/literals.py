@@ -21,7 +21,8 @@ from lz.sorting import (Implementation,
 from lz.transposition import transpose
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
-from tests.utils import find
+from tests.utils import (find,
+                         is_pickleable)
 
 
 @pytest.fixture(scope='function')
@@ -40,6 +41,11 @@ def non_zero_real_number() -> Real:
 @pytest.fixture(scope='function')
 def object_() -> Any:
     return find(strategies.objects)
+
+
+@pytest.fixture(scope='function')
+def pickleable_object() -> Any:
+    return find(strategies.objects.filter(is_pickleable))
 
 
 @pytest.fixture(scope='function')

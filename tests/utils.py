@@ -254,3 +254,12 @@ def not_raises(*exceptions_classes: Type[Exception]) -> ContextManager[None]:
 
 def round_trip_pickle(object_: Any) -> Any:
     return pickle.loads(pickle.dumps(object_))
+
+
+def is_pickleable(object_: Any) -> bool:
+    try:
+        pickle.dumps(object_)
+    except pickle.PicklingError:
+        return False
+    else:
+        return True
