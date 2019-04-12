@@ -226,6 +226,11 @@ class Curry(ApplierBase):
                              field_seeker=seekers.complex_)
 
 
+@signatures.factory.register(Curry)
+def _(object_: Curry) -> signatures.Base:
+    return object_.signature
+
+
 def curry(function: Callable[..., Range],
           *,
           signature: Optional[signatures.Base] = None) -> Curry:
