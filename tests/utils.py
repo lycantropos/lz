@@ -196,6 +196,8 @@ def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
 
 
 def has_similar_types(left_object: Any, right_object: Any) -> bool:
+    if isinstance(left_object, abc.Iterator):
+        return isinstance(right_object, abc.Iterator)
     left_type = type(left_object)
     right_type = type(right_object)
     return (issubclass(left_type, right_type)
