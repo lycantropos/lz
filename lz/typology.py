@@ -1,5 +1,7 @@
+from functools import partial
 from operator import attrgetter
-from typing import Any
+from typing import (Any,
+                    Tuple)
 
 from .hints import Predicate
 
@@ -8,10 +10,8 @@ def instance_of(*types: type) -> Predicate:
     """
     Creates predicate that checks if object is instance of given types.
     """
-
-    def predicate(object_: Any) -> bool:
-        return isinstance(object_, types)
-
+    predicate = partial(is_instance_of,
+                        types=types)
     types_names = list(map(attrgetter('__name__'), types))
     predicate.__name__ = 'is_instance_of_' + '_or_'.join(types_names)
     predicate.__qualname__ = 'is_instance_of_' + '_or_'.join(types_names)
@@ -26,10 +26,8 @@ def subclass_of(*types: type) -> Predicate:
     """
     Creates predicate that checks if type is subclass of given types.
     """
-
-    def predicate(type_: type) -> bool:
-        return issubclass(type_, types)
-
+    predicate = partial(is_subclass_of,
+                        types=types)
     types_names = list(map(attrgetter('__name__'), types))
     predicate.__name__ = 'is_subclass_of_' + '_or_'.join(types_names)
     predicate.__qualname__ = 'is_subclass_of_' + '_or_'.join(types_names)
@@ -38,3 +36,11 @@ def subclass_of(*types: type) -> Predicate:
                          'of one of types: "{types}".'
                          .format(types='", "'.join(types_full_names)))
     return predicate
+
+
+def is_instance_of(object_: Any, types: Tuple[type, ...]) -> bool:
+    return isinstance(object_, types)
+
+
+def is_subclass_of(type_: type, types: Tuple[type, ...]) -> bool:
+    return issubclass(type_, types)
