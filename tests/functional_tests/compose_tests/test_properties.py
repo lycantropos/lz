@@ -4,11 +4,14 @@ from itertools import repeat
 from typing import (Any,
                     Tuple)
 
+import pytest
+
 from lz.functional import (compose,
                            curry,
                            identity)
 from lz.hints import (Domain,
                       Map,
+                      Operator,
                       Range)
 from tests.utils import (Intermediate,
                          not_raises)
@@ -49,11 +52,15 @@ def test_currying(suitable_maps: Tuple[Map[Domain, Intermediate], ...],
     assert result == composition(map_argument)
 
 
-def test_nesting(object_: Any) -> None:
-    composition = reduce(compose,
-                         repeat(identity,
-                                times=sys.getrecursionlimit()),
-                         identity)
+@pytest.fixture(scope='session')
+def deep_composition() -> Operator:
+    return reduce(compose,
+                  repeat(identity,
+                         times=sys.getrecursionlimit()),
+                  identity)
 
+
+def test_nesting(object_: Any,
+                 deep_composition: Operator) -> None:
     with not_raises(RecursionError):
-        composition(object_)
+        deep_composition(object_)
