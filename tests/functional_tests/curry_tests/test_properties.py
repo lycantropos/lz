@@ -29,18 +29,17 @@ def test_valid_call(transparent_function: Callable[..., Range],
                                           **transparent_function_kwargs)
 
 
-def test_consecutive_call(transparent_function: Callable[..., Range],
-                          transparent_function_args: Tuple[Domain, ...],
-                          transparent_function_kwargs: Dict[str, Domain]
-                          ) -> None:
-    curried = curry(transparent_function)
-    double_curried = curry(curried)
+def test_involution(transparent_function: Callable[..., Range],
+                    transparent_function_args: Tuple[Domain, ...],
+                    transparent_function_kwargs: Dict[str, Domain]
+                    ) -> None:
+    double_curried = curry(curry(transparent_function))
 
     result = double_curried(*transparent_function_args,
                             **transparent_function_kwargs)
 
-    assert result == curried(*transparent_function_args,
-                             **transparent_function_kwargs)
+    assert result == transparent_function(*transparent_function_args,
+                                          **transparent_function_kwargs)
 
 
 def test_invalid_args_call(
