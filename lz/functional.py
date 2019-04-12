@@ -96,6 +96,11 @@ class Composition:
         return self.functions == other.functions
 
 
+@signatures.factory.register(Composition)
+def _(object_: Composition) -> signatures.Base:
+    return signatures.factory(object_.functions[-1])
+
+
 def _compose(*functions: Callable[..., Any],
              function_name: str,
              file_path: str,
