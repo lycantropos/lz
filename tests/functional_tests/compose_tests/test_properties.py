@@ -1,9 +1,11 @@
 import sys
 from functools import reduce
 from itertools import repeat
-from typing import (Any)
+from typing import (Any,
+                    Tuple)
 
 from lz.functional import (compose,
+                           curry,
                            identity)
 from lz.hints import (Domain,
                       Map,
@@ -34,6 +36,17 @@ def test_associativity(last_map: Map[Intermediate, Range],
     right_composition_result = right_composition(map_argument)
 
     assert left_composition_result == right_composition_result
+
+
+def test_currying(suitable_maps: Tuple[Map[Domain, Intermediate], ...],
+                  next_suitable_map: Map[Intermediate, Range],
+                  map_argument: Domain) -> None:
+    composition = compose(next_suitable_map, *suitable_maps)
+    curried_composition = curry(composition)
+
+    result = curried_composition(map_argument)
+
+    assert result == composition(map_argument)
 
 
 def test_nesting(object_: Any) -> None:
