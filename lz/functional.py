@@ -178,6 +178,11 @@ class Combination:
     __repr__ = generate_repr(__init__)
 
 
+@signatures.factory.register(Combination)
+def _(object_: Combination) -> signatures.Base:
+    return signatures.factory(object_.__call__)
+
+
 class ApplierBase(abc.Callable):
     def __init__(self, function: Callable[..., Range],
                  *args: Domain,
