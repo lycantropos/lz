@@ -14,6 +14,8 @@ from typing import (Any,
                     Union)
 
 from paradigm import signatures
+from reprit import seekers
+from reprit.base import generate_repr
 
 from .hints import (Domain,
                     Map,
@@ -85,9 +87,8 @@ class Composition:
     def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
         return self.function(*args, **kwargs)
 
-    def __repr__(self) -> str:
-        return (type(self).__qualname__
-                + '(' + ', '.join(map(repr, self.functions)) + ')')
+    __repr__ = generate_repr(__init__,
+                             field_seeker=seekers.complex_)
 
     def __eq__(self, other: 'Composition') -> bool:
         if not isinstance(other, Composition):
@@ -169,9 +170,7 @@ class Combination:
         yield from (map_(argument)
                     for map_, argument in zip(self.maps, arguments))
 
-    def __repr__(self) -> str:
-        return (type(self).__qualname__
-                + '(' + ', '.join(map(repr, self.maps)) + ')')
+    __repr__ = generate_repr(__init__)
 
 
 class ApplierBase(abc.Callable):
@@ -198,14 +197,6 @@ class ApplierBase(abc.Callable):
     def keywords(self) -> Dict[str, Domain]:
         return self._kwargs
 
-    def __repr__(self) -> str:
-        arguments_strings = itertools.chain(
-                [repr(self.func)],
-                arguments_to_strings(self.args, self.keywords))
-        cls = type(self)
-        return (cls.__module__ + '.' + cls.__qualname__
-                + '(' + ', '.join(arguments_strings) + ')')
-
 
 ApplierBase.register(functools.partial)
 
@@ -230,6 +221,9 @@ class Curry(ApplierBase):
                     or self.signature.all_set(*args, **kwargs)):
                 raise
         return type(self)(self.func, self.signature, *args, **kwargs)
+
+    __repr__ = generate_repr(__init__,
+                             field_seeker=seekers.complex_)
 
 
 def arguments_to_strings(positional_arguments: Tuple[Any, ...],
@@ -280,8 +274,7 @@ class Constant:
     def __call__(self, *args: Any, **kwargs: Any) -> Domain:
         return self.object_
 
-    def __repr__(self) -> str:
-        return type(self).__qualname__ + '(' + repr(self.object_) + ')'
+    __repr__ = generate_repr(__init__)
 
 
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
@@ -314,6 +307,4 @@ class Cleavage:
         yield from (function(*args, **kwargs)
                     for function in self.functions)
 
-    def __repr__(self) -> str:
-        return (type(self).__qualname__
-                + '(' + ', '.join(map(repr, self.functions)) + ')')
+    __repr__ = generate_repr(__init__)

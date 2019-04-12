@@ -5,7 +5,6 @@ from typing import (Callable,
                     List,
                     Tuple)
 
-from .functional import ApplierBase
 from .hints import (Domain,
                     Map,
                     Range)

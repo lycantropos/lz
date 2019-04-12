@@ -5,6 +5,8 @@ from typing import (Callable,
                     List,
                     Tuple)
 
+from reprit.base import generate_repr
+
 from . import left
 from .functional import (ApplierBase,
                          compose,
@@ -71,6 +73,8 @@ class Applier(ApplierBase):
 
     def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
         return self.func(*args, *self.args, **self.keywords, **kwargs)
+
+    __repr__ = generate_repr(__init__)
 
 
 def applier(function: Callable[..., Range],
