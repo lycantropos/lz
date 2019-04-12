@@ -226,12 +226,6 @@ class Curry(ApplierBase):
                              field_seeker=seekers.complex_)
 
 
-def arguments_to_strings(positional_arguments: Tuple[Any, ...],
-                         keyword_arguments: Dict[str, Any]) -> Iterable[str]:
-    yield from map(repr, positional_arguments)
-    yield from itertools.starmap('{}={!r}'.format, keyword_arguments.items())
-
-
 def curry(function: Callable[..., Range],
           *,
           signature: Optional[signatures.Base] = None) -> Curry:
