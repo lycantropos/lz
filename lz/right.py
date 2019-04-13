@@ -5,6 +5,7 @@ from typing import (Callable,
                     List,
                     Tuple)
 
+from reprit import seekers
 from reprit.base import generate_repr
 
 from . import left
@@ -74,7 +75,8 @@ class Applier(ApplierBase):
     def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
         return self.func(*args, *self.args, **self.keywords, **kwargs)
 
-    __repr__ = generate_repr(__init__)
+    __repr__ = generate_repr(__init__,
+                             field_seeker=seekers.complex_)
 
 
 def applier(function: Callable[..., Range],
