@@ -111,21 +111,14 @@ transparent_functions = (non_variadic_transparent_functions
 paths_names_parts = to_strings(string.digits + string.ascii_letters + '_')
 transparent_functions_args = {
     bool: strategies.tuples(objects),
-    complex: strategies.tuples(
-            numbers),
-    float: strategies.tuples(
-            real_numbers),
-    identity: strategies.tuples(
-            objects),
+    complex: strategies.tuples(numbers),
+    float: strategies.tuples(real_numbers),
+    identity: strategies.tuples(objects),
     int: strategies.tuples(integers),
-    json.dumps: strategies.tuples(
-            json_serializable_objects),
-    json.loads: strategies.tuples(
-            json_serializable_objects.map(
-                    json.dumps)),
-    os.path.join: to_homogeneous_tuples(
-            paths_names_parts,
-            min_size=1),
+    json.dumps: strategies.tuples(json_serializable_objects),
+    json.loads: strategies.tuples(json_serializable_objects.map(json.dumps)),
+    os.path.join: to_homogeneous_tuples(paths_names_parts,
+                                        min_size=1),
     str: strategies.tuples(objects),
 }
 transparent_functions_kwargs = {
@@ -191,6 +184,26 @@ def to_transparent_functions_calls(function: Function
                              to_transparent_function_kwargs(function))
 
 
+def to_transparent_functions_calls_with_invalid_args(
+        function: Function) -> Strategy[FunctionCall]:
+    return strategies.tuples(strategies.just(function),
+                             to_invalid_args(function),
+                             to_transparent_function_kwargs(function))
+
+
+def to_transparent_functions_calls_with_invalid_kwargs(
+        function: Function) -> Strategy[FunctionCall]:
+    return strategies.tuples(strategies.just(function),
+                             to_transparent_function_args(function),
+                             to_unexpected_kwargs(function))
+
+
+non_variadic_transparent_functions_calls_with_invalid_args = (
+    non_variadic_transparent_functions.flatmap(
+            to_transparent_functions_calls_with_invalid_args))
+non_variadic_transparent_functions_calls_with_invalid_kwargs = (
+    non_variadic_transparent_functions.flatmap(
+            to_transparent_functions_calls_with_invalid_kwargs))
 transparent_functions_calls = (transparent_functions
                                .flatmap(to_transparent_functions_calls))
 
@@ -220,10 +233,10 @@ transparent_functions_partitioned_calls = (transparent_functions_calls
                                            .flatmap(partition_call))
 
 
-def to_unexpected_args(function: Callable[..., Any],
-                       *,
-                       values: SearchStrategy[Domain] = strategies.none()
-                       ) -> SearchStrategy[Tuple[Domain, ...]]:
+def to_invalid_args(function: Callable[..., Any],
+                    *,
+                    values: SearchStrategy[Domain] = strategies.none()
+                    ) -> SearchStrategy[Tuple[Domain, ...]]:
     signature = signatures.factory(function)
     count = signature_to_max_positionals_count(signature) + 1
     return to_homogeneous_tuples(values,

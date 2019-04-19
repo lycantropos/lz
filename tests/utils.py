@@ -5,7 +5,8 @@ from collections import (abc,
                          deque)
 from contextlib import contextmanager
 from functools import singledispatch
-from itertools import (starmap,
+from itertools import (chain,
+                       starmap,
                        zip_longest)
 from operator import methodcaller
 from typing import (Any,
@@ -19,11 +20,6 @@ from typing import (Any,
                     Type,
                     TypeVar)
 
-try:
-    from typing import ContextManager
-except ImportError:
-    from typing_extensions import ContextManager
-
 import pytest
 from hypothesis import (Phase,
                         core,
@@ -33,8 +29,14 @@ from hypothesis.errors import (NoSuchExample,
 from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import (Domain,
+                      Map,
                       Range)
 from lz.replication import duplicate
+
+try:
+    from typing import ContextManager
+except ImportError:
+    from typing_extensions import ContextManager
 
 Intermediate = TypeVar('Intermediate')
 Args = Tuple[Domain, ...]
@@ -248,6 +250,11 @@ encoding_to_bom = (defaultdict(bytes,
                                 'utf_32_be': codecs.BOM_UTF32_BE,
                                 'utf_32_le': codecs.BOM_UTF32_LE})
                    .__getitem__)
+
+
+def flatmap(function: Map[Domain, Iterable[Range]],
+            *iterables: Iterable[Domain]) -> Iterable[Range]:
+    yield from chain.from_iterable(map(function, *iterables))
 
 
 def equivalence(left_statement: bool, right_statement: bool) -> bool:

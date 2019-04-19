@@ -1,65 +1,58 @@
-from typing import (Callable,
-                    Dict,
-                    Tuple)
-
 import pytest
+from hypothesis import given
 
 from lz.functional import (Curry,
                            curry)
-from lz.hints import (Domain,
-                      Range)
+from tests import strategies
+from tests.utils import (Function,
+                         FunctionCall)
 
 
-def test_empty_call(transparent_function: Callable[..., Range]) -> None:
-    curried = curry(transparent_function)
+@given(strategies.transparent_functions)
+def test_empty_call(function: Function) -> None:
+    curried = curry(function)
 
     result = curried()
 
     assert curried.signature.all_set() or isinstance(result, Curry)
 
 
-def test_valid_call(transparent_function: Callable[..., Range],
-                    transparent_function_args: Tuple[Domain, ...],
-                    transparent_function_kwargs: Dict[str, Domain]) -> None:
-    curried = curry(transparent_function)
+@given(strategies.transparent_functions_calls)
+def test_valid_call(function_call: FunctionCall) -> None:
+    function, args, kwargs = function_call
 
-    result = curried(*transparent_function_args, **transparent_function_kwargs)
+    curried = curry(function)
 
-    assert result == transparent_function(*transparent_function_args,
-                                          **transparent_function_kwargs)
+    result = curried(*args, **kwargs)
 
-
-def test_involution(transparent_function: Callable[..., Range],
-                    transparent_function_args: Tuple[Domain, ...],
-                    transparent_function_kwargs: Dict[str, Domain]
-                    ) -> None:
-    double_curried = curry(curry(transparent_function))
-
-    result = double_curried(*transparent_function_args,
-                            **transparent_function_kwargs)
-
-    assert result == transparent_function(*transparent_function_args,
-                                          **transparent_function_kwargs)
+    assert result == function(*args, **kwargs)
 
 
-def test_invalid_args_call(
-        non_variadic_transparent_function: Callable[..., Range],
-        non_variadic_transparent_function_invalid_args: Tuple[Domain, ...],
-        non_variadic_transparent_function_kwargs: Dict[str, Domain]) -> None:
-    curried = curry(non_variadic_transparent_function)
+@given(strategies.transparent_functions_calls)
+def test_involution(function_call: FunctionCall) -> None:
+    function, args, kwargs = function_call
+    double_curried = curry(curry(function))
+
+    result = double_curried(*args, **kwargs)
+
+    assert result == function(*args, **kwargs)
+
+
+@given(strategies.non_variadic_transparent_functions_calls_with_invalid_args)
+def test_invalid_args_call(function_call_with_invalid_args: FunctionCall
+                           ) -> None:
+    function, invalid_args, kwargs = function_call_with_invalid_args
+    curried = curry(function)
 
     with pytest.raises(TypeError):
-        curried(*non_variadic_transparent_function_invalid_args,
-                **non_variadic_transparent_function_kwargs)
+        curried(*invalid_args, **kwargs)
 
 
-def test_invalid_kwargs_call(
-        non_variadic_transparent_function: Callable[..., Range],
-        non_variadic_transparent_function_args: Dict[str, Domain],
-        non_variadic_transparent_function_invalid_kwargs: Tuple[Domain, ...]
-) -> None:
-    curried = curry(non_variadic_transparent_function)
+@given(strategies.non_variadic_transparent_functions_calls_with_invalid_kwargs)
+def test_invalid_kwargs_call(function_call_with_invalid_kwargs: FunctionCall
+                             ) -> None:
+    function, args, invalid_kwargs = function_call_with_invalid_kwargs
+    curried = curry(function)
 
     with pytest.raises(TypeError):
-        curried(*non_variadic_transparent_function_args,
-                **non_variadic_transparent_function_invalid_kwargs)
+        curried(*args, **invalid_kwargs)
