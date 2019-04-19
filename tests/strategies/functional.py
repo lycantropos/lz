@@ -109,7 +109,7 @@ variadic_transparent_functions = strategies.just(os.path.join)
 transparent_functions = (non_variadic_transparent_functions
                          | variadic_transparent_functions)
 paths_names_parts = to_strings(string.digits + string.ascii_letters + '_')
-transparent_functions_args = {
+to_transparent_function_args = {
     bool: strategies.tuples(objects),
     complex: strategies.tuples(numbers),
     float: strategies.tuples(real_numbers),
@@ -120,8 +120,8 @@ transparent_functions_args = {
     os.path.join: to_homogeneous_tuples(paths_names_parts,
                                         min_size=1),
     str: strategies.tuples(objects),
-}
-transparent_functions_kwargs = {
+}.__getitem__
+to_transparent_function_kwargs = {
     bool: empty.dictionaries,
     complex: empty.dictionaries,
     float: empty.dictionaries,
@@ -139,9 +139,7 @@ transparent_functions_kwargs = {
                       | strategies.sampled_from([int, float]))}),
     os.path.join: empty.dictionaries,
     str: empty.dictionaries,
-}
-to_transparent_function_args = transparent_functions_args.__getitem__
-to_transparent_function_kwargs = transparent_functions_kwargs.__getitem__
+}.__getitem__
 projectors = strategies.sampled_from([add, and_, max, min, or_,
                                       os.path.join, sub, xor])
 projectors_domains = {add: [lists, numbers, strings, tuples],
@@ -195,7 +193,7 @@ def to_transparent_functions_calls_with_invalid_kwargs(
         function: Function) -> Strategy[FunctionCall]:
     return strategies.tuples(strategies.just(function),
                              to_transparent_function_args(function),
-                             to_unexpected_kwargs(function))
+                             to_invalid_kwargs(function))
 
 
 non_variadic_transparent_functions_calls_with_invalid_args = (
@@ -243,10 +241,10 @@ def to_invalid_args(function: Callable[..., Any],
                                  min_size=count)
 
 
-def to_unexpected_kwargs(function: Callable[..., Any],
-                         *,
-                         values: SearchStrategy[Domain] = strategies.none()
-                         ) -> SearchStrategy[Dict[str, Domain]]:
+def to_invalid_kwargs(function: Callable[..., Any],
+                      *,
+                      values: Strategy[Domain] = strategies.none()
+                      ) -> Strategy[Dict[str, Domain]]:
     signature = signatures.factory(function)
     keywords = signature_to_keywords_union(signature)
     is_unexpected = negate(keywords.__contains__)
