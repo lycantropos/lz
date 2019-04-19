@@ -1,18 +1,15 @@
-from typing import (Callable,
-                    Dict,
-                    Tuple)
+from hypothesis import given
 
 from lz.functional import pack
-from lz.hints import (Domain,
-                      Range)
+from tests import strategies
+from tests.utils import FunctionCall
 
 
-def test_basic(transparent_function: Callable[..., Range],
-               transparent_function_args: Tuple[Domain, ...],
-               transparent_function_kwargs: Dict[str, Domain]) -> None:
-    packed = pack(transparent_function)
+@given(strategies.transparent_functions_calls)
+def test_basic(function_call: FunctionCall) -> None:
+    function, args, kwargs = function_call
+    packed = pack(function)
 
-    result = packed(transparent_function_args, transparent_function_kwargs)
+    result = packed(args, kwargs)
 
-    assert result == transparent_function(*transparent_function_args,
-                                          **transparent_function_kwargs)
+    assert result == function(*args, **kwargs)
