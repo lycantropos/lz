@@ -12,13 +12,11 @@ import pytest
 from hypothesis.searchstrategy import SearchStrategy as Strategy
 
 from lz.functional import identity
-from lz.hints import (FiniteIterable,
-                      Sortable)
+from lz.hints import Sortable
 from lz.reversal import reverse
 from lz.sorting import (Implementation,
                         Key,
                         with_key)
-from lz.transposition import transpose
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import (find,
@@ -193,44 +191,3 @@ def irreversible_object() -> Any:
         return reverse.dispatch(type(object_)) is reverse.dispatch(object)
 
     return find(strategies.objects.filter(is_object_irreversible))
-
-
-@pytest.fixture(scope='function')
-def transposable_iterable(
-        transposable_iterable_elements_strategy: Strategy[FiniteIterable[Any]]
-) -> Iterable[FiniteIterable[Any]]:
-    return find(strategies.to_homogeneous_iterables
-                (transposable_iterable_elements_strategy))
-
-
-@pytest.fixture(scope='function')
-def non_empty_transposable_iterable(
-        transposable_iterable_elements_strategy: Strategy[FiniteIterable[Any]],
-        size: int) -> Iterable[FiniteIterable[Any]]:
-    limit_min_size = partial(partial,
-                             min_size=1)
-    return find(limit_min_size(strategies.to_homogeneous_iterables)
-                (strategies.to_tuples(strategies.objects,
-                                      size=size + 1)))
-
-
-@pytest.fixture(scope='function')
-def transposable_iterable_element(
-        transposable_iterable_elements_strategy: Strategy[FiniteIterable[Any]]
-) -> FiniteIterable[Any]:
-    return find(transposable_iterable_elements_strategy)
-
-
-@pytest.fixture(scope='function')
-def transposable_iterable_elements_strategy(size: int
-                                            ) -> Strategy[FiniteIterable[Any]]:
-    return strategies.to_tuples(strategies.objects,
-                                size=size)
-
-
-@pytest.fixture(scope='function')
-def untransposable_object() -> Any:
-    def is_untransposable_object(object_: Any) -> bool:
-        return transpose.dispatch(type(object_)) is transpose.dispatch(object)
-
-    return find(strategies.objects.filter(is_untransposable_object))

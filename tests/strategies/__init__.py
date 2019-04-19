@@ -27,7 +27,8 @@ from .functional import (false_predicates,
                          various_suitable_maps)
 from .iterating import (groupers_keys,
                         non_negative_indices,
-                        non_negative_slices)
+                        non_negative_slices,
+                        positive_indices)
 from .literals import empty
 from .literals.base import (any_strings,
                             booleans,

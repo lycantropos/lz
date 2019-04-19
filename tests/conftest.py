@@ -12,6 +12,8 @@ from typing import (Any,
 import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.python import Metafunc
+from hypothesis import (HealthCheck,
+                        settings)
 
 from lz.replication import (replicate,
                             replicate_iterable)
@@ -80,6 +82,12 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
     # @pytest.mark.parametrize('tmp_ct', range(count))
     # def test_foo(): pass
     metafunc.parametrize('tmp_ct', range(count))
+
+
+settings_profile_name = 'default'
+settings.register_profile(settings_profile_name,
+                          suppress_health_check=[HealthCheck.filter_too_much,
+                                                 HealthCheck.too_slow])
 
 
 @pytest.fixture(scope='session',
