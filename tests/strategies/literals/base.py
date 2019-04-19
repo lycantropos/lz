@@ -20,8 +20,8 @@ from .factories import (to_byte_sequences,
                         to_dictionaries,
                         to_homogeneous_frozensets,
                         to_homogeneous_iterables,
-                        to_homogeneous_iterators,
                         to_homogeneous_lists,
+                        to_homogeneous_sequences,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
                         to_integers,
@@ -89,7 +89,6 @@ plain_hashables = (scalars
                    | classes)
 hashables = (plain_hashables
              | to_homogeneous_frozensets(deferred_hashables)
-             | to_homogeneous_iterators(deferred_objects)
              | to_homogeneous_tuples(deferred_hashables))
 indices = strategies.integers(-MAX_ITERABLES_SIZE, MAX_ITERABLES_SIZE - 1)
 slices_fields = strategies.none() | indices
@@ -99,14 +98,11 @@ slices = strategies.builds(slice,
                            slices_fields)
 byte_sequences = encodings.flatmap(to_byte_sequences)
 any_strings = strings | byte_sequences
-iterables = (any_strings
-             | to_homogeneous_iterables(deferred_objects))
+sequences = any_strings | to_homogeneous_sequences(deferred_objects)
 sets = to_homogeneous_sets(hashables)
-objects = (hashables
-           | slices
-           | iterables
-           | sets
-           | to_dictionaries(hashables, deferred_objects))
+finite_iterables = sequences | sets | to_dictionaries(hashables,
+                                                      deferred_objects)
+objects = hashables | slices | finite_iterables | sets
 pickleable_objects = objects.filter(is_pickleable)
 tuples = to_homogeneous_tuples(objects)
 lists = to_homogeneous_lists(objects)
@@ -127,8 +123,8 @@ json_serializable_objects = strategies.recursive(
 positionals_arguments = tuples
 keywords_arguments = to_dictionaries(strings, objects)
 
-sortable_domains = [byte_sequences, real_numbers, sets, strings]
+sortable_domains = [any_strings, real_numbers, sets]
 sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
                                             sortable_domains))
 
-iterables_sizes = to_integers(0, MAX_ITERABLES_SIZE)
+finite_iterables_sizes = to_integers(0, MAX_ITERABLES_SIZE)

@@ -129,7 +129,7 @@ transparent_functions_kwargs = {
     int: empty.dictionaries,
     json.dumps: strategies.fixed_dictionaries({
         'indent': strategies.integers(0, 10),
-        'sort_keys': strategies.booleans()}),
+        'sort_keys': strategies.just(True)}),
     json.loads: strategies.fixed_dictionaries({
         'object_pairs_hook': (strategies.none()
                               | strategies.just(OrderedDict)),

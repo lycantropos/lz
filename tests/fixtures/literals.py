@@ -58,7 +58,7 @@ def sorting_key() -> Key:
 
 @pytest.fixture(scope='function')
 def min_iterables_size() -> int:
-    return find(strategies.iterables_sizes
+    return find(strategies.finite_iterables_sizes
                 .filter(partial(gt, MAX_MIN_ITERABLES_SIZE)))
 
 

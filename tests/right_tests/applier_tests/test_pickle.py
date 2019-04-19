@@ -1,28 +1,20 @@
-from typing import (Callable,
-                    Dict,
-                    Tuple)
+from hypothesis import given
 
 from lz import right
-from lz.hints import (Domain,
-                      Range)
-from tests.utils import round_trip_pickle
+from tests import strategies
+from tests.utils import (PartitionedFunctionCall, are_objects_similar,
+                         round_trip_pickle)
 
 
-def test_basic(transparent_function: Callable[..., Range],
-               transparent_function_args: Tuple[Domain, ...],
-               transparent_function_first_args_part: Tuple[Domain, ...],
-               transparent_function_second_args_part: Tuple[Domain, ...],
-               transparent_function_kwargs: Dict[str, Domain],
-               transparent_function_first_kwargs_part: Dict[str, Domain],
-               transparent_function_second_kwargs_part: Dict[str, Domain]
-               ) -> None:
-    applied = right.applier(transparent_function,
-                            *transparent_function_second_args_part,
-                            **transparent_function_first_kwargs_part)
+@given(strategies.partitioned_transparent_functions_calls)
+def test_basic(partitioned_function_call: PartitionedFunctionCall) -> None:
+    (function,
+     (first_args_part, second_args_part),
+     (first_kwargs_part, second_kwargs_part)) = partitioned_function_call
+    applied = right.applier(function, *second_args_part, **first_kwargs_part)
 
     result = round_trip_pickle(applied)
 
-    assert (result(*transparent_function_first_args_part,
-                   **transparent_function_second_kwargs_part)
-            == transparent_function(*transparent_function_args,
-                                    **transparent_function_kwargs))
+    assert (result(*first_args_part, **second_kwargs_part)
+            == function(*first_args_part, *second_args_part,
+                        **first_kwargs_part, **second_kwargs_part))
