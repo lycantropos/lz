@@ -1,5 +1,4 @@
 from functools import partial
-from numbers import Real
 from operator import gt
 from typing import (Any,
                     Dict,
@@ -21,19 +20,6 @@ from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import (find,
                          is_pickleable)
-
-
-@pytest.fixture(scope='function')
-def real_number() -> Real:
-    return find(strategies.real_numbers)
-
-
-@pytest.fixture(scope='function')
-def non_zero_real_number() -> Real:
-    def is_non_zero(number: Real) -> bool:
-        return number != 0
-
-    return find(strategies.real_numbers.filter(is_non_zero))
 
 
 @pytest.fixture(scope='function')
