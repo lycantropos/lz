@@ -1,19 +1,16 @@
-from typing import (Any,
-                    Callable,
-                    Dict)
+from hypothesis import given
 
 from lz.functional import flip
-from lz.hints import Domain
+from tests import strategies
+from tests.utils import FunctionCall
 
 
-def test_basic(transparent_function: Callable[..., Any],
-               transparent_function_args: Domain,
-               transparent_function_kwargs: Dict[str, Domain]) -> None:
-    flipped = flip(transparent_function)
+@given(strategies.transparent_functions_calls)
+def test_basic(function_call: FunctionCall) -> None:
+    function, args, kwargs = function_call
+    flipped = flip(function)
 
-    original_result = transparent_function(*transparent_function_args,
-                                           **transparent_function_kwargs)
-    flipped_result = flipped(*reversed(transparent_function_args),
-                             **transparent_function_kwargs)
+    original_result = function(*args, **kwargs)
+    flipped_result = flipped(*reversed(args), **kwargs)
 
     assert flipped_result == original_result

@@ -1,21 +1,16 @@
-from typing import (Callable,
-                    Dict,
-                    Tuple)
+from hypothesis import given
 
 from lz.functional import flip
-from lz.hints import (Domain,
-                      Range)
-from tests.utils import round_trip_pickle
+from tests import strategies
+from tests.utils import (FunctionCall,
+                         round_trip_pickle)
 
 
-def test_round_trip(transparent_function: Callable[..., Range],
-                    transparent_function_args: Tuple[Domain, ...],
-                    transparent_function_kwargs: Dict[str, Domain]) -> None:
-    curried = flip(transparent_function)
+@given(strategies.transparent_functions_calls)
+def test_round_trip(function_call: FunctionCall) -> None:
+    function, args, kwargs = function_call
+    flipped = flip(function)
 
-    result = round_trip_pickle(curried)
+    result = round_trip_pickle(flipped)
 
-    assert (result(*transparent_function_args,
-                   **transparent_function_kwargs)
-            == curried(*transparent_function_args,
-                       **transparent_function_kwargs))
+    assert result(*args, **kwargs) == flipped(*args, **kwargs)

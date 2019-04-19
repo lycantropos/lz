@@ -1,33 +1,28 @@
-from typing import (Any,
-                    Callable,
-                    Dict)
+from hypothesis import given
 
 from lz.functional import (curry,
                            flip)
-from lz.hints import Domain
+from tests import strategies
+from tests.utils import FunctionCall
 
 
-def test_involution(transparent_function: Callable[..., Any],
-                    transparent_function_args: Domain,
-                    transparent_function_kwargs: Dict[str, Domain]) -> None:
-    double_flipped = flip(flip(transparent_function))
+@given(strategies.transparent_functions_calls)
+def test_involution(function_call: FunctionCall) -> None:
+    function, args, kwargs = function_call
+    double_flipped = flip(flip(function))
 
-    original_result = transparent_function(*transparent_function_args,
-                                           **transparent_function_kwargs)
-    double_flipped_result = double_flipped(*transparent_function_args,
-                                           **transparent_function_kwargs)
+    original_result = function(*args, **kwargs)
+    double_flipped_result = double_flipped(*args, **kwargs)
 
     assert double_flipped_result == original_result
 
 
-def test_currying(transparent_function: Callable[..., Any],
-                  transparent_function_args: Domain,
-                  transparent_function_kwargs: Dict[str, Domain]) -> None:
-    flipped = flip(transparent_function)
+@given(strategies.transparent_functions_calls)
+def test_currying(function_call: FunctionCall) -> None:
+    function, args, kwargs = function_call
+    flipped = flip(function)
     curried_flipped = curry(flipped)
 
-    result = curried_flipped(*transparent_function_args,
-                             **transparent_function_kwargs)
+    result = curried_flipped(*args, **kwargs)
 
-    assert result == flipped(*transparent_function_args,
-                             **transparent_function_kwargs)
+    assert result == flipped(*args, **kwargs)
