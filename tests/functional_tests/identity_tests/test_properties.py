@@ -1,9 +1,13 @@
 from typing import Any
 
+from hypothesis import given
+
 from lz.functional import (curry,
                            identity)
+from tests import strategies
 
 
+@given(strategies.objects)
 def test_currying(object_: Any) -> None:
     curried = curry(identity)
 
