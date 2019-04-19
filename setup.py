@@ -18,7 +18,7 @@ setup_requires = [
 tests_require = [
     'pytest>=3.8.1',
     'pytest-cov>=2.6.0',
-    'hypothesis>=3.73.1, <4.0.0',
+    'hypothesis>=3.73.1, <=4.17.0',
 ]
 
 setup(name='lz',
