@@ -229,7 +229,7 @@ def partition_call(call: FunctionCall) -> Strategy[PartitionedFunctionCall]:
                              .map(partition_kwargs))
 
 
-transparent_functions_partitioned_calls = (transparent_functions_calls
+partitioned_transparent_functions_calls = (transparent_functions_calls
                                            .flatmap(partition_call))
 
 

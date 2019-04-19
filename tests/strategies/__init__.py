@@ -14,6 +14,7 @@ from .functional import (
     non_variadic_transparent_functions,
     non_variadic_transparent_functions_calls_with_invalid_args,
     non_variadic_transparent_functions_calls_with_invalid_kwargs,
+    partitioned_transparent_functions_calls,
     predicates,
     predicates_arguments,
     projectors,

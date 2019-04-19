@@ -3,19 +3,16 @@ from hypothesis import given
 from lz import (left,
                 right)
 from lz.functional import curry
-from tests.functional_tests import strategies
+from tests import strategies
 from tests.utils import PartitionedFunctionCall
 
 
-@given(strategies.transparent_functions_partitioned_calls)
+@given(strategies.partitioned_transparent_functions_calls)
 def test_consecutive_application(
-        transparent_function_partitioned_call: PartitionedFunctionCall
-) -> None:
+        partitioned_function_call: PartitionedFunctionCall) -> None:
     (function,
-     (first_args_part,
-      second_args_part),
-     (first_kwargs_part,
-      second_kwargs_part)) = transparent_function_partitioned_call
+     (first_args_part, second_args_part),
+     (first_kwargs_part, second_kwargs_part)) = partitioned_function_call
 
     fold = left.folder(left.applier,
                        left.applier(function,
@@ -28,15 +25,12 @@ def test_consecutive_application(
                         **first_kwargs_part, **second_kwargs_part))
 
 
-@given(strategies.transparent_functions_partitioned_calls)
+@given(strategies.partitioned_transparent_functions_calls)
 def test_composition_with_right(
-        transparent_function_partitioned_call: PartitionedFunctionCall
-) -> None:
+        partitioned_function_call: PartitionedFunctionCall) -> None:
     (function,
-     (first_args_part,
-      second_args_part),
-     (first_kwargs_part,
-      second_kwargs_part)) = transparent_function_partitioned_call
+     (first_args_part, second_args_part),
+     (first_kwargs_part, second_kwargs_part)) = partitioned_function_call
     right_applied = right.applier(function,
                                   *second_args_part,
                                   **first_kwargs_part)
@@ -50,22 +44,17 @@ def test_composition_with_right(
                                 **first_kwargs_part, **second_kwargs_part)
 
 
-@given(strategies.transparent_functions_partitioned_calls)
-def test_currying(
-        transparent_function_partitioned_call: PartitionedFunctionCall
-) -> None:
+@given(strategies.partitioned_transparent_functions_calls)
+def test_currying(partitioned_function_call: PartitionedFunctionCall) -> None:
     (function,
-     (first_args_part,
-      second_args_part),
-     (first_kwargs_part,
-      second_kwargs_part)) = transparent_function_partitioned_call
+     (first_args_part, second_args_part),
+     (first_kwargs_part, second_kwargs_part)) = partitioned_function_call
     applied = left.applier(function,
                            *first_args_part,
                            **first_kwargs_part)
 
     result = curry(applied)
 
-    assert (result(*second_args_part,
-                   **second_kwargs_part)
+    assert (result(*second_args_part, **second_kwargs_part)
             == function(*first_args_part, *second_args_part,
                         **first_kwargs_part, **second_kwargs_part))
