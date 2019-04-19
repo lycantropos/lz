@@ -13,6 +13,7 @@ from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
 from tests.configs import MAX_ITERABLES_SIZE
+from tests.utils import is_pickleable
 from .factories import (to_byte_sequences,
                         to_byte_strings,
                         to_characters,
@@ -106,6 +107,7 @@ objects = (hashables
            | iterables
            | sets
            | to_dictionaries(hashables, deferred_objects))
+pickleable_objects = objects.filter(is_pickleable)
 tuples = to_homogeneous_tuples(objects)
 lists = to_homogeneous_lists(objects)
 

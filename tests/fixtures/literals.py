@@ -18,18 +18,12 @@ from lz.sorting import (Implementation,
                         with_key)
 from tests import strategies
 from tests.configs import MAX_MIN_ITERABLES_SIZE
-from tests.utils import (find,
-                         is_pickleable)
+from tests.utils import find
 
 
 @pytest.fixture(scope='function')
 def object_() -> Any:
     return find(strategies.objects)
-
-
-@pytest.fixture(scope='function')
-def pickleable_object() -> Any:
-    return find(strategies.objects.filter(is_pickleable))
 
 
 @pytest.fixture(scope='function')
