@@ -9,10 +9,13 @@ from itertools import (starmap,
                        zip_longest)
 from operator import methodcaller
 from typing import (Any,
+                    Callable,
+                    Dict,
                     Hashable,
                     Iterable,
                     Mapping,
                     Set,
+                    Tuple,
                     Type,
                     TypeVar)
 
@@ -29,13 +32,22 @@ from hypothesis.errors import (NoSuchExample,
                                Unsatisfiable)
 from hypothesis.searchstrategy import SearchStrategy
 
-from lz.hints import Domain
+from lz.hints import (Domain,
+                      Range)
 from lz.replication import duplicate
 
 Intermediate = TypeVar('Intermediate')
+Args = Tuple[Domain, ...]
+Kwargs = Dict[str, Domain]
+Function = Callable[..., Range]
+FunctionCall = Tuple[Function, Args, Kwargs]
+PartitionedFunctionCall = Tuple[Function,
+                                Tuple[Args, Args],
+                                Tuple[Kwargs, Kwargs]]
+Strategy = SearchStrategy
 
 
-def find(strategy: SearchStrategy[Domain]) -> Domain:
+def find(strategy: Strategy[Domain]) -> Domain:
     first_object_list = []
 
     def condition(object_: Any) -> bool:

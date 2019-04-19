@@ -1,9 +1,11 @@
 import json
 import os
+import random
 import string
 from collections import OrderedDict
 from decimal import Decimal
-from functools import (reduce,
+from functools import (partial,
+                       reduce,
                        singledispatch)
 from operator import (add,
                       and_,
@@ -12,6 +14,7 @@ from operator import (add,
                       xor)
 from typing import (Any,
                     Callable,
+                    Container,
                     Dict,
                     Sequence,
                     Tuple)
@@ -28,6 +31,8 @@ from lz.hints import (Domain,
                       Predicate,
                       Range)
 from lz.logical import negate
+from tests.utils import (Args, Function, FunctionCall, Kwargs,
+                         PartitionedFunctionCall, Strategy)
 from .literals import empty
 from .literals.base import (classes,
                             integers,
@@ -42,6 +47,7 @@ from .literals.base import (classes,
                             tuples)
 from .literals.factories import (to_homogeneous_lists,
                                  to_homogeneous_tuples,
+                                 to_integers,
                                  to_strings)
 from .utils import identifiers
 
@@ -141,8 +147,8 @@ transparent_functions_kwargs = {
     os.path.join: empty.dictionaries,
     str: empty.dictionaries,
 }
-to_transparent_functions_args = transparent_functions_args.__getitem__
-to_transparent_functions_kwargs = transparent_functions_kwargs.__getitem__
+to_transparent_function_args = transparent_functions_args.__getitem__
+to_transparent_function_kwargs = transparent_functions_kwargs.__getitem__
 projectors = strategies.sampled_from([add, and_, max, min, or_,
                                       os.path.join, sub, xor])
 projectors_domains = {add: [lists, numbers, strings, tuples],
@@ -176,6 +182,42 @@ projectors_domains_initials = {
 }
 to_projectors_domains = projectors_domains.__getitem__
 to_projectors_domains_initials = projectors_domains_initials.__getitem__
+
+
+def to_transparent_functions_calls(function: Function
+                                   ) -> Strategy[FunctionCall]:
+    return strategies.tuples(strategies.just(function),
+                             to_transparent_function_args(function),
+                             to_transparent_function_kwargs(function))
+
+
+transparent_functions_calls = (transparent_functions
+                               .flatmap(to_transparent_functions_calls))
+
+
+def partition_call(call: FunctionCall) -> Strategy[PartitionedFunctionCall]:
+    function, args, kwargs = call
+
+    def partition_args(args_position: int) -> Tuple[Args, Args]:
+        return args[:args_position], args[args_position:]
+
+    def partition_kwargs(first_keys: Container[str]) -> Tuple[Kwargs, Kwargs]:
+        return ({key: value
+                 for key, value in kwargs.items()
+                 if key in first_keys},
+                {key: value
+                 for key, value in kwargs.items()
+                 if key not in first_keys})
+
+    return strategies.tuples(strategies.just(function),
+                             to_integers(0, len(args)).map(partition_args),
+                             to_integers(0, len(kwargs))
+                             .map(partial(random.sample, kwargs.keys()))
+                             .map(partition_kwargs))
+
+
+transparent_functions_partitioned_calls = (transparent_functions_calls
+                                           .flatmap(partition_call))
 
 
 def to_unexpected_args(function: Callable[..., Any],

@@ -86,6 +86,7 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
 
 settings_profile_name = 'default'
 settings.register_profile(settings_profile_name,
+                          deadline=None,
                           suppress_health_check=[HealthCheck.filter_too_much,
                                                  HealthCheck.too_slow])
 
