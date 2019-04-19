@@ -1,6 +1,4 @@
-import random
 from typing import (Callable,
-                    Dict,
                     Iterable,
                     Sequence,
                     Tuple)
@@ -12,7 +10,6 @@ from lz.hints import (Domain,
                       Map,
                       Predicate,
                       Range)
-from lz.logical import negate
 from tests import strategies
 from tests.utils import (Intermediate,
                          find)
@@ -114,122 +111,6 @@ def another_various_suitable_maps() -> Sequence[Map]:
 @pytest.fixture(scope='function')
 def next_suitable_map(suitable_maps: Tuple[Map, ...]) -> Map:
     return find(strategies.to_one_of_suitable_maps(suitable_maps[0]))
-
-
-@pytest.fixture(scope='function')
-def transparent_function() -> Callable[..., Range]:
-    return find(strategies.transparent_functions)
-
-
-@pytest.fixture(scope='function')
-def transparent_function_args(transparent_function: Callable[..., Range]
-                              ) -> Tuple[Domain, ...]:
-    return find(strategies.to_transparent_functions_args(transparent_function))
-
-
-@pytest.fixture(scope='function')
-def transparent_function_kwargs(transparent_function: Callable[..., Range]
-                                ) -> Dict[str, Domain]:
-    return find(strategies
-                .to_transparent_functions_kwargs(transparent_function))
-
-
-@pytest.fixture(scope='function')
-def transparent_function_args_count(
-        transparent_function_args: Tuple[Domain, ...]) -> int:
-    return len(transparent_function_args)
-
-
-@pytest.fixture(scope='function')
-def transparent_function_kwargs_count(
-        transparent_function_kwargs: Dict[str, Domain]) -> int:
-    return len(transparent_function_kwargs)
-
-
-@pytest.fixture(scope='function')
-def transparent_function_applied_kwargs_count(
-        transparent_function_kwargs_count: int) -> int:
-    return find(strategies.to_integers(
-            min_value=0,
-            max_value=transparent_function_kwargs_count))
-
-
-@pytest.fixture(scope='function')
-def transparent_function_applied_args_count(
-        transparent_function_args_count: int) -> int:
-    return find(strategies.to_integers(
-            min_value=0,
-            max_value=transparent_function_args_count))
-
-
-@pytest.fixture(scope='function')
-def transparent_function_first_args_part(
-        transparent_function_args: Tuple[Domain, ...],
-        transparent_function_applied_args_count: int) -> Tuple[Domain, ...]:
-    return transparent_function_args[:transparent_function_applied_args_count]
-
-
-@pytest.fixture(scope='function')
-def transparent_function_first_kwargs_part(
-        transparent_function_kwargs: Dict[str, Domain],
-        transparent_function_applied_kwargs_count: int) -> Dict[str, Domain]:
-    keys = random.sample(list(transparent_function_kwargs),
-                         transparent_function_applied_kwargs_count)
-    return {key: transparent_function_kwargs[key]
-            for key in keys}
-
-
-@pytest.fixture(scope='function')
-def transparent_function_second_args_part(
-        transparent_function_args: Tuple[Domain, ...],
-        transparent_function_applied_args_count: int) -> Tuple[Domain, ...]:
-    return transparent_function_args[transparent_function_applied_args_count:]
-
-
-@pytest.fixture(scope='function')
-def transparent_function_second_kwargs_part(
-        transparent_function_kwargs: Dict[str, Domain],
-        transparent_function_first_kwargs_part) -> len:
-    return {key: value
-            for key, value in transparent_function_kwargs.items()
-            if key not in transparent_function_first_kwargs_part}
-
-
-@pytest.fixture(scope='function')
-def non_variadic_transparent_function() -> Callable[..., Range]:
-    return find(strategies.non_variadic_transparent_functions)
-
-
-@pytest.fixture(scope='function')
-def non_variadic_transparent_function_args(
-        non_variadic_transparent_function: Callable[..., Range]
-) -> Tuple[Domain, ...]:
-    return find(strategies.to_transparent_functions_args(
-            non_variadic_transparent_function))
-
-
-@pytest.fixture(scope='function')
-def non_variadic_transparent_function_invalid_args(
-        non_variadic_transparent_function: Callable[..., Range]
-) -> Tuple[Domain, ...]:
-    return find(strategies
-                .to_unexpected_args(non_variadic_transparent_function))
-
-
-@pytest.fixture(scope='function')
-def non_variadic_transparent_function_kwargs(
-        non_variadic_transparent_function: Callable[..., Range]
-) -> Dict[str, Domain]:
-    return find(strategies.to_transparent_functions_kwargs(
-            non_variadic_transparent_function))
-
-
-@pytest.fixture(scope='function')
-def non_variadic_transparent_function_invalid_kwargs(
-        non_variadic_transparent_function: Callable[..., Range]
-) -> Dict[str, Domain]:
-    return find(strategies
-                .to_unexpected_kwargs(non_variadic_transparent_function))
 
 
 @pytest.fixture(scope='function')
