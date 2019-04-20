@@ -86,6 +86,8 @@ def chop_sequence(iterable: Sequence[Domain],
     """
     Splits sequence into chunks of given size.
     """
+    if not size:
+        return
     for start in range(0, len(iterable), size):
         yield iterable[start:start + size]
 
