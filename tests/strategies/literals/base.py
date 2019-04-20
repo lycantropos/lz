@@ -10,10 +10,10 @@ from typing import (Dict,
                     Union)
 
 from hypothesis import strategies
-from hypothesis.searchstrategy import SearchStrategy
 
 from tests.configs import (MAX_ITERABLES_SIZE,
                            MAX_MIN_ITERABLES_SIZE)
+from tests.hints import Strategy
 from tests.utils import is_pickleable
 from .factories import (to_byte_sequences,
                         to_byte_strings,
@@ -107,8 +107,7 @@ tuples = to_homogeneous_tuples(objects)
 lists = to_homogeneous_lists(objects)
 
 
-def extend_json(children: SearchStrategy[Serializable]
-                ) -> SearchStrategy[Serializable]:
+def extend_json(children: Strategy[Serializable]) -> Strategy[Serializable]:
     return (strategies.lists(children)
             | to_dictionaries(strategies.text(strategies
                                               .sampled_from(string.printable)),
