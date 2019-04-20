@@ -2,33 +2,36 @@ from itertools import islice
 from typing import (Any,
                     Iterable)
 
+from hypothesis import given
+
 from lz.iterating import (capacity,
                           cutter)
 from lz.replication import duplicate
 from tests.configs import MAX_ITERABLES_SIZE
 from tests.utils import are_iterables_similar
+from . import strategies
 
 
-def test_capacity(iterable: Iterable[Any],
-                  cutter_slice: slice) -> None:
-    cut = cutter(cutter_slice)
+@given(strategies.iterables, strategies.non_negative_slices)
+def test_capacity(iterable: Iterable[Any], slice_: slice) -> None:
+    cut = cutter(slice_)
     result = cut(iterable)
 
-    assert capacity(result) <= slice_to_size(cutter_slice)
+    assert capacity(result) <= slice_to_size(slice_)
 
 
-def test_elements(iterable: Iterable[Any],
-                  cutter_slice: slice) -> None:
+@given(strategies.iterables, strategies.non_negative_slices)
+def test_elements(iterable: Iterable[Any], slice_: slice) -> None:
     original, target = duplicate(iterable)
 
-    cut = cutter(cutter_slice)
+    cut = cutter(slice_)
     result = cut(target)
 
     assert are_iterables_similar(result,
                                  islice(original,
-                                        cutter_slice.start,
-                                        cutter_slice.stop,
-                                        cutter_slice.step))
+                                        slice_.start,
+                                        slice_.stop,
+                                        slice_.step))
 
 
 def slice_to_size(slice_: slice) -> int:
