@@ -1,6 +1,8 @@
-from typing import (BinaryIO,
+from typing import (AnyStr,
+                    BinaryIO,
                     Callable,
                     Dict,
+                    IO,
                     Tuple,
                     TypeVar,
                     Union)
@@ -11,6 +13,7 @@ from lz.hints import (Domain,
                       Range)
 
 ByteStreamWithBatchParameters = Tuple[BinaryIO, bytes, Tuple[int, int]]
+StreamWithReverseParameters = Tuple[IO, AnyStr, Tuple[int, AnyStr, bool]]
 Intermediate = TypeVar('Intermediate')
 ByteSequence = Union[bytearray, bytes]
 Args = Tuple[Domain, ...]

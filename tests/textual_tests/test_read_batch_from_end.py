@@ -1,8 +1,7 @@
-from typing import BinaryIO
-
 from hypothesis import given
 
 from lz.textual import read_batch_from_end
+from tests.hints import ByteStreamWithBatchParameters
 from tests.textual_tests import strategies
 
 

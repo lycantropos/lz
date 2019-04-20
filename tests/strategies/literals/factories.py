@@ -1,4 +1,5 @@
 import io
+import os
 import sys
 from collections import defaultdict
 from functools import wraps
@@ -18,6 +19,7 @@ from typing import (AnyStr,
 
 from hypothesis import strategies
 
+from lz.functional import pack
 from lz.hints import Domain
 from tests.configs import MAX_ITERABLES_SIZE
 from tests.hints import (ByteSequence,
@@ -359,3 +361,21 @@ def to_tuples(elements: Optional[Strategy[Domain]] = None,
         raise ValueError('Either size should be zero '
                          'or elements should be specified.')
     return strategies.tuples(*repeat(elements, size))
+
+
+def to_separator(any_string: AnyStr) -> Strategy[AnyStr]:
+    if not any_string:
+        result = os.sep
+        if not isinstance(any_string, str):
+            result = result.encode()
+        return strategies.just(result)
+    length = len(any_string)
+
+    def to_start_stop(start: int) -> Strategy[Tuple[int, int]]:
+        return strategies.tuples(strategies.just(start),
+                                 strategies.integers(start + 1, length))
+
+    return (strategies.integers(0, length - 1)
+            .flatmap(to_start_stop)
+            .map(pack(slice))
+            .map(any_string.__getitem__))

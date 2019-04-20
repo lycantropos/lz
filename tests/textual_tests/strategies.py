@@ -1,18 +1,17 @@
-import os
 from typing import (AnyStr,
                     BinaryIO,
                     Tuple)
 
 from hypothesis import strategies
 
-from lz.functional import pack
 from tests.hints import (ByteSequence,
                          ByteStreamWithBatchParameters,
                          Strategy)
 from tests.strategies import (encodings,
                               to_any_strings,
                               to_byte_sequences,
-                              to_byte_streams)
+                              to_byte_streams,
+                              to_separator)
 from tests.utils import (to_stream_contents,
                          to_stream_size)
 
@@ -39,24 +38,6 @@ def to_strings_with_encoding(encoding: str
 strings_with_encodings = encodings.flatmap(to_strings_with_encoding)
 
 
-def to_separator(any_string: AnyStr) -> Strategy[AnyStr]:
-    if not any_string:
-        result = os.sep
-        if not isinstance(any_string, str):
-            result = result.encode()
-        return strategies.just(result)
-    length = len(any_string)
-
-    def to_start_stop(start: int) -> Strategy[Tuple[int, int]]:
-        return strategies.tuples(strategies.just(start),
-                                 strategies.integers(start + 1, length))
-
-    return (strategies.integers(0, length - 1)
-            .flatmap(to_start_stop)
-            .map(pack(slice))
-            .map(any_string.__getitem__))
-
-
 def to_any_string_with_separator(any_string: AnyStr
                                  ) -> Strategy[Tuple[AnyStr, AnyStr]]:
     return strategies.tuples(strategies.just(any_string),
@@ -79,4 +60,6 @@ def to_byte_stream_with_batch_parameters(
                                                batches_end_positions))
 
 
-byte_streams_with_batch_parameters = encodings.flatmap(to_byte_streams)
+byte_streams_with_batch_parameters = (
+    encodings.flatmap(to_byte_streams).flatmap(
+            to_byte_stream_with_batch_parameters))
