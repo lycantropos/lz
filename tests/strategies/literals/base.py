@@ -4,8 +4,11 @@ import platform
 import string
 import sys
 from collections import abc
+from functools import partial
 from types import ModuleType
-from typing import (Dict,
+from typing import (Any,
+                    Dict,
+                    Iterable,
                     List,
                     Union)
 
@@ -15,7 +18,8 @@ from tests.configs import (MAX_ITERABLES_SIZE,
                            MAX_MIN_ITERABLES_SIZE)
 from tests.hints import Strategy
 from tests.utils import is_pickleable
-from .factories import (to_byte_sequences,
+from .factories import (to_any_streams,
+                        to_byte_sequences,
                         to_byte_strings,
                         to_dictionaries,
                         to_homogeneous_frozensets,
@@ -127,3 +131,15 @@ sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
                                             sortable_domains))
 
 min_iterables_sizes = strategies.integers(0, MAX_MIN_ITERABLES_SIZE)
+
+
+def to_iterables(min_size: int) -> Strategy[Iterable[Any]]:
+    limit_min_size = partial(partial,
+                             min_size=min_size)
+    return (encodings.flatmap(limit_min_size(to_any_streams))
+            | encodings.flatmap(limit_min_size(to_byte_sequences))
+            | limit_min_size(to_homogeneous_iterables)(objects)
+            | encodings.flatmap(limit_min_size(to_strings)))
+
+
+iterables = min_iterables_sizes.flatmap(to_iterables)

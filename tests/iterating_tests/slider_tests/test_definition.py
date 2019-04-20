@@ -2,6 +2,8 @@ from itertools import islice
 from typing import (Any,
                     Iterable)
 
+from hypothesis import given
+
 from lz import (left,
                 right)
 from lz.iterating import (capacity,
@@ -10,10 +12,12 @@ from lz.iterating import (capacity,
                           last,
                           slider)
 from lz.replication import duplicate
+from tests import strategies
 from tests.utils import (are_iterables_similar,
                          is_empty)
 
 
+@given(strategies.iterables)
 def test_base_case_by_size_capacity(iterable: Iterable[Any]) -> None:
     target, original = duplicate(iterable)
     slide = slider(0)
@@ -23,6 +27,7 @@ def test_base_case_by_size_capacity(iterable: Iterable[Any]) -> None:
     assert capacity(result) == capacity(original) + 1
 
 
+@given(strategies.iterables)
 def test_base_case_by_size_elements(iterable: Iterable[Any]) -> None:
     target, original = duplicate(iterable)
     slide = slider(0)
@@ -35,6 +40,7 @@ def test_base_case_by_size_elements(iterable: Iterable[Any]) -> None:
                                  original)
 
 
+@given(strategies.iterables, strategies.non_negative_indices)
 def test_step_by_size_total_capacity(iterable: Iterable[Any],
                                      size: int) -> None:
     original, target = duplicate(iterable)
@@ -45,6 +51,7 @@ def test_step_by_size_total_capacity(iterable: Iterable[Any],
     assert 0 <= capacity(slider(size)(original)) - capacity(result) <= 1
 
 
+@given(strategies.iterables, strategies.non_negative_indices)
 def test_step_by_size_elementwise_capacity(iterable: Iterable[Any],
                                            size: int) -> None:
     slide = slider(size + 1)
@@ -55,8 +62,8 @@ def test_step_by_size_elementwise_capacity(iterable: Iterable[Any],
                for element in result)
 
 
-def test_step_by_size_elements(iterable: Iterable[Any],
-                               size: int) -> None:
+@given(strategies.iterables, strategies.non_negative_indices)
+def test_step_by_size_elements(iterable: Iterable[Any], size: int) -> None:
     original, target = duplicate(iterable)
     slide = slider(size + 1)
 
@@ -66,6 +73,7 @@ def test_step_by_size_elements(iterable: Iterable[Any],
                                  islice(original, size + 1))
 
 
+@given(strategies.empty.iterables, strategies.non_negative_indices)
 def test_base_case_by_iterable_capacity(empty_iterable: Iterable[Any],
                                         size: int) -> None:
     slide = slider(size + 1)
@@ -75,6 +83,7 @@ def test_base_case_by_iterable_capacity(empty_iterable: Iterable[Any],
     assert capacity(result) == 1
 
 
+@given(strategies.empty.iterables, strategies.non_negative_indices)
 def test_base_case_by_iterable_elements(empty_iterable: Iterable[Any],
                                         size: int) -> None:
     slide = slider(size + 1)
@@ -84,6 +93,9 @@ def test_base_case_by_iterable_elements(empty_iterable: Iterable[Any],
     assert all(map(is_empty, result))
 
 
+@given(strategies.iterables,
+       strategies.objects,
+       strategies.non_negative_indices)
 def test_step_left_by_iterable_total_capacity(iterable: Iterable[Any],
                                               object_: Any,
                                               size: int) -> None:
@@ -96,6 +108,9 @@ def test_step_left_by_iterable_total_capacity(iterable: Iterable[Any],
     assert 0 <= capacity(result) - capacity(slide(original)) <= 1
 
 
+@given(strategies.iterables,
+       strategies.objects,
+       strategies.non_negative_indices)
 def test_step_left_by_iterable_elementwise_capacity(iterable: Iterable[Any],
                                                     object_: Any,
                                                     size: int) -> None:
@@ -108,6 +123,9 @@ def test_step_left_by_iterable_elementwise_capacity(iterable: Iterable[Any],
                for element in result)
 
 
+@given(strategies.iterables,
+       strategies.objects,
+       strategies.non_negative_indices)
 def test_step_left_by_iterable_elements(iterable: Iterable[Any],
                                         object_: Any,
                                         size: int) -> None:
@@ -119,6 +137,9 @@ def test_step_left_by_iterable_elements(iterable: Iterable[Any],
     assert first(first(result)) is object_
 
 
+@given(strategies.iterables,
+       strategies.objects,
+       strategies.non_negative_indices)
 def test_step_right_by_iterable_total_capacity(iterable: Iterable[Any],
                                                object_: Any,
                                                size: int) -> None:
@@ -131,6 +152,9 @@ def test_step_right_by_iterable_total_capacity(iterable: Iterable[Any],
     assert 0 <= capacity(result) - capacity(slide(original)) <= 1
 
 
+@given(strategies.iterables,
+       strategies.objects,
+       strategies.non_negative_indices)
 def test_step_right_by_iterable_elementwise_capacity(iterable: Iterable[Any],
                                                      object_: Any,
                                                      size: int) -> None:
@@ -143,6 +167,9 @@ def test_step_right_by_iterable_elementwise_capacity(iterable: Iterable[Any],
                for element in result)
 
 
+@given(strategies.iterables,
+       strategies.objects,
+       strategies.non_negative_indices)
 def test_step_right_by_iterable_elements(iterable: Iterable[Any],
                                          object_: Any,
                                          size: int) -> None:
