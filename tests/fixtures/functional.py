@@ -6,26 +6,9 @@ import pytest
 from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import (Domain,
-                      Map,
-                      Predicate,
                       Range)
 from tests import strategies
 from tests.utils import find
-
-
-@pytest.fixture(scope='session')
-def true_predicate() -> Predicate:
-    return find(strategies.true_predicates)
-
-
-@pytest.fixture(scope='session')
-def false_predicate() -> Predicate:
-    return find(strategies.false_predicates)
-
-
-@pytest.fixture(scope='session')
-def predicate() -> Predicate:
-    return find(strategies.predicates)
 
 
 @pytest.fixture(scope='function')
