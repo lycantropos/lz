@@ -1,19 +1,21 @@
 from collections import abc
-from typing import Sequence
+
+from hypothesis import given
 
 from lz.functional import (cleave,
                            curry)
-from lz.hints import (Domain,
-                      Map)
+from tests.hints import CleavageCall
 from tests.utils import are_iterables_similar
+from . import strategies
 
 
-def test_currying(maps: Sequence[Map],
-                  map_argument: Domain) -> None:
+@given(strategies.cleavage_calls)
+def test_currying(cleavage_call: CleavageCall) -> None:
+    maps, argument = cleavage_call
     cleavage = cleave(*maps)
     curried_cleavage = curry(cleavage)
 
-    result = curried_cleavage(map_argument)
+    result = curried_cleavage(argument)
 
     assert isinstance(result, abc.Iterable)
-    assert are_iterables_similar(result, cleavage(map_argument))
+    assert are_iterables_similar(result, cleavage(argument))
