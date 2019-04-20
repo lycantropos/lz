@@ -1,16 +1,20 @@
-from typing import (Any,
-                    Sequence)
+from typing import Sequence
+
+from hypothesis import given
 
 from lz.typology import subclass_of
 from tests.utils import equivalence
+from . import strategies
 
 
-def test_base_case(class_: Any) -> None:
+@given(strategies.classes)
+def test_base_case(class_: type) -> None:
     result = subclass_of()
 
     assert not result(class_)
 
 
+@given(strategies.classes_sequences, strategies.classes, strategies.classes)
 def test_step(classes: Sequence[type],
               class_: type,
               other_class: type) -> None:

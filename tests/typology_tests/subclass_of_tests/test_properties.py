@@ -1,15 +1,19 @@
+from hypothesis import given
+
 from lz.typology import subclass_of
 from tests.utils import equivalence
+from . import strategies
 
 
+@given(strategies.classes)
 def test_type(class_: type) -> None:
     result = subclass_of(class_)
 
     assert callable(result)
 
 
-def test_result_type(class_: type,
-                     other_class: type) -> None:
+@given(strategies.classes, strategies.classes)
+def test_result_type(class_: type, other_class: type) -> None:
     function = subclass_of(class_)
 
     result = function(other_class)
@@ -17,12 +21,14 @@ def test_result_type(class_: type,
     assert isinstance(result, bool)
 
 
+@given(strategies.classes)
 def test_basic(class_: type) -> None:
     result = subclass_of(class_)
 
     assert result(class_)
 
 
+@given(strategies.classes, strategies.classes, strategies.classes)
 def test_commutativity(class_: type,
                        other_class: type,
                        another_class: type) -> None:
