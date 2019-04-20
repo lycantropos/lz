@@ -1,16 +1,21 @@
 from typing import (Any,
                     Sequence)
 
+from hypothesis import given
+
 from lz.typology import instance_of
 from tests.utils import equivalence
+from . import strategies
 
 
+@given(strategies.objects)
 def test_base_case(object_: Any) -> None:
     result = instance_of()
 
     assert not result(object_)
 
 
+@given(strategies.classes_sequences, strategies.classes, strategies.objects)
 def test_step(classes: Sequence[type], class_: type, object_: Any) -> None:
     base_function = instance_of(*classes)
     adjunct_function = instance_of(class_)
