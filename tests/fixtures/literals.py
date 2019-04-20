@@ -1,5 +1,4 @@
 from functools import partial
-from operator import gt
 from typing import (Any,
                     Dict,
                     Hashable,
@@ -17,7 +16,6 @@ from lz.sorting import (Implementation,
                         Key,
                         with_key)
 from tests import strategies
-from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.utils import find
 
 
@@ -58,8 +56,7 @@ def sorting_key() -> Key:
 
 @pytest.fixture(scope='function')
 def min_iterables_size() -> int:
-    return find(strategies.finite_iterables_sizes
-                .filter(partial(gt, MAX_MIN_ITERABLES_SIZE)))
+    return find(strategies.min_finite_iterables_sizes)
 
 
 @pytest.fixture(scope='function')

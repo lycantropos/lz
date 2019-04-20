@@ -12,7 +12,8 @@ from typing import (Dict,
 from hypothesis import strategies
 from hypothesis.searchstrategy import SearchStrategy
 
-from tests.configs import MAX_ITERABLES_SIZE
+from tests.configs import (MAX_ITERABLES_SIZE,
+                           MAX_MIN_ITERABLES_SIZE)
 from tests.utils import is_pickleable
 from .factories import (to_byte_sequences,
                         to_byte_strings,
@@ -125,4 +126,4 @@ sortable_domains = [byte_sequences, real_numbers, sets, strings]
 sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
                                             sortable_domains))
 
-finite_iterables_sizes = strategies.integers(0, MAX_ITERABLES_SIZE)
+min_finite_iterables_sizes = strategies.integers(0, MAX_MIN_ITERABLES_SIZE)
