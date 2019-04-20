@@ -143,3 +143,4 @@ def to_iterables(min_size: int) -> Strategy[Iterable[Any]]:
 
 
 iterables = min_iterables_sizes.flatmap(to_iterables)
+non_empty_iterables = strategies.just(1).flatmap(to_iterables)
