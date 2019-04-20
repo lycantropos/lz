@@ -105,8 +105,8 @@ def sequence(min_iterables_size: int) -> Iterable[Any]:
                                                         .to_byte_sequences))
             | limit_min_size(strategies
                              .to_homogeneous_sequences)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies
-                                                    .to_characters()))
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_strings)))
 
 
 @pytest.fixture(scope='function')
@@ -120,8 +120,8 @@ def non_empty_iterable() -> Iterable[Any]:
                                                           .to_byte_sequences))
             | limit_min_size(strategies
                              .to_homogeneous_iterables)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies
-                                                    .to_characters()))
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_strings)))
 
 
 @pytest.fixture(scope='function')
@@ -133,8 +133,8 @@ def non_empty_sequence() -> Sequence[Any]:
                                                         .to_byte_sequences))
             | limit_min_size(strategies
                              .to_homogeneous_sequences)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies
-                                                    .to_characters()))
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_strings)))
 
 
 @pytest.fixture(scope='function')
@@ -146,7 +146,8 @@ def nested_iterable(min_iterables_size: int,
     return find(
             limit_min_size(strategies
                            .to_homogeneous_iterables)(iterables_strategy)
-            | limit_min_size(strategies.to_strings)(strategies.to_characters())
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_strings))
             | strategies.encodings.flatmap(limit_min_size(strategies
                                                           .to_text_streams)))
 
@@ -161,8 +162,8 @@ def iterables_strategy(min_iterables_size: int) -> Strategy[Iterable[Any]]:
                                                           .to_byte_sequences))
             | limit_min_size(strategies
                              .to_homogeneous_iterables)(strategies.objects)
-            | limit_min_size(strategies.to_strings)(strategies
-                                                    .to_characters()))
+            | strategies.encodings.flatmap(limit_min_size(strategies
+                                                          .to_strings)))
 
 
 @pytest.fixture(scope='function')

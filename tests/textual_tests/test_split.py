@@ -1,12 +1,18 @@
-from typing import AnyStr
+from typing import (AnyStr,
+                    Tuple)
+
+from hypothesis import given
 
 from lz.textual import split
+from tests.textual_tests import strategies
 
 
-def test_keep_separator(any_string: AnyStr,
-                        any_separator: AnyStr) -> None:
+@given(strategies.any_strings_with_separators)
+def test_keep_separator(any_string_with_separator: Tuple[AnyStr, AnyStr]
+                        ) -> None:
+    any_string, separator = any_string_with_separator
     parts = split(any_string,
-                  separator=any_separator,
+                  separator=separator,
                   keep_separator=True)
 
     empty_string = type(any_string)()
@@ -14,10 +20,12 @@ def test_keep_separator(any_string: AnyStr,
     assert empty_string.join(parts) == any_string
 
 
-def test_skip_separator(any_string: AnyStr,
-                        any_separator: AnyStr) -> None:
+@given(strategies.any_strings_with_separators)
+def test_skip_separator(any_string_with_separator: Tuple[AnyStr, AnyStr]
+                        ) -> None:
+    any_string, separator = any_string_with_separator
     parts = split(any_string,
-                  separator=any_separator,
+                  separator=separator,
                   keep_separator=False)
 
-    assert any_separator.join(parts) == any_string
+    assert separator.join(parts) == any_string

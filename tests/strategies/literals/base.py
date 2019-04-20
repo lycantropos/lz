@@ -16,7 +16,6 @@ from tests.configs import MAX_ITERABLES_SIZE
 from tests.utils import is_pickleable
 from .factories import (to_byte_sequences,
                         to_byte_strings,
-                        to_characters,
                         to_dictionaries,
                         to_homogeneous_frozensets,
                         to_homogeneous_iterables,
@@ -24,7 +23,6 @@ from .factories import (to_byte_sequences,
                         to_homogeneous_sequences,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
-                        to_integers,
                         to_strings)
 
 Serializable = Union[None, bool, float, int, str]
@@ -69,7 +67,7 @@ if sys.platform == 'win32' and platform.python_implementation() != 'PyPy':
     encodings.append('cp65001')
 encodings = strategies.sampled_from(encodings)
 byte_strings = encodings.flatmap(to_byte_strings)
-strings = to_strings(to_characters())
+strings = encodings.flatmap(to_strings)
 
 
 def module_to_classes(module: ModuleType) -> List[type]:
@@ -127,4 +125,4 @@ sortable_domains = [byte_sequences, real_numbers, sets, strings]
 sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
                                             sortable_domains))
 
-finite_iterables_sizes = to_integers(0, MAX_ITERABLES_SIZE)
+finite_iterables_sizes = strategies.integers(0, MAX_ITERABLES_SIZE)

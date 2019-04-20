@@ -51,7 +51,6 @@ from .literals.base import (classes,
                             tuples)
 from .literals.factories import (to_homogeneous_lists,
                                  to_homogeneous_tuples,
-                                 to_integers,
                                  to_strings)
 from .utils import identifiers
 
@@ -224,11 +223,12 @@ def partition_call(call: FunctionCall) -> Strategy[PartitionedFunctionCall]:
                  for key, value in kwargs.items()
                  if key not in first_keys})
 
+    args_partitions = strategies.integers(0, len(args)).map(partition_args)
+    kwargs_partitions = (strategies.integers(0, len(kwargs))
+                         .map(partial(random.sample, kwargs.keys()))
+                         .map(partition_kwargs))
     return strategies.tuples(strategies.just(function),
-                             to_integers(0, len(args)).map(partition_args),
-                             to_integers(0, len(kwargs))
-                             .map(partial(random.sample, kwargs.keys()))
-                             .map(partition_kwargs))
+                             args_partitions, kwargs_partitions)
 
 
 partitioned_transparent_functions_calls = (transparent_functions_calls

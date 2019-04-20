@@ -1,3 +1,5 @@
+from hypothesis import strategies
+
 from .definitions import (built_in_functions,
                           callables,
                           classes,
@@ -43,12 +45,11 @@ from .literals.base import (any_strings,
                             real_numbers,
                             sortable_iterables)
 from .literals.factories import (to_any_streams,
+                                 to_any_strings,
                                  to_byte_sequences,
                                  to_byte_streams,
-                                 to_characters,
                                  to_homogeneous_iterables,
                                  to_homogeneous_sequences,
-                                 to_integers,
                                  to_strings,
                                  to_text_streams,
                                  to_tuples)
@@ -56,3 +57,5 @@ from .sorting import (registered_sorting_algorithms,
                       sorting_keys,
                       unregistered_sorting_algorithms)
 from .utils import identifiers
+
+to_integers = strategies.integers
