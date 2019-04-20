@@ -45,7 +45,7 @@ def map_arguments() -> Iterable[Domain]:
 
 @pytest.fixture(scope='function')
 def maps() -> Sequence[Map]:
-    return find(strategies.maps_lists)
+    return find(strategies.to_homogeneous_sequences(strategies.maps))
 
 
 @pytest.fixture(scope='function')

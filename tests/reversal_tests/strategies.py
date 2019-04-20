@@ -10,7 +10,7 @@ from tests.hints import (Strategy,
                          StreamWithReverseParameters)
 from tests.strategies import (empty,
                               encodings,
-                              min_finite_iterables_sizes,
+                              min_iterables_sizes,
                               objects,
                               to_byte_sequences,
                               to_byte_streams,
@@ -29,15 +29,15 @@ non_empty_sequences = (encodings.flatmap(to_non_empty(to_byte_sequences))
                        | encodings.flatmap(to_non_empty(to_strings)))
 
 
-def to_sequences(min_iterables_size: int) -> Strategy[Sequence[Any]]:
+def to_sequences(min_size: int) -> Strategy[Sequence[Any]]:
     limit_min_size = partial(partial,
-                             min_size=min_iterables_size)
+                             min_size=min_size)
     return (encodings.flatmap(limit_min_size(to_byte_sequences))
             | limit_min_size(to_homogeneous_sequences)(objects)
             | encodings.flatmap(limit_min_size(to_strings)))
 
 
-sequences = min_finite_iterables_sizes.flatmap(to_sequences)
+sequences = min_iterables_sizes.flatmap(to_sequences)
 
 
 def to_stream_with_reverse_parameters(
