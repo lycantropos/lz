@@ -28,26 +28,6 @@ def predicate() -> Predicate:
     return find(strategies.predicates)
 
 
-@pytest.fixture(scope='session')
-def left_predicate() -> Predicate:
-    return find(strategies.predicates)
-
-
-@pytest.fixture(scope='session')
-def mid_predicate() -> Predicate:
-    return find(strategies.predicates)
-
-
-@pytest.fixture(scope='session')
-def right_predicate() -> Predicate:
-    return find(strategies.predicates)
-
-
-@pytest.fixture(scope='session')
-def predicate_argument() -> Domain:
-    return find(strategies.predicates_arguments)
-
-
 @pytest.fixture(scope='function')
 def map_() -> Map:
     return find(strategies.maps)
