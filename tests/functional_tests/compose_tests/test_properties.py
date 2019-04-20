@@ -10,7 +10,7 @@ from lz.hints import (Domain,
                       Map,
                       Operator,
                       Range)
-from tests.hints import MapsChainCall
+from tests.hints import CompositionCall
 from tests.utils import not_raises
 from . import strategies
 
@@ -28,7 +28,7 @@ def test_identity(map_call: Tuple[Map[Domain, Range], Domain]) -> None:
 
 
 @given(strategies.maps_triplets_calls)
-def test_associativity(maps_triplet_call: MapsChainCall) -> None:
+def test_associativity(maps_triplet_call: CompositionCall) -> None:
     (last_map, next_map, map_), map_argument = maps_triplet_call
     left_composition = compose(compose(last_map, next_map), map_)
     right_composition = compose(last_map, compose(next_map, map_))
@@ -40,7 +40,7 @@ def test_associativity(maps_triplet_call: MapsChainCall) -> None:
 
 
 @given(strategies.maps_chain_calls)
-def test_currying(maps_chain_call: MapsChainCall) -> None:
+def test_currying(maps_chain_call: CompositionCall) -> None:
     (next_suitable_map, *suitable_maps), map_argument = maps_chain_call
     composition = compose(next_suitable_map, *suitable_maps)
     curried_composition = curry(composition)

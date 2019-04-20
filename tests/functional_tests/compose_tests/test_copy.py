@@ -3,12 +3,12 @@ import copy
 from hypothesis import given
 
 from lz.functional import compose
-from tests.hints import MapsChainCall
+from tests.hints import CompositionCall
 from . import strategies
 
 
 @given(strategies.maps_chain_calls)
-def test_shallow(maps_chain_call: MapsChainCall) -> None:
+def test_shallow(maps_chain_call: CompositionCall) -> None:
     various_suitable_maps, map_argument = maps_chain_call
     composition = compose(*various_suitable_maps)
 
@@ -19,7 +19,7 @@ def test_shallow(maps_chain_call: MapsChainCall) -> None:
 
 
 @given(strategies.maps_chain_calls)
-def test_deep(maps_chain_call: MapsChainCall) -> None:
+def test_deep(maps_chain_call: CompositionCall) -> None:
     various_suitable_maps, map_argument = maps_chain_call
     composition = compose(*various_suitable_maps)
 

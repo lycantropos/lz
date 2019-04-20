@@ -26,5 +26,5 @@ PartitionedFunctionCall = Tuple[Function,
                                 Tuple[Args, Args],
                                 Tuple[Kwargs, Kwargs]]
 CombinationCall = Tuple[Sequence[Map], Sequence[Domain]]
-MapsChainCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
+CompositionCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
 Strategy = SearchStrategy
