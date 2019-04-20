@@ -2,7 +2,7 @@ from hypothesis import given
 
 from lz import right
 from tests import strategies
-from tests.utils import PartitionedFunctionCall
+from tests.hints import PartitionedFunctionCall
 
 
 @given(strategies.partitioned_transparent_functions_calls)

@@ -11,8 +11,8 @@ from lz.hints import (Domain,
                       Predicate,
                       Range)
 from tests import strategies
-from tests.utils import (Intermediate,
-                         find)
+from tests.hints import Intermediate
+from tests.utils import find
 
 
 @pytest.fixture(scope='session')

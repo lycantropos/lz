@@ -4,7 +4,7 @@ from hypothesis import given
 from lz.functional import (Curry,
                            curry)
 from tests import strategies
-from tests.utils import (Function,
+from tests.hints import (Function,
                          FunctionCall)
 
 

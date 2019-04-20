@@ -31,8 +31,12 @@ from lz.hints import (Domain,
                       Predicate,
                       Range)
 from lz.logical import negate
-from tests.utils import (Args, Function, FunctionCall, Kwargs,
-                         PartitionedFunctionCall, Strategy)
+from tests.hints import (Args,
+                         Function,
+                         FunctionCall,
+                         Kwargs,
+                         PartitionedFunctionCall,
+                         Strategy)
 from .literals import empty
 from .literals.base import (classes,
                             integers,

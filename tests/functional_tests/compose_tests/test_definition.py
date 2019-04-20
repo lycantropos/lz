@@ -6,7 +6,7 @@ from lz.functional import compose
 from lz.hints import (Domain,
                       Map,
                       Range)
-from tests.utils import Intermediate
+from tests.hints import Intermediate
 
 
 def test_base_case(callable_: Callable[..., Any]) -> None:

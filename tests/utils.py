@@ -10,15 +10,11 @@ from itertools import (chain,
                        zip_longest)
 from operator import methodcaller
 from typing import (Any,
-                    Callable,
-                    Dict,
                     Hashable,
                     Iterable,
                     Mapping,
                     Set,
-                    Tuple,
-                    Type,
-                    TypeVar)
+                    Type)
 
 import pytest
 from hypothesis import (Phase,
@@ -26,27 +22,17 @@ from hypothesis import (Phase,
                         settings)
 from hypothesis.errors import (NoSuchExample,
                                Unsatisfiable)
-from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import (Domain,
                       Map,
                       Range)
 from lz.replication import duplicate
+from .hints import Strategy
 
 try:
     from typing import ContextManager
 except ImportError:
     from typing_extensions import ContextManager
-
-Intermediate = TypeVar('Intermediate')
-Args = Tuple[Domain, ...]
-Kwargs = Dict[str, Domain]
-Function = Callable[..., Range]
-FunctionCall = Tuple[Function, Args, Kwargs]
-PartitionedFunctionCall = Tuple[Function,
-                                Tuple[Args, Args],
-                                Tuple[Kwargs, Kwargs]]
-Strategy = SearchStrategy
 
 
 def find(strategy: Strategy[Domain]) -> Domain:

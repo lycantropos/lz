@@ -3,7 +3,7 @@ from hypothesis import given
 from lz.functional import (curry,
                            pack)
 from tests import strategies
-from tests.utils import FunctionCall
+from tests.hints import FunctionCall
 
 
 @given(strategies.transparent_functions_calls)

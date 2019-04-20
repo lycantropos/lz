@@ -13,8 +13,8 @@ from lz.hints import (Domain,
                       Map,
                       Operator,
                       Range)
-from tests.utils import (Intermediate,
-                         not_raises)
+from tests.hints import Intermediate
+from tests.utils import not_raises
 
 
 def test_identity(map_: Map[Domain, Range],

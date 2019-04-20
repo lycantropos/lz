@@ -4,7 +4,7 @@ from lz import (left,
                 right)
 from lz.functional import curry
 from tests import strategies
-from tests.utils import PartitionedFunctionCall
+from tests.hints import PartitionedFunctionCall
 
 
 @given(strategies.partitioned_transparent_functions_calls)

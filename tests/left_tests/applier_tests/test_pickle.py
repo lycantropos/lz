@@ -2,8 +2,8 @@ from hypothesis import given
 
 from lz import left
 from tests import strategies
-from tests.utils import (PartitionedFunctionCall,
-                         round_trip_pickle)
+from tests.hints import PartitionedFunctionCall
+from tests.utils import round_trip_pickle
 
 
 @given(strategies.partitioned_transparent_functions_calls)
