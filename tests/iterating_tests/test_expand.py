@@ -1,10 +1,13 @@
 from typing import Any
 
 import pytest
+from hypothesis import given
 
 from lz.iterating import expand
+from tests import strategies
 
 
+@given(strategies.objects)
 def test_basic(object_: Any) -> None:
     result = expand(object_)
     result_iterator = iter(result)
