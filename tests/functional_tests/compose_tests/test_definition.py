@@ -1,23 +1,23 @@
 from typing import (Any,
-                    Callable,
-                    Tuple)
+                    Callable)
+
+from hypothesis import given
 
 from lz.functional import compose
-from lz.hints import (Domain,
-                      Map,
-                      Range)
-from tests.hints import Intermediate
+from tests.hints import MapsChainCall
+from . import strategies
 
 
+@given(strategies.callables)
 def test_base_case(callable_: Callable[..., Any]) -> None:
     composition = compose(callable_)
 
     assert composition is callable_
 
 
-def test_step(suitable_maps: Tuple[Map[Domain, Intermediate], ...],
-              next_suitable_map: Map[Intermediate, Range],
-              map_argument: Domain) -> None:
+@given(strategies.maps_chain_calls)
+def test_step(maps_chain_call: MapsChainCall) -> None:
+    (next_suitable_map, *suitable_maps), map_argument = maps_chain_call
     composition = compose(*suitable_maps)
     next_composition = compose(next_suitable_map, *suitable_maps)
 

@@ -1,10 +1,7 @@
 from functools import partial
-from types import (BuiltinFunctionType,
-                   FunctionType,
+from types import (FunctionType,
                    MethodType)
-from typing import (Any,
-                    Callable,
-                    Sequence)
+from typing import Sequence
 
 import pytest
 from paradigm.hints import (MethodDescriptorType,
@@ -13,16 +10,6 @@ from paradigm.hints import (MethodDescriptorType,
 from tests import strategies
 from tests.utils import (find,
                          is_pickleable)
-
-
-@pytest.fixture(scope='function')
-def built_in_function() -> BuiltinFunctionType:
-    return find(strategies.built_in_functions)
-
-
-@pytest.fixture(scope='function')
-def callable_() -> Callable[..., Any]:
-    return find(strategies.callables)
 
 
 @pytest.fixture(scope='function')
@@ -49,28 +36,3 @@ def classes() -> Sequence[type]:
 def pickleable_classes() -> Sequence[type]:
     return find(strategies.to_homogeneous_sequences(strategies.classes
                                                     .filter(is_pickleable)))
-
-
-@pytest.fixture(scope='function')
-def function() -> FunctionType:
-    return find(strategies.functions)
-
-
-@pytest.fixture(scope='function')
-def method() -> MethodType:
-    return find(strategies.methods)
-
-
-@pytest.fixture(scope='function')
-def method_descriptor() -> MethodDescriptorType:
-    return find(strategies.methods_descriptors)
-
-
-@pytest.fixture(scope='function')
-def partial_callable() -> partial:
-    return find(strategies.partial_callables)
-
-
-@pytest.fixture(scope='function')
-def wrapper_descriptor() -> WrapperDescriptorType:
-    return find(strategies.methods_descriptors)

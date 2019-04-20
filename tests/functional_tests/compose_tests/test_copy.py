@@ -1,13 +1,15 @@
 import copy
-from typing import Sequence
+
+from hypothesis import given
 
 from lz.functional import compose
-from lz.hints import (Domain,
-                      Map)
+from tests.hints import MapsChainCall
+from . import strategies
 
 
-def test_shallow(various_suitable_maps: Sequence[Map],
-                 map_argument: Domain) -> None:
+@given(strategies.maps_chain_calls)
+def test_shallow(maps_chain_call: MapsChainCall) -> None:
+    various_suitable_maps, map_argument = maps_chain_call
     composition = compose(*various_suitable_maps)
 
     shallow_copy = copy.copy(composition)
@@ -16,8 +18,9 @@ def test_shallow(various_suitable_maps: Sequence[Map],
     assert shallow_copy(map_argument) == composition(map_argument)
 
 
-def test_deep(various_suitable_maps: Sequence[Map],
-              map_argument: Domain) -> None:
+@given(strategies.maps_chain_calls)
+def test_deep(maps_chain_call: MapsChainCall) -> None:
+    various_suitable_maps, map_argument = maps_chain_call
     composition = compose(*various_suitable_maps)
 
     deep_copy = copy.deepcopy(composition)

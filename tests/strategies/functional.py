@@ -86,12 +86,13 @@ maps_arguments = (strategies.integers()
                                       allow_infinity=False))
 
 
-@strategies.composite
-def extend_suitable_maps(draw: Map[SearchStrategy, Any],
-                         maps_tuples: SearchStrategy) -> Tuple[Map, ...]:
-    maps_tuple = draw(maps_tuples)
-    last_map = draw(to_one_of_suitable_maps(maps_tuple[0]))
-    return (last_map,) + maps_tuple
+def extend_suitable_maps(maps_tuples: SearchStrategy
+                         ) -> Strategy[Tuple[Map, ...]]:
+    def expand(maps_tuple: Tuple[Map, ...]) -> Strategy[Tuple[Map, ...]]:
+        return strategies.tuples(to_one_of_suitable_maps(maps_tuple[0]),
+                                 *map(strategies.just, maps_tuple))
+
+    return maps_tuples.flatmap(expand)
 
 
 suitable_maps = strategies.recursive(strategies.tuples(maps),

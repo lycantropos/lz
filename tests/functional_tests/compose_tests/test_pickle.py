@@ -1,13 +1,14 @@
-from typing import Sequence
+from hypothesis import given
 
 from lz.functional import compose
-from lz.hints import (Domain,
-                      Map)
+from tests.hints import MapsChainCall
 from tests.utils import round_trip_pickle
+from . import strategies
 
 
-def test_round_trip(various_suitable_maps: Sequence[Map],
-                    map_argument: Domain) -> None:
+@given(strategies.maps_chain_calls)
+def test_round_trip(maps_chain_call: MapsChainCall) -> None:
+    various_suitable_maps, map_argument = maps_chain_call
     composition = compose(*various_suitable_maps)
 
     result = round_trip_pickle(composition)

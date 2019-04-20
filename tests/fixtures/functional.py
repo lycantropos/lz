@@ -1,7 +1,6 @@
 from typing import (Callable,
                     Iterable,
-                    Sequence,
-                    Tuple)
+                    Sequence)
 
 import pytest
 from hypothesis.searchstrategy import SearchStrategy
@@ -11,7 +10,6 @@ from lz.hints import (Domain,
                       Predicate,
                       Range)
 from tests import strategies
-from tests.hints import Intermediate
 from tests.utils import find
 
 
@@ -76,41 +74,6 @@ def maps_arguments(maps: Sequence[Map]) -> Sequence[Domain]:
     return find(strategies.to_homogeneous_sequences(strategies.maps_arguments,
                                                     min_size=maps_count,
                                                     max_size=maps_count))
-
-
-@pytest.fixture(scope='function')
-def next_map(map_: Map[Domain, Range]) -> Map[Range, Intermediate]:
-    return find(strategies.to_one_of_suitable_maps(map_))
-
-
-@pytest.fixture(scope='function')
-def last_map(next_map: Map[Range, Intermediate]) -> Map[Intermediate, Range]:
-    return find(strategies.to_one_of_suitable_maps(next_map))
-
-
-@pytest.fixture(scope='function')
-def suitable_maps() -> Tuple[Map, ...]:
-    return find(strategies.suitable_maps)
-
-
-@pytest.fixture(scope='function')
-def various_suitable_maps() -> Tuple[Map, ...]:
-    return find(strategies.various_suitable_maps)
-
-
-@pytest.fixture(scope='function')
-def other_various_suitable_maps() -> Sequence[Map]:
-    return find(strategies.various_suitable_maps)
-
-
-@pytest.fixture(scope='function')
-def another_various_suitable_maps() -> Sequence[Map]:
-    return find(strategies.various_suitable_maps)
-
-
-@pytest.fixture(scope='function')
-def next_suitable_map(suitable_maps: Tuple[Map, ...]) -> Map:
-    return find(strategies.to_one_of_suitable_maps(suitable_maps[0]))
 
 
 @pytest.fixture(scope='function')

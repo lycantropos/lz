@@ -10,6 +10,7 @@ from typing import (AnyStr,
 from hypothesis.searchstrategy import SearchStrategy
 
 from lz.hints import (Domain,
+                      Map,
                       Range)
 
 ByteStreamWithBatchParameters = Tuple[BinaryIO, bytes, Tuple[int, int]]
@@ -23,4 +24,5 @@ FunctionCall = Tuple[Function, Args, Kwargs]
 PartitionedFunctionCall = Tuple[Function,
                                 Tuple[Args, Args],
                                 Tuple[Kwargs, Kwargs]]
+MapsChainCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
 Strategy = SearchStrategy
