@@ -111,7 +111,8 @@ non_variadic_transparent_functions = strategies.sampled_from([bool, complex,
 variadic_transparent_functions = strategies.just(os.path.join)
 transparent_functions = (non_variadic_transparent_functions
                          | variadic_transparent_functions)
-paths_names_parts = to_strings(string.digits + string.ascii_letters + '_')
+paths_names_parts = strategies.text(
+        strategies.sampled_from(string.digits + string.ascii_letters + '_'))
 to_transparent_function_args = {
     bool: strategies.tuples(objects),
     complex: strategies.tuples(numbers),

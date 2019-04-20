@@ -110,14 +110,15 @@ lists = to_homogeneous_lists(objects)
 def extend_json(children: SearchStrategy[Serializable]
                 ) -> SearchStrategy[Serializable]:
     return (strategies.lists(children)
-            | to_dictionaries(to_strings(string.printable),
+            | to_dictionaries(strategies.text(strategies
+                                              .sampled_from(string.printable)),
                               children))
 
 
 json_serializable_objects = strategies.recursive(
         strategies.none()
         | real_numbers
-        | to_strings(string.printable),
+        | strategies.text(strategies.sampled_from(string.printable)),
         extend_json)
 positionals_arguments = tuples
 keywords_arguments = to_dictionaries(strings, objects)
