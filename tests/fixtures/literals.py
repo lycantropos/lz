@@ -108,19 +108,6 @@ def non_empty_iterable() -> Iterable[Any]:
 
 
 @pytest.fixture(scope='function')
-def non_empty_sequence() -> Sequence[Any]:
-    limit_min_size = partial(partial,
-                             min_size=1)
-    return find(
-            strategies.encodings.flatmap(limit_min_size(strategies
-                                                        .to_byte_sequences))
-            | limit_min_size(strategies
-                             .to_homogeneous_sequences)(strategies.objects)
-            | strategies.encodings.flatmap(limit_min_size(strategies
-                                                          .to_strings)))
-
-
-@pytest.fixture(scope='function')
 def nested_iterable(min_iterables_size: int,
                     iterables_strategy: Strategy[Iterable[Any]]
                     ) -> Iterable[Iterable[Any]]:

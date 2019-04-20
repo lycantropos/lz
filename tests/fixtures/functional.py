@@ -29,34 +29,6 @@ def predicate() -> Predicate:
 
 
 @pytest.fixture(scope='function')
-def map_() -> Map:
-    return find(strategies.maps)
-
-
-@pytest.fixture(scope='function')
-def map_argument() -> Domain:
-    return find(strategies.maps_arguments)
-
-
-@pytest.fixture(scope='function')
-def map_arguments() -> Iterable[Domain]:
-    return find(strategies.to_homogeneous_iterables(strategies.maps_arguments))
-
-
-@pytest.fixture(scope='function')
-def maps() -> Sequence[Map]:
-    return find(strategies.to_homogeneous_sequences(strategies.maps))
-
-
-@pytest.fixture(scope='function')
-def maps_arguments(maps: Sequence[Map]) -> Sequence[Domain]:
-    maps_count = len(maps)
-    return find(strategies.to_homogeneous_sequences(strategies.maps_arguments,
-                                                    min_size=maps_count,
-                                                    max_size=maps_count))
-
-
-@pytest.fixture(scope='function')
 def projector() -> Callable[[Domain, Domain], Domain]:
     return find(strategies.projectors)
 
