@@ -28,7 +28,8 @@ from .factories import (to_any_streams,
                         to_homogeneous_sequences,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
-                        to_strings)
+                        to_strings,
+                        to_text_streams)
 
 Serializable = Union[None, bool, float, int, str]
 Serializable = Union[Dict[str, Serializable], List[Serializable]]
@@ -144,3 +145,14 @@ def to_iterables(min_size: int) -> Strategy[Iterable[Any]]:
 
 iterables = min_iterables_sizes.flatmap(to_iterables)
 non_empty_iterables = strategies.just(1).flatmap(to_iterables)
+
+
+def to_nested_iterables(min_size: int) -> Strategy[Iterable[Iterable[Any]]]:
+    limit_min_size = partial(partial,
+                             min_size=min_size)
+    return (limit_min_size(to_homogeneous_iterables)(iterables)
+            | encodings.flatmap(limit_min_size(to_strings))
+            | encodings.flatmap(limit_min_size(to_text_streams)))
+
+
+nested_iterables = min_iterables_sizes.flatmap(to_nested_iterables)
