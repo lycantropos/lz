@@ -14,9 +14,9 @@ from . import strategies
 
 @given(strategies.plain_hashables_iterables, strategies.groupers_keys)
 def test_round_trip(iterable: Iterable[Hashable],
-                    key: Map[Any, Hashable]) -> None:
+                    key_function: Map[Any, Hashable]) -> None:
     original, target = duplicate(iterable)
-    group_by = grouper(key)
+    group_by = grouper(key_function)
 
     result = round_trip_pickle(group_by)
 

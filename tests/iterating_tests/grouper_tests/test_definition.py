@@ -11,9 +11,10 @@ from . import strategies
 
 
 @given(strategies.hashables_iterables, strategies.groupers_keys)
-def test_basic(iterable: Iterable[Hashable], key: Map[Any, Hashable]) -> None:
+def test_basic(iterable: Iterable[Hashable],
+               key_function: Map[Any, Hashable]) -> None:
     original, target = duplicate(iterable)
-    group_by = grouper(key)
+    group_by = grouper(key_function)
 
     result = group_by(target)
     result_list = list(result)
@@ -21,4 +22,4 @@ def test_basic(iterable: Iterable[Hashable], key: Map[Any, Hashable]) -> None:
     assert all(element in group
                for element in original
                for key, group in result_list
-               if key(element) == key)
+               if key_function(element) == key)
