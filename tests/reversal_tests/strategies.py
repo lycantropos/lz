@@ -1,11 +1,13 @@
 from functools import partial
-from typing import (Any, IO, Sequence)
+from typing import (Any,
+                    IO,
+                    Sequence)
 
 from hypothesis import strategies
 
 from lz.reversal import reverse
-from tests.hints import Strategy, \
-    StreamWithReverseParameters
+from tests.hints import (Strategy,
+                         StreamWithReverseParameters)
 from tests.strategies import (empty,
                               encodings,
                               min_finite_iterables_sizes,
@@ -14,8 +16,10 @@ from tests.strategies import (empty,
                               to_byte_streams,
                               to_homogeneous_sequences,
                               to_separator,
-                              to_strings, to_text_streams)
-from tests.utils import to_stream_contents, to_stream_size
+                              to_strings,
+                              to_text_streams)
+from tests.utils import (to_stream_contents,
+                         to_stream_size)
 
 empty_sequences = empty.sequences
 to_non_empty = partial(partial,
