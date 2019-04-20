@@ -3,6 +3,7 @@ from typing import (AnyStr,
                     Callable,
                     Dict,
                     IO,
+                    Sequence,
                     Tuple,
                     TypeVar,
                     Union)
@@ -24,5 +25,6 @@ FunctionCall = Tuple[Function, Args, Kwargs]
 PartitionedFunctionCall = Tuple[Function,
                                 Tuple[Args, Args],
                                 Tuple[Kwargs, Kwargs]]
+CombinationCall = Tuple[Sequence[Map], Sequence[Domain]]
 MapsChainCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
 Strategy = SearchStrategy

@@ -1,19 +1,21 @@
 from collections import abc
-from typing import Sequence
+
+from hypothesis import given
 
 from lz.functional import (combine,
                            curry)
-from lz.hints import (Domain,
-                      Map)
+from tests.hints import CombinationCall
 from tests.utils import are_iterables_similar
+from . import strategies
 
 
-def test_currying(maps: Sequence[Map],
-                  maps_arguments: Sequence[Domain]) -> None:
+@given(strategies.combinations_calls)
+def test_currying(combination_call: CombinationCall) -> None:
+    maps, arguments = combination_call
     combination = combine(*maps)
     curried_combination = curry(combination)
 
-    result = curried_combination(maps_arguments)
+    result = curried_combination(arguments)
 
     assert isinstance(result, abc.Iterable)
-    assert are_iterables_similar(result, combination(maps_arguments))
+    assert are_iterables_similar(result, combination(arguments))
