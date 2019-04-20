@@ -1,4 +1,5 @@
 import codecs
+import os
 import pickle
 from collections import (abc,
                          defaultdict,
@@ -10,7 +11,9 @@ from itertools import (chain,
                        zip_longest)
 from operator import methodcaller
 from typing import (Any,
+                    AnyStr,
                     Hashable,
+                    IO,
                     Iterable,
                     Mapping,
                     Set,
@@ -270,3 +273,15 @@ def is_pickleable(object_: Any) -> bool:
         return False
     else:
         return True
+
+
+def to_stream_contents(stream: IO[AnyStr]) -> AnyStr:
+    result = stream.read()
+    stream.seek(0)
+    return result
+
+
+def to_stream_size(stream: IO[AnyStr]) -> int:
+    result = stream.seek(0, os.SEEK_END)
+    stream.seek(0)
+    return result

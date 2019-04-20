@@ -1,17 +1,20 @@
 import os
 from typing import (AnyStr,
                     BinaryIO,
-                    IO,
                     Tuple)
 
 from hypothesis import strategies
 
 from lz.functional import pack
-from tests.hints import ByteStreamWithBatchParameters, ByteSequence, Strategy
+from tests.hints import (ByteSequence,
+                         ByteStreamWithBatchParameters,
+                         Strategy)
 from tests.strategies import (encodings,
                               to_any_strings,
                               to_byte_sequences,
                               to_byte_streams)
+from tests.utils import (to_stream_contents,
+                         to_stream_size)
 
 
 def to_byte_sequences_with_encoding(encoding: str
@@ -74,18 +77,6 @@ def to_byte_stream_with_batch_parameters(
                              strategies.just(to_stream_contents(byte_stream)),
                              strategies.tuples(batches_sizes,
                                                batches_end_positions))
-
-
-def to_stream_contents(stream: IO[AnyStr]) -> AnyStr:
-    result = stream.read()
-    stream.seek(0)
-    return result
-
-
-def to_stream_size(stream: IO[AnyStr]) -> int:
-    result = stream.seek(0, os.SEEK_END)
-    stream.seek(0)
-    return result
 
 
 byte_streams_with_batch_parameters = encodings.flatmap(to_byte_streams)
