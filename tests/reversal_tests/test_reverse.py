@@ -64,7 +64,7 @@ def test_byte_stream(
                      keep_lines_separator=keep_separator)
 
     assert isinstance(result, abc.Iterable)
-    assert all(line.rstrip() in contents
+    assert all(line.strip() in contents
                for line in result)
 
 
@@ -76,13 +76,13 @@ def test_text_stream(
      (batch_size,
       lines_separator,
       keep_separator)) = text_stream_with_reverse_parameters
-    result = list(reverse(stream,
-                          batch_size=batch_size,
-                          lines_separator=lines_separator,
-                          keep_lines_separator=keep_separator))
+    result = reverse(stream,
+                     batch_size=batch_size,
+                     lines_separator=lines_separator,
+                     keep_lines_separator=keep_separator)
 
     assert isinstance(result, abc.Iterable)
-    assert all(line.rstrip() in contents
+    assert all(line.strip() in contents
                for line in result)
 
 
