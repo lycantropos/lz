@@ -18,12 +18,15 @@ def accumulator(function: Callable[[Range, Domain], Range],
     Returns function that yields cumulative results of given binary function
     starting from given initial object in direction from left to right.
     """
-    attach_initial = attacher(initial)
+    return functools.partial(accumulate,
+                             function=function,
+                             initial=initial)
 
-    def accumulate(iterable: Iterable[Domain]) -> Iterable[Range]:
-        yield from itertools.accumulate(attach_initial(iterable), function)
 
-    return accumulate
+def accumulate(iterable: Iterable[Domain],
+               function: Callable[[Range, Domain], Range],
+               initial: Range) -> Iterable[Range]:
+    yield from itertools.accumulate(attach(iterable, initial), function)
 
 
 def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
