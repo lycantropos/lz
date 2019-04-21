@@ -2,10 +2,17 @@ from typing import (Any,
                     Dict,
                     Tuple)
 
+from hypothesis import given
+
 from lz.hints import Predicate
 from lz.logical import negate
+from tests import strategies
 
 
+@given(strategies.false_predicates,
+       strategies.true_predicates,
+       strategies.positionals_arguments,
+       strategies.keywords_arguments)
 def test_basic(false_predicate: Predicate,
                true_predicate: Predicate,
                positional_arguments: Tuple,
@@ -26,6 +33,10 @@ def test_basic(false_predicate: Predicate,
     assert not negated_true_predicate_result
 
 
+@given(strategies.false_predicates,
+       strategies.true_predicates,
+       strategies.positionals_arguments,
+       strategies.keywords_arguments)
 def test_involution(false_predicate: Predicate,
                     true_predicate: Predicate,
                     positional_arguments: Tuple,
