@@ -195,9 +195,8 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
     Returns function that selects elements from the end of iterable.
     Resulted iterable will have size not greater than given one.
     """
-    return compose(iter,
-                   functools.partial(deque,
-                                     maxlen=size))
+    return functools.partial(deque,
+                             maxlen=size)
 
 
 last = compose(next, trailer(1))
