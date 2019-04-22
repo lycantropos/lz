@@ -1,6 +1,7 @@
 from typing import (Any,
                     Iterable)
 
+import pytest
 from hypothesis import given
 
 from lz.iterating import (expand,
@@ -17,3 +18,9 @@ def test_basic(non_empty_iterable: Iterable[Any]) -> None:
     result = first(target)
 
     assert iterable_starts_with(original, expand(result))
+
+
+@given(strategies.empty.iterables)
+def test_empty_iterable(empty_iterable: Iterable[Any]) -> None:
+    with pytest.raises(ValueError):
+        first(empty_iterable)
