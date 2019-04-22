@@ -11,20 +11,20 @@ from . import strategies
 
 @given(strategies.accumulator_calls)
 def test_first(accumulator_call: LeftAccumulatorCall) -> None:
-    projector, projector_initial, projector_iterable = accumulator_call
-    accumulate = left.accumulator(projector, projector_initial)
+    function, initial, iterable = accumulator_call
+    accumulate = left.accumulator(function, initial)
 
-    result = accumulate(projector_iterable)
+    result = accumulate(iterable)
 
-    assert first(result) is projector_initial
+    assert first(result) is initial
 
 
 @given(strategies.accumulator_calls)
 def test_last(accumulator_call: LeftAccumulatorCall) -> None:
-    projector, projector_initial, projector_iterable = accumulator_call
-    original, target = duplicate(projector_iterable)
-    accumulate = left.accumulator(projector, projector_initial)
-    fold = left.folder(projector, projector_initial)
+    function, initial, iterable = accumulator_call
+    original, target = duplicate(iterable)
+    accumulate = left.accumulator(function, initial)
+    fold = left.folder(function, initial)
 
     result = accumulate(target)
 
