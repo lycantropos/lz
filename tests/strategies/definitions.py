@@ -1,10 +1,7 @@
 import importlib
 import inspect
 from functools import partial
-from itertools import chain
-from types import ModuleType
-from typing import (Any,
-                    Union)
+from typing import Any
 
 from tests.utils import flatmap
 
@@ -14,7 +11,6 @@ except ImportError:
     from typing import _Protocol as Protocol
 
 from hypothesis import strategies
-from hypothesis.searchstrategy import SearchStrategy
 from paradigm.definitions import (is_supported,
                                   stdlib_modules_names,
                                   to_contents,
