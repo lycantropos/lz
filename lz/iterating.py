@@ -199,8 +199,15 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
                              maxlen=size)
 
 
-last = compose(next, trailer(1))
-last.__doc__ = 'Returns last element of iterable.'
+def last(iterable: Iterable[Domain]) -> Domain:
+    """
+    Returns last element of iterable.
+    """
+    try:
+        return deque(iterable,
+                     maxlen=1)[0]
+    except IndexError as error:
+        raise ValueError('Argument supposed to be non-empty.') from error
 
 
 @singledispatch
