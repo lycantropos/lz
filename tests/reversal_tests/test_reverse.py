@@ -9,7 +9,8 @@ from lz.iterating import (first,
                           last)
 from lz.replication import duplicate
 from lz.reversal import reverse
-from tests.hints import StreamWithReverseParameters
+from tests.hints import (ByteSequence,
+                         StreamWithReverseParameters)
 from tests.utils import (are_iterables_similar,
                          are_objects_similar,
                          is_empty)
@@ -64,7 +65,8 @@ def test_byte_stream(
                      keep_lines_separator=keep_separator)
 
     assert isinstance(result, abc.Iterable)
-    assert all(line.strip() in contents
+    assert all(remove_newline_characters_from_byte_sequence(line)
+               in remove_newline_characters_from_byte_sequence(contents)
                for line in result)
 
 
@@ -82,8 +84,18 @@ def test_text_stream(
                      keep_lines_separator=keep_separator)
 
     assert isinstance(result, abc.Iterable)
-    assert all(line.strip() in contents
+    assert all(remove_newline_characters_from_string(line)
+               in remove_newline_characters_from_string(contents)
                for line in result)
+
+
+def remove_newline_characters_from_byte_sequence(byte_sequence: ByteSequence
+                                                 ) -> str:
+    return byte_sequence.translate(None, b'\r\n')
+
+
+def remove_newline_characters_from_string(string: str) -> str:
+    return string.translate(str.maketrans({'\r': None, '\n': None}))
 
 
 @given(strategies.irreversible_objects)
