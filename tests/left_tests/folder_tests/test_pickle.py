@@ -9,9 +9,9 @@ from . import strategies
 
 @given(strategies.folder_calls)
 def test_round_trip(folder_call: LeftFolderCall) -> None:
-    projector, initial, iterable = folder_call
+    function, initial, iterable = folder_call
     original, target = duplicate(iterable)
-    fold = left.folder(projector, initial)
+    fold = left.folder(function, initial)
 
     result = round_trip_pickle(fold)
 
