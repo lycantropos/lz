@@ -7,7 +7,7 @@ from lz.functional import identity
 from lz.hints import (Domain,
                       Map)
 from tests.hints import Strategy
-from tests.strategies import (hashables,
+from tests.strategies import (scalars,
                               min_iterables_sizes,
                               to_homogeneous_iterables)
 
@@ -39,7 +39,7 @@ def to_iterables(min_size: int,
 
 
 hashables_iterables = min_iterables_sizes.flatmap(partial(to_iterables,
-                                                          elements=hashables))
+                                                          elements=scalars))
 plain_hashables_iterables = (min_iterables_sizes
                              .flatmap(partial(to_iterables,
-                                              elements=hashables)))
+                                              elements=scalars)))

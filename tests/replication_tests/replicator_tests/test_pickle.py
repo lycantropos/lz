@@ -10,7 +10,7 @@ from tests.utils import (are_iterables_similar,
 from . import strategies
 
 
-@given(strategies.objects, strategies.iterables, strategies.sizes)
+@given(strategies.scalars, strategies.iterables, strategies.sizes)
 def test_round_trip(object_: Any, iterable: Iterable[Any], size: int) -> None:
     for target in (object_, iterable):
         replicate = replicator(size + 1)

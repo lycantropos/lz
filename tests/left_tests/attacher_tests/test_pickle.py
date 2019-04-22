@@ -10,7 +10,7 @@ from tests.utils import (are_iterables_similar,
                          round_trip_pickle)
 
 
-@given(strategies.iterables, strategies.objects)
+@given(strategies.iterables, strategies.scalars)
 def test_round_trip(iterable: Iterable[Any], object_: Any) -> None:
     original, target = duplicate(iterable)
     attach = left.attacher(object_)

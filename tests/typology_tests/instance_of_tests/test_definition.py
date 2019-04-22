@@ -8,14 +8,14 @@ from tests.utils import equivalence
 from . import strategies
 
 
-@given(strategies.objects)
+@given(strategies.scalars)
 def test_base_case(object_: Any) -> None:
     result = instance_of()
 
     assert not result(object_)
 
 
-@given(strategies.classes_sequences, strategies.classes, strategies.objects)
+@given(strategies.classes_sequences, strategies.classes, strategies.scalars)
 def test_step(classes: Sequence[type], class_: type, object_: Any) -> None:
     base_function = instance_of(*classes)
     adjunct_function = instance_of(class_)

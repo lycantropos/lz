@@ -8,7 +8,7 @@ from lz.functional import to_constant
 from tests import strategies
 
 
-@given(strategies.objects,
+@given(strategies.scalars,
        strategies.positionals_arguments,
        strategies.keywords_arguments)
 def test_basic(object_: Any,

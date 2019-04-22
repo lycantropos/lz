@@ -6,7 +6,7 @@ from lz.functional import identity
 from tests import strategies
 
 
-@given(strategies.objects)
+@given(strategies.scalars)
 def test_basic(object_: Any) -> None:
     result = identity(object_)
 

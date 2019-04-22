@@ -98,7 +98,7 @@ def remove_newline_characters_from_string(string: str) -> str:
     return string.translate(str.maketrans({'\r': None, '\n': None}))
 
 
-@given(strategies.irreversible_objects)
-def test_unsupported_type(irreversible_object: Any) -> None:
+@given(strategies.scalars)
+def test_unsupported_type(object_: Any) -> None:
     with pytest.raises(TypeError):
-        reverse(irreversible_object)
+        reverse(object_)

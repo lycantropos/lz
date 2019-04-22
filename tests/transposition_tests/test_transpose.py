@@ -63,7 +63,7 @@ def test_involution(
     assert are_iterables_similar(result, original)
 
 
-@given(strategies.untransposable_objects)
-def test_unsupported_type(untransposable_object: Any) -> None:
+@given(strategies.scalars)
+def test_unsupported_type(object_: Any) -> None:
     with pytest.raises(TypeError):
-        transpose(untransposable_object)
+        transpose(object_)

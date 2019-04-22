@@ -5,13 +5,12 @@ from typing import (Any,
 
 from hypothesis import strategies
 
-from lz.reversal import reverse
 from tests.hints import (Strategy,
                          StreamWithReverseParameters)
 from tests.strategies import (empty,
                               encodings,
                               min_iterables_sizes,
-                              objects,
+                              scalars,
                               to_byte_sequences,
                               to_byte_streams,
                               to_homogeneous_sequences,
@@ -25,7 +24,7 @@ empty_sequences = empty.sequences
 to_non_empty = partial(partial,
                        min_size=1)
 non_empty_sequences = (encodings.flatmap(to_non_empty(to_byte_sequences))
-                       | to_non_empty(to_homogeneous_sequences)(objects)
+                       | to_non_empty(to_homogeneous_sequences)(scalars)
                        | encodings.flatmap(to_non_empty(to_strings)))
 
 
@@ -33,7 +32,7 @@ def to_sequences(min_size: int) -> Strategy[Sequence[Any]]:
     limit_min_size = partial(partial,
                              min_size=min_size)
     return (encodings.flatmap(limit_min_size(to_byte_sequences))
-            | limit_min_size(to_homogeneous_sequences)(objects)
+            | limit_min_size(to_homogeneous_sequences)(scalars)
             | encodings.flatmap(limit_min_size(to_strings)))
 
 
@@ -58,10 +57,3 @@ byte_streams_with_reverse_parameters = (
 text_streams_with_reverse_parameters = (
     encodings.flatmap(to_text_streams).flatmap(
             to_stream_with_reverse_parameters))
-
-
-def is_object_irreversible(object_: Any) -> bool:
-    return reverse.dispatch(type(object_)) is reverse.dispatch(object)
-
-
-irreversible_objects = objects.filter(is_object_irreversible)

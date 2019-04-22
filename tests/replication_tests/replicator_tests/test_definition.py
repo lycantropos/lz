@@ -9,7 +9,7 @@ from tests.utils import (are_iterables_similar,
 from . import strategies
 
 
-@given(strategies.objects, strategies.iterables)
+@given(strategies.scalars, strategies.iterables)
 def test_base_case(object_: Any, iterable: Iterable[Any]) -> None:
     replicate = replicator(0)
     for target in (object_, iterable):
@@ -18,7 +18,7 @@ def test_base_case(object_: Any, iterable: Iterable[Any]) -> None:
         assert is_empty(result)
 
 
-@given(strategies.objects, strategies.iterables, strategies.sizes)
+@given(strategies.scalars, strategies.iterables, strategies.sizes)
 def test_step(object_: Any, iterable: Iterable[Any], size: int) -> None:
     replicate = replicator(size + 1)
     for target in (object_, iterable):

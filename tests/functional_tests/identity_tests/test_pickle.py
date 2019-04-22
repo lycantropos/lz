@@ -7,7 +7,7 @@ from tests import strategies
 from tests.utils import round_trip_pickle
 
 
-@given(strategies.objects)
+@given(strategies.scalars)
 def test_round_trip(object_: Any) -> None:
     result = round_trip_pickle(identity)
 

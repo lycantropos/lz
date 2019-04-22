@@ -9,7 +9,7 @@ from lz.iterating import last
 from tests import strategies
 
 
-@given(strategies.iterables, strategies.objects)
+@given(strategies.iterables, strategies.scalars)
 def test_basic(iterable: Iterable[Any], object_: Any) -> None:
     attach = right.attacher(object_)
 

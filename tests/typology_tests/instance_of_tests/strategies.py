@@ -1,5 +1,5 @@
 from tests.strategies import (classes,
-                              objects,
+                              scalars,
                               to_homogeneous_sequences)
 from tests.utils import is_pickleable
 
@@ -17,4 +17,4 @@ classes = classes.filter(supports_instance_checks)
 classes_sequences = to_homogeneous_sequences(classes)
 pickleable_classes_sequences = to_homogeneous_sequences(classes
                                                         .filter(is_pickleable))
-objects = objects
+scalars = scalars

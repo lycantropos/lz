@@ -9,7 +9,7 @@ from lz.functional import (curry,
 from tests import strategies
 
 
-@given(strategies.objects,
+@given(strategies.scalars,
        strategies.positionals_arguments,
        strategies.keywords_arguments)
 def test_currying(object_: Any,

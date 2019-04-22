@@ -48,8 +48,8 @@ from .literals.base import (byte_sequences,
                             json_serializable_objects,
                             lists,
                             numbers,
-                            objects,
                             real_numbers,
+                            scalars,
                             sets,
                             sortable_domains,
                             strings,
@@ -71,7 +71,7 @@ built_in_classes = strategies.sampled_from(module_to_classes(builtins))
 classes = abstract_base_classes | built_in_classes
 is_instance_predicates = classes.map(instance_of)
 predicates = false_predicates | true_predicates | is_instance_predicates
-predicates_arguments = objects
+predicates_arguments = scalars
 starting_maps = [identity, float, str, json.dumps]
 suitable_maps = {identity: [identity, float, str],
                  float: starting_maps,
@@ -116,16 +116,16 @@ transparent_functions = (non_variadic_transparent_functions
 paths_names_parts = strategies.text(
         strategies.sampled_from(string.digits + string.ascii_letters + '_'))
 to_transparent_function_args = {
-    bool: strategies.tuples(objects),
+    bool: strategies.tuples(scalars),
     complex: strategies.tuples(numbers),
     float: strategies.tuples(real_numbers),
-    identity: strategies.tuples(objects),
+    identity: strategies.tuples(scalars),
     int: strategies.tuples(integers),
     json.dumps: strategies.tuples(json_serializable_objects),
     json.loads: strategies.tuples(json_serializable_objects.map(json.dumps)),
     os.path.join: to_homogeneous_tuples(paths_names_parts,
                                         min_size=1),
-    str: strategies.tuples(objects),
+    str: strategies.tuples(scalars),
 }.__getitem__
 to_transparent_function_kwargs = {
     bool: empty.dictionaries,

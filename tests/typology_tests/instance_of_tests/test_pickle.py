@@ -8,7 +8,7 @@ from tests.utils import round_trip_pickle
 from . import strategies
 
 
-@given(strategies.pickleable_classes_sequences, strategies.objects)
+@given(strategies.pickleable_classes_sequences, strategies.scalars)
 def test_round_trip(pickleable_classes: Sequence[type], object_: Any) -> None:
     function = instance_of(*pickleable_classes)
 

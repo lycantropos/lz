@@ -8,7 +8,7 @@ from lz.iterating import first
 from tests import strategies
 
 
-@given(strategies.iterables, strategies.objects)
+@given(strategies.iterables, strategies.scalars)
 def test_basic(iterable: Iterable[Any], object_: Any) -> None:
     attach = left.attacher(object_)
 

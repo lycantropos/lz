@@ -7,7 +7,7 @@ from lz.functional import (curry,
 from tests import strategies
 
 
-@given(strategies.objects)
+@given(strategies.scalars)
 def test_currying(object_: Any) -> None:
     curried = curry(identity)
 

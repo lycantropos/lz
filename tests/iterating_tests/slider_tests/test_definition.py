@@ -94,7 +94,7 @@ def test_base_case_by_iterable_elements(empty_iterable: Iterable[Any],
 
 
 @given(strategies.iterables,
-       strategies.objects,
+       strategies.scalars,
        strategies.non_negative_indices)
 def test_step_left_by_iterable_total_capacity(iterable: Iterable[Any],
                                               object_: Any,
@@ -109,7 +109,7 @@ def test_step_left_by_iterable_total_capacity(iterable: Iterable[Any],
 
 
 @given(strategies.iterables,
-       strategies.objects,
+       strategies.scalars,
        strategies.non_negative_indices)
 def test_step_left_by_iterable_elementwise_capacity(iterable: Iterable[Any],
                                                     object_: Any,
@@ -124,7 +124,7 @@ def test_step_left_by_iterable_elementwise_capacity(iterable: Iterable[Any],
 
 
 @given(strategies.iterables,
-       strategies.objects,
+       strategies.scalars,
        strategies.non_negative_indices)
 def test_step_left_by_iterable_elements(iterable: Iterable[Any],
                                         object_: Any,
@@ -138,7 +138,7 @@ def test_step_left_by_iterable_elements(iterable: Iterable[Any],
 
 
 @given(strategies.iterables,
-       strategies.objects,
+       strategies.scalars,
        strategies.non_negative_indices)
 def test_step_right_by_iterable_total_capacity(iterable: Iterable[Any],
                                                object_: Any,
@@ -153,7 +153,7 @@ def test_step_right_by_iterable_total_capacity(iterable: Iterable[Any],
 
 
 @given(strategies.iterables,
-       strategies.objects,
+       strategies.scalars,
        strategies.non_negative_indices)
 def test_step_right_by_iterable_elementwise_capacity(iterable: Iterable[Any],
                                                      object_: Any,
@@ -168,7 +168,7 @@ def test_step_right_by_iterable_elementwise_capacity(iterable: Iterable[Any],
 
 
 @given(strategies.iterables,
-       strategies.objects,
+       strategies.scalars,
        strategies.non_negative_indices)
 def test_step_right_by_iterable_elements(iterable: Iterable[Any],
                                          object_: Any,

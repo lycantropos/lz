@@ -66,14 +66,10 @@ if sys.platform == 'win32' and platform.python_implementation() != 'PyPy':
 encodings = strategies.sampled_from(encodings)
 byte_strings = encodings.flatmap(to_byte_strings)
 strings = encodings.flatmap(to_strings)
-hashables = (scalars
-             | byte_strings
-             | strings)
 byte_sequences = encodings.flatmap(to_byte_sequences)
-sets = to_homogeneous_sets(hashables)
-objects = hashables
-tuples = to_homogeneous_tuples(objects)
-lists = to_homogeneous_lists(objects)
+sets = to_homogeneous_sets(scalars)
+tuples = to_homogeneous_tuples(scalars)
+lists = to_homogeneous_lists(scalars)
 
 
 def extend_json(children: Strategy[Serializable]) -> Strategy[Serializable]:
@@ -89,7 +85,7 @@ json_serializable_objects = strategies.recursive(
         | strategies.text(strategies.sampled_from(string.printable)),
         extend_json)
 positionals_arguments = tuples
-keywords_arguments = to_dictionaries(strings, objects)
+keywords_arguments = to_dictionaries(strings, scalars)
 sortable_domains = [byte_sequences, real_numbers, sets, strings]
 min_iterables_sizes = strategies.integers(0, MAX_MIN_ITERABLES_SIZE)
 
@@ -99,7 +95,7 @@ def to_iterables(min_size: int) -> Strategy[Iterable[Any]]:
                              min_size=min_size)
     return (encodings.flatmap(limit_min_size(to_any_streams))
             | encodings.flatmap(limit_min_size(to_byte_sequences))
-            | limit_min_size(to_homogeneous_iterables)(objects)
+            | limit_min_size(to_homogeneous_iterables)(scalars)
             | encodings.flatmap(limit_min_size(to_strings)))
 
 

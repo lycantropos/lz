@@ -17,7 +17,7 @@ def test_base_case(empty_iterable: Iterable[Any]) -> None:
     assert result == 0
 
 
-@given(strategies.iterables, strategies.objects)
+@given(strategies.iterables, strategies.scalars)
 def test_step_right(iterable: Iterable[Any], object_: Any) -> None:
     original, target = duplicate(iterable)
     attach = right.attacher(object_)
@@ -27,7 +27,7 @@ def test_step_right(iterable: Iterable[Any], object_: Any) -> None:
     assert result == capacity(original) + 1
 
 
-@given(strategies.iterables, strategies.objects)
+@given(strategies.iterables, strategies.scalars)
 def test_step_left(iterable: Iterable[Any], object_: Any) -> None:
     original, target = duplicate(iterable)
     attach = left.attacher(object_)

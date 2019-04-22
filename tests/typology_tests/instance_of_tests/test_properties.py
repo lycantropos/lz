@@ -14,7 +14,7 @@ def test_type(class_: type) -> None:
     assert callable(result)
 
 
-@given(strategies.classes, strategies.objects)
+@given(strategies.classes, strategies.scalars)
 def test_result_type(class_: type, object_: Any) -> None:
     function = instance_of(class_)
 
@@ -23,14 +23,14 @@ def test_result_type(class_: type, object_: Any) -> None:
     assert isinstance(result, bool)
 
 
-@given(strategies.objects)
+@given(strategies.scalars)
 def test_basic(object_: Any) -> None:
     result = instance_of(type(object_))
 
     assert result(object_)
 
 
-@given(strategies.classes, strategies.classes, strategies.objects)
+@given(strategies.classes, strategies.classes, strategies.scalars)
 def test_commutativity(class_: type, other_class: type, object_: Any) -> None:
     left_function = instance_of(class_, other_class)
     right_function = instance_of(other_class, class_)
