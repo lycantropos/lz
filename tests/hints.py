@@ -3,6 +3,7 @@ from typing import (AnyStr,
                     Callable,
                     Dict,
                     IO,
+                    Iterable,
                     Sequence,
                     Tuple,
                     TypeVar,
@@ -25,6 +26,8 @@ FunctionCall = Tuple[Function, Args, Kwargs]
 PartitionedFunctionCall = Tuple[Function,
                                 Tuple[Args, Args],
                                 Tuple[Kwargs, Kwargs]]
+LeftProjector = Callable[[Range, Domain], Range]
+LeftAccumulatorCall = Tuple[LeftProjector, Range, Iterable[Domain]]
 CleavageCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
 CombinationCall = Tuple[Sequence[Map], Sequence[Domain]]
 CompositionCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]

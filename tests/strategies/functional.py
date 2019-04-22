@@ -38,7 +38,8 @@ from tests.hints import (Args,
                          PartitionedFunctionCall,
                          Strategy)
 from .literals import empty
-from .literals.base import (classes,
+from .literals.base import (byte_sequences,
+                            classes,
                             integers,
                             json_serializable_objects,
                             lists,
@@ -49,9 +50,7 @@ from .literals.base import (classes,
                             sortable_domains,
                             strings,
                             tuples)
-from .literals.factories import (to_homogeneous_lists,
-                                 to_homogeneous_tuples,
-                                 to_strings)
+from .literals.factories import to_homogeneous_tuples
 from .utils import identifiers
 
 false_predicates = strategies.just(to_constant(False))
@@ -163,9 +162,11 @@ projectors_domains_initials = {
     (and_, sets): sets,
     (add, strings): empty.strings,
     (add, tuples): empty.tuples,
+    (max, byte_sequences): empty.byte_sequences,
     (max, real_numbers): strategies.just(float('-inf')),
     (max, sets): empty.sets,
     (max, strings): empty.strings,
+    (min, byte_sequences): empty.byte_sequences,
     (min, real_numbers): strategies.just(float('inf')),
     (min, sets): empty.sets,
     (min, strings): empty.strings,
