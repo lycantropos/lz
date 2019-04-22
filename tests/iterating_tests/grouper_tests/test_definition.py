@@ -10,7 +10,7 @@ from lz.replication import duplicate
 from . import strategies
 
 
-@given(strategies.hashables_iterables, strategies.groupers_keys)
+@given(strategies.hashables_iterables, strategies.keys_functions)
 def test_basic(iterable: Iterable[Hashable],
                key_function: Map[Any, Hashable]) -> None:
     original, target = duplicate(iterable)
