@@ -343,11 +343,11 @@ def strings_sizes_to_bytes_sizes(min_size: int,
                                  encoding: str) -> Tuple[int, Optional[int]]:
     encoding_length = encodings_lengths[encoding]
     bom = encoding_to_bom(encoding)
-    bytes_min_size = min_size * encoding_length + len(bom)
-    bytes_max_size = max_size
-    if bytes_max_size is not None:
-        bytes_max_size = bytes_max_size * encoding_length + len(bom)
-    return bytes_min_size, bytes_max_size
+    result_min_size = min_size * encoding_length + len(bom)
+    result_max_size = max_size
+    if result_max_size is not None:
+        result_max_size = result_max_size * encoding_length + len(bom)
+    return result_min_size, result_max_size
 
 
 def to_tuples(elements: Optional[Strategy[Domain]] = None,
