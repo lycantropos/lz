@@ -180,8 +180,14 @@ def header(size: int) -> Operator[Iterable[Domain]]:
     return cutter(slice(size))
 
 
-first = compose(next, iter)
-first.__doc__ = 'Returns first element of iterable.'
+def first(iterable: Iterable[Domain]) -> Domain:
+    """
+    Returns first element of iterable.
+    """
+    try:
+        return next(iter(iterable))
+    except StopIteration as error:
+        raise ValueError('Argument supposed to be non-empty.') from error
 
 
 def trailer(size: int) -> Operator[Iterable[Domain]]:
