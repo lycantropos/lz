@@ -28,6 +28,7 @@ PartitionedFunctionCall = Tuple[Function,
                                 Tuple[Kwargs, Kwargs]]
 LeftProjector = Callable[[Range, Domain], Range]
 LeftAccumulatorCall = Tuple[LeftProjector, Range, Iterable[Domain]]
+LeftFolderCall = Tuple[LeftProjector, Range, Iterable[Domain]]
 CleavageCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
 CombinationCall = Tuple[Sequence[Map], Sequence[Domain]]
 CompositionCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
