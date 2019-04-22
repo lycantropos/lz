@@ -10,8 +10,6 @@ from typing import (Any,
                     TextIO)
 
 import pytest
-from _pytest.config.argparsing import Parser
-from _pytest.python import Metafunc
 from hypothesis import (HealthCheck,
                         settings)
 
@@ -62,27 +60,6 @@ def path_to_module_name(path: str) -> str:
 
 fixtures_package_path = os.path.join(base_directory_path, 'fixtures')
 pytest_plugins = list(explore_pytest_plugins(fixtures_package_path))
-
-
-def pytest_addoption(parser: Parser) -> None:
-    parser.addoption('--repeat',
-                     action='store',
-                     help='Number of times to repeat each test.')
-
-
-def pytest_generate_tests(metafunc: Metafunc) -> None:
-    if metafunc.config.option.repeat is None:
-        return
-    count = int(metafunc.config.option.repeat)
-    # We're going to duplicate these tests by parametrisation,
-    # which requires that each test has a fixture to accept the parameter.
-    # We can add a new fixture like so:
-    metafunc.fixturenames.append('tmp_ct')
-    # Now we parametrize. This is what happens when we do e.g.,
-    # @pytest.mark.parametrize('tmp_ct', range(count))
-    # def test_foo(): pass
-    metafunc.parametrize('tmp_ct', range(count))
-
 
 settings_profile_name = 'default'
 settings.register_profile(settings_profile_name,
