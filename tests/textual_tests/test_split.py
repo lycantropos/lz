@@ -3,7 +3,7 @@ from typing import (AnyStr,
 
 from hypothesis import given
 
-from lz.textual import rsplit
+from lz.textual import split
 from tests.textual_tests import strategies
 
 
@@ -11,9 +11,9 @@ from tests.textual_tests import strategies
 def test_keep_separator(any_string_with_separator: Tuple[AnyStr, AnyStr]
                         ) -> None:
     any_string, separator = any_string_with_separator
-    parts = rsplit(any_string,
-                   separator=separator,
-                   keep_separator=True)
+    parts = split(any_string,
+                  separator=separator,
+                  keep_separator=True)
 
     empty_string = type(any_string)()
 
@@ -24,8 +24,8 @@ def test_keep_separator(any_string_with_separator: Tuple[AnyStr, AnyStr]
 def test_skip_separator(any_string_with_separator: Tuple[AnyStr, AnyStr]
                         ) -> None:
     any_string, separator = any_string_with_separator
-    parts = rsplit(any_string,
-                   separator=separator,
-                   keep_separator=False)
+    parts = split(any_string,
+                  separator=separator,
+                  keep_separator=False)
 
     assert separator.join(parts) == any_string

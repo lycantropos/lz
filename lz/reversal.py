@@ -21,7 +21,7 @@ from .hints import (Domain,
                     Range)
 from .textual import (decoder,
                       read_batch_from_end,
-                      rsplit)
+                      split)
 
 
 @overload
@@ -104,7 +104,7 @@ def reverse_binary_stream(object_: BinaryIO,
         lines_splitter = methodcaller(str.splitlines.__name__,
                                       keep_lines_separator)
     else:
-        lines_splitter = functools.partial(rsplit,
+        lines_splitter = functools.partial(split,
                                            separator=lines_separator,
                                            keep_separator=keep_lines_separator)
     stream_size = object_.seek(0, os.SEEK_END)
@@ -120,15 +120,27 @@ def reverse_binary_stream(object_: BinaryIO,
         remaining_bytes_count = next(remaining_bytes_indicator)
     except StopIteration:
         return
-    batch = read_batch_from_end(object_,
-                                size=batch_size,
-                                end_position=remaining_bytes_count)
+
+    def read_batch(position: int) -> bytes:
+        result = read_batch_from_end(object_,
+                                     size=batch_size,
+                                     end_position=position)
+        while result.startswith(lines_separator):
+            try:
+                position = next(remaining_bytes_indicator)
+            except StopIteration:
+                break
+            result = (read_batch_from_end(object_,
+                                          size=batch_size,
+                                          end_position=position)
+                      + result)
+        return result
+
+    batch = read_batch(remaining_bytes_count)
     segment, *lines = lines_splitter(batch)
     yield from reverse(lines)
     for remaining_bytes_count in remaining_bytes_indicator:
-        batch = read_batch_from_end(object_,
-                                    size=batch_size,
-                                    end_position=remaining_bytes_count)
+        batch = read_batch(remaining_bytes_count)
         lines = lines_splitter(batch)
         if batch.endswith(lines_separator):
             yield segment
