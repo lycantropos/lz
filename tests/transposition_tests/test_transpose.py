@@ -12,7 +12,8 @@ from lz.transposition import transpose
 from tests.utils import (are_iterables_similar,
                          is_empty,
                          iterable_ends_with,
-                         iterable_starts_with)
+                         iterable_starts_with,
+                         slow_data_generation)
 from . import strategies
 
 
@@ -23,6 +24,7 @@ def test_base_case(empty_iterable: Iterable[Any]) -> None:
     assert is_empty(result)
 
 
+@slow_data_generation
 @given(strategies.transposable_iterables,
        strategies.transposable_iterables_elements)
 def test_step_left(transposable_iterable: Iterable[FiniteIterable[Any]],
@@ -35,6 +37,7 @@ def test_step_left(transposable_iterable: Iterable[FiniteIterable[Any]],
                for iterable, coordinate in zip(result, original_element))
 
 
+@slow_data_generation
 @given(strategies.transposable_iterables,
        strategies.transposable_iterables_elements)
 def test_step_right(transposable_iterable: Iterable[FiniteIterable[Any]],
@@ -48,6 +51,7 @@ def test_step_right(transposable_iterable: Iterable[FiniteIterable[Any]],
                for iterable, coordinate in zip(result, original_element))
 
 
+@slow_data_generation
 @given(strategies.non_empty_transposable_iterables)
 def test_involution(
         non_empty_transposable_iterable: Iterable[FiniteIterable[Any]]

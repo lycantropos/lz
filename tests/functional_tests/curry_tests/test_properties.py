@@ -6,8 +6,10 @@ from lz.functional import (Curry,
 from tests import strategies
 from tests.hints import (Function,
                          FunctionCall)
+from tests.utils import slow_data_generation
 
 
+@slow_data_generation
 @given(strategies.transparent_functions)
 def test_empty_call(function: Function) -> None:
     curried = curry(function)
@@ -17,6 +19,7 @@ def test_empty_call(function: Function) -> None:
     assert curried.signature.all_set() or isinstance(result, Curry)
 
 
+@slow_data_generation
 @given(strategies.transparent_functions_calls)
 def test_valid_call(function_call: FunctionCall) -> None:
     function, args, kwargs = function_call
@@ -28,6 +31,7 @@ def test_valid_call(function_call: FunctionCall) -> None:
     assert result == function(*args, **kwargs)
 
 
+@slow_data_generation
 @given(strategies.transparent_functions_calls)
 def test_involution(function_call: FunctionCall) -> None:
     function, args, kwargs = function_call
@@ -38,6 +42,7 @@ def test_involution(function_call: FunctionCall) -> None:
     assert result == function(*args, **kwargs)
 
 
+@slow_data_generation
 @given(strategies.non_variadic_transparent_functions_calls_with_invalid_args)
 def test_invalid_args_call(function_call_with_invalid_args: FunctionCall
                            ) -> None:
@@ -48,6 +53,7 @@ def test_invalid_args_call(function_call_with_invalid_args: FunctionCall
         curried(*invalid_args, **kwargs)
 
 
+@slow_data_generation
 @given(strategies.non_variadic_transparent_functions_calls_with_invalid_kwargs)
 def test_invalid_kwargs_call(function_call_with_invalid_kwargs: FunctionCall
                              ) -> None:

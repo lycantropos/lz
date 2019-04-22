@@ -10,8 +10,10 @@ from paradigm.hints import (MethodDescriptorType,
 from lz.functional import (Curry,
                            curry)
 from tests import strategies
+from tests.utils import slow_data_generation
 
 
+@slow_data_generation
 @given(built_in_function=strategies.built_in_functions,
        class_=strategies.classes,
        function=strategies.functions,

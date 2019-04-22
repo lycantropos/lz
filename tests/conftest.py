@@ -61,12 +61,6 @@ def path_to_module_name(path: str) -> str:
 fixtures_package_path = os.path.join(base_directory_path, 'fixtures')
 pytest_plugins = list(explore_pytest_plugins(fixtures_package_path))
 
-settings_profile_name = 'default'
-settings.register_profile(settings_profile_name,
-                          deadline=None,
-                          suppress_health_check=[HealthCheck.filter_too_much,
-                                                 HealthCheck.too_slow])
-
 
 @pytest.fixture(scope='session',
                 autouse=True)
