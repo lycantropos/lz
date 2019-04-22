@@ -1,5 +1,7 @@
 from typing import Iterable
 
+from hypothesis import given
+
 from lz.hints import Sortable
 from lz.iterating import (capacity,
                           slider)
@@ -7,8 +9,12 @@ from lz.replication import duplicate
 from lz.sorting import (Key,
                         sorter)
 from tests.utils import iterables_has_same_elements
+from . import strategies
 
 
+@given(strategies.sortable_iterables,
+       strategies.registered_sorting_algorithms,
+       strategies.sorting_keys)
 def test_order(sortable_iterable: Iterable[Sortable],
                registered_sorting_algorithm: str,
                sorting_key: Key) -> None:
@@ -35,6 +41,9 @@ def objects_are_partially_ordered(left_object: Sortable,
     return left_object < right_object or not (right_object < left_object)
 
 
+@given(strategies.sortable_iterables,
+       strategies.registered_sorting_algorithms,
+       strategies.sorting_keys)
 def test_capacity(sortable_iterable: Iterable[Sortable],
                   registered_sorting_algorithm: str,
                   sorting_key: Key) -> None:
@@ -47,6 +56,9 @@ def test_capacity(sortable_iterable: Iterable[Sortable],
     assert capacity(result) == capacity(original)
 
 
+@given(strategies.sortable_iterables,
+       strategies.registered_sorting_algorithms,
+       strategies.sorting_keys)
 def test_elements(sortable_iterable: Iterable[Sortable],
                   registered_sorting_algorithm: str,
                   sorting_key: Key) -> None:

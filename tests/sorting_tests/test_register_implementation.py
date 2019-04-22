@@ -1,8 +1,13 @@
+from hypothesis import given
+
 from lz.sorting import (Implementation,
                         implementations,
                         register_implementation)
+from . import strategies
 
 
+@given(strategies.unregistered_sorting_algorithms,
+       strategies.sorting_implementations)
 def test_basic(unregistered_sorting_algorithm: str,
                sorting_implementation: Implementation) -> None:
     result = register_implementation(unregistered_sorting_algorithm,
@@ -12,6 +17,8 @@ def test_basic(unregistered_sorting_algorithm: str,
     assert is_algorithm_registered(unregistered_sorting_algorithm)
 
 
+@given(strategies.unregistered_sorting_algorithms,
+       strategies.sorting_implementations)
 def test_currying(unregistered_sorting_algorithm: str,
                   sorting_implementation: Implementation) -> None:
     decorator = register_implementation(unregistered_sorting_algorithm)

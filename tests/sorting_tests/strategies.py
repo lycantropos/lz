@@ -1,9 +1,9 @@
 from hypothesis import strategies
 
-from lz.functional import identity
 from lz.sorting import implementations
 
-sorting_keys = strategies.just(identity) | strategies.none()
+sorting_implementations = strategies.sampled_from(list(implementations
+                                                       .values()))
 registered_sorting_algorithms = strategies.sampled_from(list(implementations))
 
 

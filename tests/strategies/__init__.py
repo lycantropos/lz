@@ -43,7 +43,7 @@ from .literals.base import (any_strings,
                             plain_hashables,
                             positionals_arguments,
                             real_numbers,
-                            sortable_iterables)
+                            sortable_domains)
 from .literals.factories import (to_any_streams,
                                  to_any_strings,
                                  to_byte_sequences,
@@ -54,9 +54,6 @@ from .literals.factories import (to_any_streams,
                                  to_strings,
                                  to_text_streams,
                                  to_tuples)
-from .sorting import (registered_sorting_algorithms,
-                      sorting_keys,
-                      unregistered_sorting_algorithms)
 from .utils import identifiers
 
 to_integers = strategies.integers
