@@ -21,7 +21,7 @@ from .hints import (Domain,
                     Range)
 from .textual import (decoder,
                       read_batch_from_end,
-                      split)
+                      rsplit)
 
 
 @overload
@@ -104,7 +104,7 @@ def reverse_binary_stream(object_: BinaryIO,
         lines_splitter = methodcaller(str.splitlines.__name__,
                                       keep_lines_separator)
     else:
-        lines_splitter = functools.partial(split,
+        lines_splitter = functools.partial(rsplit,
                                            separator=lines_separator,
                                            keep_separator=keep_lines_separator)
     stream_size = object_.seek(0, os.SEEK_END)

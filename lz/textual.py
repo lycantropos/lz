@@ -7,14 +7,14 @@ from typing import (AnyStr,
 from .hints import Map
 
 
-def split(string: AnyStr,
-          *,
-          separator: AnyStr,
-          keep_separator: bool) -> List[AnyStr]:
+def rsplit(string: AnyStr,
+           *,
+           separator: AnyStr,
+           keep_separator: bool) -> List[AnyStr]:
     """
-    Splits given string by given separator.
+    Splits given string by given separator from right end.
     """
-    parts = string.split(separator)
+    parts = string.rsplit(separator)
     if keep_separator:
         *parts, last_part = parts
         parts = [part + separator for part in parts]
