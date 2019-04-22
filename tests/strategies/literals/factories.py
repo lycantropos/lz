@@ -254,7 +254,6 @@ encodings_unsupported_code_points = defaultdict(
          })
 
 to_dictionaries = limit_max_size(strategies.dictionaries)
-to_homogeneous_frozensets = limit_max_size(strategies.frozensets)
 
 
 @limit_max_size

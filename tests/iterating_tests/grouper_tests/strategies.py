@@ -4,11 +4,11 @@ from typing import Hashable
 from hypothesis import strategies
 
 from lz.functional import identity
-from lz.hints import Domain, Map
+from lz.hints import (Domain,
+                      Map)
 from tests.hints import Strategy
 from tests.strategies import (hashables,
                               min_iterables_sizes,
-                              plain_hashables,
                               to_homogeneous_iterables)
 
 
@@ -43,4 +43,4 @@ hashables_iterables = min_iterables_sizes.flatmap(partial(to_iterables,
                                                           elements=hashables))
 plain_hashables_iterables = (min_iterables_sizes
                              .flatmap(partial(to_iterables,
-                                              elements=plain_hashables)))
+                                              elements=hashables)))

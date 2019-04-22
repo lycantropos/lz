@@ -29,8 +29,7 @@ from .functional import (
 from .iterating import (non_negative_indices,
                         positive_indices)
 from .literals import empty
-from .literals.base import (any_strings,
-                            booleans,
+from .literals.base import (booleans,
                             encodings,
                             hashables,
                             iterables,
@@ -39,8 +38,6 @@ from .literals.base import (any_strings,
                             nested_iterables,
                             non_empty_iterables,
                             objects,
-                            pickleable_objects,
-                            plain_hashables,
                             positionals_arguments,
                             real_numbers,
                             sortable_domains)

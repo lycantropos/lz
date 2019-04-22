@@ -1,11 +1,7 @@
-import builtins
-import inspect
 import platform
 import string
 import sys
-from collections import abc
 from functools import partial
-from types import ModuleType
 from typing import (Any,
                     Dict,
                     Iterable,
@@ -14,18 +10,14 @@ from typing import (Any,
 
 from hypothesis import strategies
 
-from tests.configs import (MAX_ITERABLES_SIZE,
-                           MAX_MIN_ITERABLES_SIZE)
+from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.hints import Strategy
-from tests.utils import is_pickleable
 from .factories import (to_any_streams,
                         to_byte_sequences,
                         to_byte_strings,
                         to_dictionaries,
-                        to_homogeneous_frozensets,
                         to_homogeneous_iterables,
                         to_homogeneous_lists,
-                        to_homogeneous_sequences,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
                         to_strings,
@@ -74,40 +66,12 @@ if sys.platform == 'win32' and platform.python_implementation() != 'PyPy':
 encodings = strategies.sampled_from(encodings)
 byte_strings = encodings.flatmap(to_byte_strings)
 strings = encodings.flatmap(to_strings)
-
-
-def module_to_classes(module: ModuleType) -> List[type]:
-    return list(filter(inspect.isclass,
-                       vars(module).values()))
-
-
-abstract_base_classes = strategies.sampled_from(module_to_classes(abc))
-built_in_classes = strategies.sampled_from(module_to_classes(builtins))
-classes = abstract_base_classes | built_in_classes
-
-deferred_hashables = strategies.deferred(lambda: hashables)
-deferred_objects = strategies.deferred(lambda: objects)
-plain_hashables = (scalars
-                   | byte_strings
-                   | strings
-                   | classes)
-hashables = (plain_hashables
-             | to_homogeneous_frozensets(deferred_hashables)
-             | to_homogeneous_tuples(deferred_hashables))
-indices = strategies.integers(-MAX_ITERABLES_SIZE, MAX_ITERABLES_SIZE - 1)
-slices_fields = strategies.none() | indices
-slices = strategies.builds(slice,
-                           slices_fields,
-                           slices_fields,
-                           slices_fields)
+hashables = (scalars
+             | byte_strings
+             | strings)
 byte_sequences = encodings.flatmap(to_byte_sequences)
-any_strings = strings | byte_sequences
-sequences = any_strings | to_homogeneous_sequences(deferred_objects)
 sets = to_homogeneous_sets(hashables)
-finite_iterables = sequences | sets | to_dictionaries(hashables,
-                                                      deferred_objects)
-objects = hashables | slices | finite_iterables | sets
-pickleable_objects = objects.filter(is_pickleable)
+objects = hashables
 tuples = to_homogeneous_tuples(objects)
 lists = to_homogeneous_lists(objects)
 

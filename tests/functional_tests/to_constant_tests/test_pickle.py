@@ -10,7 +10,7 @@ from tests.utils import (are_objects_similar,
                          round_trip_pickle)
 
 
-@given(strategies.pickleable_objects,
+@given(strategies.objects,
        strategies.positionals_arguments,
        strategies.keywords_arguments)
 def test_round_trip(pickleable_object: Any,

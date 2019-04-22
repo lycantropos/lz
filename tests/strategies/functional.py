@@ -1,8 +1,11 @@
+import builtins
+import inspect
 import json
 import os
 import random
 import string
-from collections import OrderedDict
+from collections import (OrderedDict,
+                         abc)
 from decimal import Decimal
 from functools import (partial,
                        reduce,
@@ -12,10 +15,12 @@ from operator import (add,
                       or_,
                       sub,
                       xor)
+from types import ModuleType
 from typing import (Any,
                     Callable,
                     Container,
                     Dict,
+                    List,
                     Sequence,
                     Tuple)
 
@@ -28,9 +33,9 @@ from lz.functional import (identity,
                            to_constant)
 from lz.hints import (Domain,
                       Map,
-                      Predicate,
                       Range)
 from lz.logical import negate
+from lz.typology import instance_of
 from tests.hints import (Args,
                          Function,
                          FunctionCall,
@@ -39,7 +44,6 @@ from tests.hints import (Args,
                          Strategy)
 from .literals import empty
 from .literals.base import (byte_sequences,
-                            classes,
                             integers,
                             json_serializable_objects,
                             lists,
@@ -57,16 +61,15 @@ false_predicates = strategies.just(to_constant(False))
 true_predicates = strategies.just(to_constant(True))
 
 
-def to_is_instance_predicate(class_: type) -> Predicate:
-    def predicate(object_: Any) -> bool:
-        return isinstance(object_, class_)
-
-    predicate.__name__ = 'is_instance_of' + class_.__name__
-    predicate.__qualname__ = 'is_instance_of' + class_.__qualname__
-    return predicate
+def module_to_classes(module: ModuleType) -> List[type]:
+    return list(filter(inspect.isclass,
+                       vars(module).values()))
 
 
-is_instance_predicates = classes.map(to_is_instance_predicate)
+abstract_base_classes = strategies.sampled_from(module_to_classes(abc))
+built_in_classes = strategies.sampled_from(module_to_classes(builtins))
+classes = abstract_base_classes | built_in_classes
+is_instance_predicates = classes.map(instance_of)
 predicates = false_predicates | true_predicates | is_instance_predicates
 predicates_arguments = objects
 starting_maps = [identity, float, str, json.dumps]
