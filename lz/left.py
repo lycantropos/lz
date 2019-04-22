@@ -26,6 +26,10 @@ def accumulator(function: Callable[[Range, Domain], Range],
 def accumulate(iterable: Iterable[Domain],
                function: Callable[[Range, Domain], Range],
                initial: Range) -> Iterable[Range]:
+    """
+    Yields cumulative results of given binary function
+    starting from given initial object in direction from left to right.
+    """
     yield from itertools.accumulate(attach(iterable, initial), function)
 
 
@@ -61,11 +65,19 @@ def folder(function: Callable[[Range, Domain], Range],
     Returns function that cumulatively applies given binary function
     starting from given initial object in direction from left to right.
     """
+    return functools.partial(fold,
+                             function=function,
+                             initial=initial)
 
-    def fold(iterable: Iterable[Domain]) -> Range:
-        return functools.reduce(function, iterable, initial)
 
-    return fold
+def fold(iterable: Iterable[Domain],
+         function: Callable[[Range, Domain], Range],
+         initial: Range) -> Range:
+    """
+    Cumulatively applies given binary function
+    starting from given initial object in direction from left to right.
+    """
+    return functools.reduce(function, iterable, initial)
 
 
 Applier = functools.partial
