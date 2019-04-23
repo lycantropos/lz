@@ -364,7 +364,7 @@ def to_tuples(elements: Optional[Strategy[Domain]] = None,
 
 def to_separator(any_string: AnyStr) -> Strategy[AnyStr]:
     if not any_string:
-        result = os.sep
+        result = os.linesep
         if not isinstance(any_string, str):
             result = result.encode()
         return strategies.just(result)
