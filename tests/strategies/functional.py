@@ -108,9 +108,10 @@ various_suitable_maps = suitable_maps.filter(is_various)
 # "transparent" is an abbr. of "referential transparent"
 non_variadic_transparent_functions = strategies.sampled_from([bool, complex,
                                                               float, identity,
-                                                              int, json.dumps,
-                                                              json.loads, str])
-variadic_transparent_functions = strategies.just(os.path.join)
+                                                              int, str])
+variadic_transparent_functions = strategies.sampled_from([json.dumps,
+                                                          json.loads,
+                                                          os.path.join])
 transparent_functions = (non_variadic_transparent_functions
                          | variadic_transparent_functions)
 paths_names_parts = strategies.text(
