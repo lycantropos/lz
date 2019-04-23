@@ -1,0 +1,4095 @@
+<html>
+  <head>
+    <title>pycobertura report</title>
+    <meta charset="UTF-8">
+    <style>
+/*! normalize.css v3.0.2 | MIT License | git.io/normalize */
+
+/**
+ * 1. Set default font family to sans-serif.
+ * 2. Prevent iOS text size adjust after orientation change, without disabling
+ *    user zoom.
+ */
+
+html {
+  font-family: sans-serif; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/**
+ * Remove default margin.
+ */
+
+body {
+  margin: 0;
+}
+
+/* HTML5 display definitions
+   ========================================================================== */
+
+/**
+ * Correct `block` display not defined for any HTML5 element in IE 8/9.
+ * Correct `block` display not defined for `details` or `summary` in IE 10/11
+ * and Firefox.
+ * Correct `block` display not defined for `main` in IE 11.
+ */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+
+/**
+ * 1. Correct `inline-block` display not defined in IE 8/9.
+ * 2. Normalize vertical alignment of `progress` in Chrome, Firefox, and Opera.
+ */
+
+audio,
+canvas,
+progress,
+video {
+  display: inline-block; /* 1 */
+  vertical-align: baseline; /* 2 */
+}
+
+/**
+ * Prevent modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+/**
+ * Address `[hidden]` styling not present in IE 8/9/10.
+ * Hide the `template` element in IE 8/9/11, Safari, and Firefox < 22.
+ */
+
+[hidden],
+template {
+  display: none;
+}
+
+/* Links
+   ========================================================================== */
+
+/**
+ * Remove the gray background color from active links in IE 10.
+ */
+
+a {
+  background-color: transparent;
+}
+
+/**
+ * Improve readability when focused and also mouse hovered in all browsers.
+ */
+
+a:active,
+a:hover {
+  outline: 0;
+}
+
+/* Text-level semantics
+   ========================================================================== */
+
+/**
+ * Address styling not present in IE 8/9/10/11, Safari, and Chrome.
+ */
+
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+
+/**
+ * Address style set to `bolder` in Firefox 4+, Safari, and Chrome.
+ */
+
+b,
+strong {
+  font-weight: bold;
+}
+
+/**
+ * Address styling not present in Safari and Chrome.
+ */
+
+dfn {
+  font-style: italic;
+}
+
+/**
+ * Address variable `h1` font-size and margin within `section` and `article`
+ * contexts in Firefox 4+, Safari, and Chrome.
+ */
+
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+/**
+ * Address styling not present in IE 8/9.
+ */
+
+mark {
+  background: #ff0;
+  color: #000;
+}
+
+/**
+ * Address inconsistent and variable font size in all browsers.
+ */
+
+small {
+  font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+ */
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+/* Embedded content
+   ========================================================================== */
+
+/**
+ * Remove border when inside `a` element in IE 8/9/10.
+ */
+
+img {
+  border: 0;
+}
+
+/**
+ * Correct overflow not hidden in IE 9/10/11.
+ */
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+/* Grouping content
+   ========================================================================== */
+
+/**
+ * Address margin not present in IE 8/9 and Safari.
+ */
+
+figure {
+  margin: 1em 40px;
+}
+
+/**
+ * Address differences between Firefox and other browsers.
+ */
+
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+
+/**
+ * Contain overflow in all browsers.
+ */
+
+pre {
+  overflow: auto;
+}
+
+/**
+ * Address odd `em`-unit font size rendering in all browsers.
+ */
+
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+/* Forms
+   ========================================================================== */
+
+/**
+ * Known limitation: by default, Chrome and Safari on OS X allow very limited
+ * styling of `select`, unless a `border` property is set.
+ */
+
+/**
+ * 1. Correct color not being inherited.
+ *    Known issue: affects color of disabled elements.
+ * 2. Correct font properties not being inherited.
+ * 3. Address margins set differently in Firefox 4+, Safari, and Chrome.
+ */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit; /* 1 */
+  font: inherit; /* 2 */
+  margin: 0; /* 3 */
+}
+
+/**
+ * Address `overflow` set to `hidden` in IE 8/9/10/11.
+ */
+
+button {
+  overflow: visible;
+}
+
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Firefox, IE 8/9/10/11, and Opera.
+ * Correct `select` style inheritance in Firefox.
+ */
+
+button,
+select {
+  text-transform: none;
+}
+
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *    `input` and others.
+ */
+
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+  cursor: pointer; /* 3 */
+}
+
+/**
+ * Re-set default cursor for disabled elements.
+ */
+
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+
+/**
+ * Remove inner padding and border in Firefox 4+.
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/**
+ * Address Firefox 4+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+
+input {
+  line-height: normal;
+}
+
+/**
+ * It's recommended that you don't attempt to style these elements.
+ * Firefox's implementation doesn't respect box-sizing, padding, or width.
+ *
+ * 1. Address box sizing set to `content-box` in IE 8/9/10.
+ * 2. Remove excess padding in IE 8/9/10.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+
+/**
+ * Fix the cursor style for Chrome's increment/decrement buttons. For certain
+ * `font-size` values of the `input`, it causes the cursor style of the
+ * decrement button to change from `default` to `text`.
+ */
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari and Chrome
+ *    (include `-moz` to future-proof).
+ */
+
+input[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box; /* 2 */
+  box-sizing: content-box;
+}
+
+/**
+ * Remove inner padding and search cancel button in Safari and Chrome on OS X.
+ * Safari (but not Chrome) clips the cancel button when the search input has
+ * padding (and `textfield` appearance).
+ */
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/**
+ * Define consistent border, margin, and padding.
+ */
+
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+
+/**
+ * 1. Correct `color` not being inherited in IE 8/9/10/11.
+ * 2. Remove padding so people aren't caught out if they zero out fieldsets.
+ */
+
+legend {
+  border: 0; /* 1 */
+  padding: 0; /* 2 */
+}
+
+/**
+ * Remove default vertical scrollbar in IE 8/9/10/11.
+ */
+
+textarea {
+  overflow: auto;
+}
+
+/**
+ * Don't inherit the `font-weight` (applied by a rule above).
+ * NOTE: the default cannot safely be changed in Chrome and Safari on OS X.
+ */
+
+optgroup {
+  font-weight: bold;
+}
+
+/* Tables
+   ========================================================================== */
+
+/**
+ * Remove most spacing between table cells.
+ */
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+td,
+th {
+  padding: 0;
+}
+/*
+* Skeleton V2.0.4
+* Copyright 2014, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 12/29/2014
+*/
+
+
+/* Table of contents
+––––––––––––––––––––––––––––––––––––––––––––––––––
+- Grid
+- Base Styles
+- Typography
+- Links
+- Buttons
+- Forms
+- Lists
+- Code
+- Tables
+- Spacing
+- Utilities
+- Clearing
+- Media Queries
+*/
+
+
+/* Grid
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+.column,
+.columns {
+  width: 100%;
+  float: left;
+  box-sizing: border-box; }
+
+/* For devices larger than 400px */
+@media (min-width: 400px) {
+  .container {
+    width: 85%;
+    padding: 0; }
+}
+
+/* For devices larger than 550px */
+@media (min-width: 550px) {
+  .container {
+    width: 80%; }
+  .column,
+  .columns {
+    margin-left: 4%; }
+  .column:first-child,
+  .columns:first-child {
+    margin-left: 0; }
+
+  .one.column,
+  .one.columns                    { width: 4.66666666667%; }
+  .two.columns                    { width: 13.3333333333%; }
+  .three.columns                  { width: 22%;            }
+  .four.columns                   { width: 30.6666666667%; }
+  .five.columns                   { width: 39.3333333333%; }
+  .six.columns                    { width: 48%;            }
+  .seven.columns                  { width: 56.6666666667%; }
+  .eight.columns                  { width: 65.3333333333%; }
+  .nine.columns                   { width: 74.0%;          }
+  .ten.columns                    { width: 82.6666666667%; }
+  .eleven.columns                 { width: 91.3333333333%; }
+  .twelve.columns                 { width: 100%; margin-left: 0; }
+
+  .one-third.column               { width: 30.6666666667%; }
+  .two-thirds.column              { width: 65.3333333333%; }
+
+  .one-half.column                { width: 48%; }
+
+  /* Offsets */
+  .offset-by-one.column,
+  .offset-by-one.columns          { margin-left: 8.66666666667%; }
+  .offset-by-two.column,
+  .offset-by-two.columns          { margin-left: 17.3333333333%; }
+  .offset-by-three.column,
+  .offset-by-three.columns        { margin-left: 26%;            }
+  .offset-by-four.column,
+  .offset-by-four.columns         { margin-left: 34.6666666667%; }
+  .offset-by-five.column,
+  .offset-by-five.columns         { margin-left: 43.3333333333%; }
+  .offset-by-six.column,
+  .offset-by-six.columns          { margin-left: 52%;            }
+  .offset-by-seven.column,
+  .offset-by-seven.columns        { margin-left: 60.6666666667%; }
+  .offset-by-eight.column,
+  .offset-by-eight.columns        { margin-left: 69.3333333333%; }
+  .offset-by-nine.column,
+  .offset-by-nine.columns         { margin-left: 78.0%;          }
+  .offset-by-ten.column,
+  .offset-by-ten.columns          { margin-left: 86.6666666667%; }
+  .offset-by-eleven.column,
+  .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
+
+  .offset-by-one-third.column,
+  .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
+  .offset-by-two-thirds.column,
+  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
+
+  .offset-by-one-half.column,
+  .offset-by-one-half.columns     { margin-left: 52%; }
+
+}
+
+
+/* Base Styles
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+/* NOTE
+html is set to 62.5% so that all the REM measurements throughout Skeleton
+are based on 10px sizing. So basically 1.5rem = 15px :) */
+html {
+  font-size: 62.5%; }
+body {
+  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #222; }
+
+
+/* Typography
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-weight: 300; }
+h1 { font-size: 4.0rem; line-height: 1.2;  letter-spacing: -.1rem;}
+h2 { font-size: 3.6rem; line-height: 1.25; letter-spacing: -.1rem; }
+h3 { font-size: 3.0rem; line-height: 1.3;  letter-spacing: -.1rem; }
+h4 { font-size: 2.4rem; line-height: 1.35; letter-spacing: -.08rem; }
+h5 { font-size: 1.8rem; line-height: 1.5;  letter-spacing: -.05rem; }
+h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
+
+/* Larger than phablet */
+@media (min-width: 550px) {
+  h1 { font-size: 5.0rem; }
+  h2 { font-size: 4.2rem; }
+  h3 { font-size: 3.6rem; }
+  h4 { font-size: 3.0rem; }
+  h5 { font-size: 2.4rem; }
+  h6 { font-size: 1.5rem; }
+}
+
+p {
+  margin-top: 0; }
+
+
+/* Links
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+a {
+  color: #1EAEDB; }
+a:hover {
+  color: #0FA0CE; }
+
+
+/* Buttons
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  display: inline-block;
+  height: 38px;
+  padding: 0 30px;
+  color: #555;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 38px;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box; }
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover,
+.button:focus,
+button:focus,
+input[type="submit"]:focus,
+input[type="reset"]:focus,
+input[type="button"]:focus {
+  color: #333;
+  border-color: #888;
+  outline: 0; }
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
+  color: #FFF;
+  background-color: #33C3F0;
+  border-color: #33C3F0; }
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="reset"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:focus {
+  color: #FFF;
+  background-color: #1EAEDB;
+  border-color: #1EAEDB; }
+
+
+/* Forms
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 38px;
+  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box; }
+/* Removes awkward default styles on some inputs for iOS */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none; }
+textarea {
+  min-height: 65px;
+  padding-top: 6px;
+  padding-bottom: 6px; }
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border: 1px solid #33C3F0;
+  outline: 0; }
+label,
+legend {
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600; }
+fieldset {
+  padding: 0;
+  border-width: 0; }
+input[type="checkbox"],
+input[type="radio"] {
+  display: inline; }
+label > .label-body {
+  display: inline-block;
+  margin-left: .5rem;
+  font-weight: normal; }
+
+
+/* Lists
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+ul {
+  list-style: circle inside; }
+ol {
+  list-style: decimal inside; }
+ol, ul {
+  padding-left: 0;
+  margin-top: 0; }
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+  margin: 1.5rem 0 1.5rem 3rem;
+  font-size: 90%; }
+li {
+  margin-bottom: 1rem; }
+
+
+/* Code
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+code {
+  padding: .2rem .5rem;
+  margin: 0 .2rem;
+  font-size: 90%;
+  white-space: nowrap;
+  background: #F1F1F1;
+  border: 1px solid #E1E1E1;
+  border-radius: 4px; }
+pre > code {
+  display: block;
+  padding: 1rem 1.5rem;
+  white-space: pre; }
+
+
+/* Tables
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #E1E1E1; }
+th:first-child,
+td:first-child {
+  padding-left: 0; }
+th:last-child,
+td:last-child {
+  padding-right: 0; }
+
+
+/* Spacing
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+button,
+.button {
+  margin-bottom: 1rem; }
+input,
+textarea,
+select,
+fieldset {
+  margin-bottom: 1.5rem; }
+pre,
+blockquote,
+dl,
+figure,
+table,
+p,
+ul,
+ol,
+form {
+  margin-bottom: 2.5rem; }
+
+
+/* Utilities
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box; }
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box; }
+.u-pull-right {
+  float: right; }
+.u-pull-left {
+  float: left; }
+
+
+/* Misc
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+hr {
+  margin-top: 3rem;
+  margin-bottom: 3.5rem;
+  border-width: 0;
+  border-top: 1px solid #E1E1E1; }
+
+
+/* Clearing
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+/* Self Clearing Goodness */
+.container:after,
+.row:after,
+.u-cf {
+  content: "";
+  display: table;
+  clear: both; }
+
+
+/* Media Queries
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+/*
+Note: The best way to structure the use of media queries is to create the queries
+near the relevant code. For example, if you wanted to change the styles for buttons
+on small devices, paste the mobile query code up in the buttons section and style it
+there.
+*/
+
+
+/* Larger than mobile */
+@media (min-width: 400px) {}
+
+/* Larger than phablet (also point when grid becomes active) */
+@media (min-width: 550px) {}
+
+/* Larger than tablet */
+@media (min-width: 750px) {}
+
+/* Larger than desktop */
+@media (min-width: 1000px) {}
+
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {}
+.hit {background-color: #EAFFEA}
+.miss {background-color: #FFECEC}
+.container .code {margin-left: 0}
+pre {line-height: 1.3}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Stmts</th>
+            <th>Miss</th>
+            <th>Cover</th>
+            <th>Missing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/__init__.py">C:/Users/aibrakov/Projects/lz/lz/__init__.py</a></td>
+            <td>1</td>
+            <td>0</td>
+            <td>100.00%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/arithmetical.py">C:/Users/aibrakov/Projects/lz/lz/arithmetical.py</a></td>
+            <td>10</td>
+            <td>3</td>
+            <td>70.00%</td>
+            <td>7, 12, 19</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/filtration.py">C:/Users/aibrakov/Projects/lz/lz/filtration.py</a></td>
+            <td>20</td>
+            <td>20</td>
+            <td>0.00%</td>
+            <td>1-69</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/functional.py">C:/Users/aibrakov/Projects/lz/lz/functional.py</a></td>
+            <td>148</td>
+            <td>23</td>
+            <td>84.46%</td>
+            <td>49, 60, 68, 96, 162, 167, 170, 178, 186-188, 228, 236, 255, 264, 279, 286, 293, 299, 308, 313, 316, 324</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/hints.py">C:/Users/aibrakov/Projects/lz/lz/hints.py</a></td>
+            <td>32</td>
+            <td>19</td>
+            <td>40.62%</td>
+            <td>18, 24-47</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/iterating.py">C:/Users/aibrakov/Projects/lz/lz/iterating.py</a></td>
+            <td>78</td>
+            <td>45</td>
+            <td>42.31%</td>
+            <td>28, 37, 44, 59, 67, 78-79, 89-92, 99, 109-116, 128, 138-141, 148, 155-165, 172, 180, 187-190, 198, 206-210, 215, 220</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/left.py">C:/Users/aibrakov/Projects/lz/lz/left.py</a></td>
+            <td>27</td>
+            <td>9</td>
+            <td>66.67%</td>
+            <td>21, 33, 40, 47, 53, 59, 68, 80, 94</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/logical.py">C:/Users/aibrakov/Projects/lz/lz/logical.py</a></td>
+            <td>12</td>
+            <td>3</td>
+            <td>75.00%</td>
+            <td>14, 21, 28</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/replication.py">C:/Users/aibrakov/Projects/lz/lz/replication.py</a></td>
+            <td>34</td>
+            <td>16</td>
+            <td>52.94%</td>
+            <td>18, 36, 46-62</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/reversal.py">C:/Users/aibrakov/Projects/lz/lz/reversal.py</a></td>
+            <td>98</td>
+            <td>62</td>
+            <td>36.73%</td>
+            <td>28, 37, 46, 56, 61, 69, 75, 84, 93-99, 116-178</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/right.py">C:/Users/aibrakov/Projects/lz/lz/right.py</a></td>
+            <td>68</td>
+            <td>12</td>
+            <td>82.35%</td>
+            <td>31-32, 39, 46, 52, 58, 67-68, 94, 110-111, 136</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/sorting.py">C:/Users/aibrakov/Projects/lz/lz/sorting.py</a></td>
+            <td>28</td>
+            <td>28</td>
+            <td>0.00%</td>
+            <td>1-63</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/textual.py">C:/Users/aibrakov/Projects/lz/lz/textual.py</a></td>
+            <td>17</td>
+            <td>8</td>
+            <td>52.94%</td>
+            <td>14, 23, 34-40</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/transposition.py">C:/Users/aibrakov/Projects/lz/lz/transposition.py</a></td>
+            <td>35</td>
+            <td>35</td>
+            <td>0.00%</td>
+            <td>1-68</td>
+          </tr>
+          <tr>
+            <td><a href="#C:/Users/aibrakov/Projects/lz/lz/typology.py">C:/Users/aibrakov/Projects/lz/lz/typology.py</a></td>
+            <td>24</td>
+            <td>16</td>
+            <td>33.33%</td>
+            <td>13-22, 29-38, 42, 46</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>632</td>
+            <td>299</td>
+            <td>52.69%</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/__init__.py">C:/Users/aibrakov/Projects/lz/lz/__init__.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="noop">&#34;&#34;&#34;&#34;Lazy&#34; calculations support.&#34;&#34;&#34;
+</span><span class="noop">
+</span><span class="hit">__version__ = &#39;0.7.0&#39;
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/arithmetical.py">C:/Users/aibrakov/Projects/lz/lz/arithmetical.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">from numbers import Real
+</span><span class="hit">from typing import overload
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@overload
+</span><span class="hit">def ceil_division(left_number: int, right_number: int) -&gt; int:
+</span><span class="miss">    pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@overload
+</span><span class="hit">def ceil_division(left_number: Real, right_number: Real) -&gt; Real:
+</span><span class="miss">    pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def ceil_division(left_number: Real, right_number: Real) -&gt; Real:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Divides given numbers with ceiling.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return -(-left_number // right_number)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/filtration.py">C:/Users/aibrakov/Projects/lz/lz/filtration.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+65 &nbsp;
+66 &nbsp;
+67 &nbsp;
+68 &nbsp;
+69 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="miss">import functools
+</span><span class="miss">import itertools
+</span><span class="miss">from typing import (Iterable,
+</span><span class="noop">                    Tuple)
+</span><span class="noop">
+</span><span class="miss">from .functional import (combine,
+</span><span class="noop">                         compose)
+</span><span class="miss">from .hints import (Domain,
+</span><span class="noop">                    Map,
+</span><span class="noop">                    Operator,
+</span><span class="noop">                    Predicate)
+</span><span class="miss">from .replication import duplicate
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">def sifter(predicate: Predicate = None) -&gt; Operator[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that selects elements from iterable
+</span><span class="noop">    which satisfy given predicate.
+</span><span class="noop">
+</span><span class="noop">    If predicate is not specified than true-like objects are selected.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(filter, predicate)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">def scavenger(predicate: Predicate = None) -&gt; Operator[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that selects elements from iterable
+</span><span class="noop">    which dissatisfy given predicate.
+</span><span class="noop">
+</span><span class="noop">    If predicate is not specified than false-like objects are selected.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(itertools.filterfalse, predicate)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">def separator(predicate: Predicate = None
+</span><span class="noop">              ) -&gt; Map[Iterable[Domain],
+</span><span class="noop">                       Tuple[Iterable[Domain], Iterable[Domain]]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that returns pair of iterables
+</span><span class="noop">    first of which consists of elements that dissatisfy given predicate
+</span><span class="noop">    and second one consists of elements that satisfy given predicate.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return compose(tuple,
+</span><span class="noop">                   combine(scavenger(predicate), sifter(predicate)),
+</span><span class="noop">                   duplicate)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">def grabber(predicate: Predicate = None) -&gt; Operator[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that selects elements from the beginning of iterable
+</span><span class="noop">    while given predicate is satisfied.
+</span><span class="noop">
+</span><span class="noop">    If predicate is not specified than true-like objects are selected.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    if predicate is None:
+</span><span class="miss">        predicate = bool
+</span><span class="miss">    return functools.partial(itertools.takewhile, predicate)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">def kicker(predicate: Predicate = None) -&gt; Operator[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that skips elements from the beginning of iterable
+</span><span class="noop">    while given predicate is satisfied.
+</span><span class="noop">
+</span><span class="noop">    If predicate is not specified than true-like objects are skipped.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    if predicate is None:
+</span><span class="miss">        predicate = bool
+</span><span class="miss">    return functools.partial(itertools.dropwhile, predicate)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/functional.py">C:/Users/aibrakov/Projects/lz/lz/functional.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+65 &nbsp;
+66 &nbsp;
+67 &nbsp;
+68 &nbsp;
+69 &nbsp;
+70 &nbsp;
+71 &nbsp;
+72 &nbsp;
+73 &nbsp;
+74 &nbsp;
+75 &nbsp;
+76 &nbsp;
+77 &nbsp;
+78 &nbsp;
+79 &nbsp;
+80 &nbsp;
+81 &nbsp;
+82 &nbsp;
+83 &nbsp;
+84 &nbsp;
+85 &nbsp;
+86 &nbsp;
+87 &nbsp;
+88 &nbsp;
+89 &nbsp;
+90 &nbsp;
+91 &nbsp;
+92 &nbsp;
+93 &nbsp;
+94 &nbsp;
+95 &nbsp;
+96 &nbsp;
+97 &nbsp;
+98 &nbsp;
+99 &nbsp;
+100 &nbsp;
+101 &nbsp;
+102 &nbsp;
+103 &nbsp;
+104 &nbsp;
+105 &nbsp;
+106 &nbsp;
+107 &nbsp;
+108 &nbsp;
+109 &nbsp;
+110 &nbsp;
+111 &nbsp;
+112 &nbsp;
+113 &nbsp;
+114 &nbsp;
+115 &nbsp;
+116 &nbsp;
+117 &nbsp;
+118 &nbsp;
+119 &nbsp;
+120 &nbsp;
+121 &nbsp;
+122 &nbsp;
+123 &nbsp;
+124 &nbsp;
+125 &nbsp;
+126 &nbsp;
+127 &nbsp;
+128 &nbsp;
+129 &nbsp;
+130 &nbsp;
+131 &nbsp;
+132 &nbsp;
+133 &nbsp;
+134 &nbsp;
+135 &nbsp;
+136 &nbsp;
+137 &nbsp;
+138 &nbsp;
+139 &nbsp;
+140 &nbsp;
+141 &nbsp;
+142 &nbsp;
+143 &nbsp;
+144 &nbsp;
+145 &nbsp;
+146 &nbsp;
+147 &nbsp;
+148 &nbsp;
+149 &nbsp;
+150 &nbsp;
+151 &nbsp;
+152 &nbsp;
+153 &nbsp;
+154 &nbsp;
+155 &nbsp;
+156 &nbsp;
+157 &nbsp;
+158 &nbsp;
+159 &nbsp;
+160 &nbsp;
+161 &nbsp;
+162 &nbsp;
+163 &nbsp;
+164 &nbsp;
+165 &nbsp;
+166 &nbsp;
+167 &nbsp;
+168 &nbsp;
+169 &nbsp;
+170 &nbsp;
+171 &nbsp;
+172 &nbsp;
+173 &nbsp;
+174 &nbsp;
+175 &nbsp;
+176 &nbsp;
+177 &nbsp;
+178 &nbsp;
+179 &nbsp;
+180 &nbsp;
+181 &nbsp;
+182 &nbsp;
+183 &nbsp;
+184 &nbsp;
+185 &nbsp;
+186 &nbsp;
+187 &nbsp;
+188 &nbsp;
+189 &nbsp;
+190 &nbsp;
+191 &nbsp;
+192 &nbsp;
+193 &nbsp;
+194 &nbsp;
+195 &nbsp;
+196 &nbsp;
+197 &nbsp;
+198 &nbsp;
+199 &nbsp;
+200 &nbsp;
+201 &nbsp;
+202 &nbsp;
+203 &nbsp;
+204 &nbsp;
+205 &nbsp;
+206 &nbsp;
+207 &nbsp;
+208 &nbsp;
+209 &nbsp;
+210 &nbsp;
+211 &nbsp;
+212 &nbsp;
+213 &nbsp;
+214 &nbsp;
+215 &nbsp;
+216 &nbsp;
+217 &nbsp;
+218 &nbsp;
+219 &nbsp;
+220 &nbsp;
+221 &nbsp;
+222 &nbsp;
+223 &nbsp;
+224 &nbsp;
+225 &nbsp;
+226 &nbsp;
+227 &nbsp;
+228 &nbsp;
+229 &nbsp;
+230 &nbsp;
+231 &nbsp;
+232 &nbsp;
+233 &nbsp;
+234 &nbsp;
+235 &nbsp;
+236 &nbsp;
+237 &nbsp;
+238 &nbsp;
+239 &nbsp;
+240 &nbsp;
+241 &nbsp;
+242 &nbsp;
+243 &nbsp;
+244 &nbsp;
+245 &nbsp;
+246 &nbsp;
+247 &nbsp;
+248 &nbsp;
+249 &nbsp;
+250 &nbsp;
+251 &nbsp;
+252 &nbsp;
+253 &nbsp;
+254 &nbsp;
+255 &nbsp;
+256 &nbsp;
+257 &nbsp;
+258 &nbsp;
+259 &nbsp;
+260 &nbsp;
+261 &nbsp;
+262 &nbsp;
+263 &nbsp;
+264 &nbsp;
+265 &nbsp;
+266 &nbsp;
+267 &nbsp;
+268 &nbsp;
+269 &nbsp;
+270 &nbsp;
+271 &nbsp;
+272 &nbsp;
+273 &nbsp;
+274 &nbsp;
+275 &nbsp;
+276 &nbsp;
+277 &nbsp;
+278 &nbsp;
+279 &nbsp;
+280 &nbsp;
+281 &nbsp;
+282 &nbsp;
+283 &nbsp;
+284 &nbsp;
+285 &nbsp;
+286 &nbsp;
+287 &nbsp;
+288 &nbsp;
+289 &nbsp;
+290 &nbsp;
+291 &nbsp;
+292 &nbsp;
+293 &nbsp;
+294 &nbsp;
+295 &nbsp;
+296 &nbsp;
+297 &nbsp;
+298 &nbsp;
+299 &nbsp;
+300 &nbsp;
+301 &nbsp;
+302 &nbsp;
+303 &nbsp;
+304 &nbsp;
+305 &nbsp;
+306 &nbsp;
+307 &nbsp;
+308 &nbsp;
+309 &nbsp;
+310 &nbsp;
+311 &nbsp;
+312 &nbsp;
+313 &nbsp;
+314 &nbsp;
+315 &nbsp;
+316 &nbsp;
+317 &nbsp;
+318 &nbsp;
+319 &nbsp;
+320 &nbsp;
+321 &nbsp;
+322 &nbsp;
+323 &nbsp;
+324 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">import ast
+</span><span class="hit">import functools
+</span><span class="hit">import inspect
+</span><span class="hit">import itertools
+</span><span class="hit">from collections import abc
+</span><span class="hit">from types import MappingProxyType
+</span><span class="hit">from typing import (Any,
+</span><span class="noop">                    Callable,
+</span><span class="noop">                    Dict,
+</span><span class="noop">                    Iterable,
+</span><span class="noop">                    Optional,
+</span><span class="noop">                    Tuple,
+</span><span class="noop">                    Type,
+</span><span class="noop">                    Union)
+</span><span class="noop">
+</span><span class="hit">from paradigm import signatures
+</span><span class="hit">from reprit import seekers
+</span><span class="hit">from reprit.base import generate_repr
+</span><span class="noop">
+</span><span class="hit">from .hints import (Domain,
+</span><span class="noop">                    Map,
+</span><span class="noop">                    Range)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def identity(argument: Domain) -&gt; Domain:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns object itself.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="hit">    return argument
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def compose(last_function: Map[Any, Range],
+</span><span class="noop">            *front_functions: Callable[..., Any]) -&gt; Callable[..., Range]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns functions composition.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="hit">    caller_frame_info = inspect.stack()[1]
+</span><span class="hit">    return Composition(last_function, *front_functions,
+</span><span class="noop">                       file_path=caller_frame_info.filename,
+</span><span class="noop">                       line_number=caller_frame_info.lineno,
+</span><span class="noop">                       line_offset=0)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">class Composition:
+</span><span class="hit">    def __new__(cls,
+</span><span class="noop">                *functions: Callable[..., Any],
+</span><span class="noop">                **kwargs: Any) -&gt; Union[&#39;Composition&#39;, Callable[..., Range]]:
+</span><span class="hit">        if len(functions) == 1:
+</span><span class="miss">            return functions[0]
+</span><span class="hit">        return super().__new__(cls)
+</span><span class="noop">
+</span><span class="hit">    def __init__(self,
+</span><span class="noop">                 *functions: Callable[..., Any],
+</span><span class="noop">                 file_path: Optional[str] = None,
+</span><span class="noop">                 line_number: int = 0,
+</span><span class="noop">                 line_offset: int = 0) -&gt; None:
+</span><span class="hit">        def flatten(function: Callable[..., Any]
+</span><span class="noop">                    ) -&gt; Iterable[Callable[..., Any]]:
+</span><span class="hit">            if isinstance(function, type(self)):
+</span><span class="miss">                yield from function.functions
+</span><span class="noop">            else:
+</span><span class="hit">                yield function
+</span><span class="noop">
+</span><span class="hit">        self._functions = tuple(itertools.chain
+</span><span class="noop">                                .from_iterable(map(flatten, functions)))
+</span><span class="hit">        self._function = None
+</span><span class="hit">        if file_path is None:
+</span><span class="miss">            file_path = __file__
+</span><span class="hit">        self._file_path = file_path
+</span><span class="hit">        self._line_number = line_number
+</span><span class="hit">        self._line_offset = line_offset
+</span><span class="noop">
+</span><span class="hit">    @property
+</span><span class="hit">    def functions(self) -&gt; Tuple[Callable[..., Any], ...]:
+</span><span class="hit">        return self._functions
+</span><span class="noop">
+</span><span class="hit">    @property
+</span><span class="hit">    def function(self) -&gt; Callable[..., Range]:
+</span><span class="hit">        if self._function is None:
+</span><span class="hit">            self._function = _compose(*self.functions,
+</span><span class="noop">                                      function_name=&#39;composition&#39;,
+</span><span class="noop">                                      file_path=self._file_path,
+</span><span class="noop">                                      line_number=self._line_number,
+</span><span class="noop">                                      line_offset=self._line_offset)
+</span><span class="hit">        return self._function
+</span><span class="noop">
+</span><span class="hit">    def __call__(self, *args: Domain, **kwargs: Domain) -&gt; Range:
+</span><span class="hit">        return self.function(*args, **kwargs)
+</span><span class="noop">
+</span><span class="hit">    __repr__ = generate_repr(__init__,
+</span><span class="noop">                             field_seeker=seekers.complex_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@signatures.factory.register(Composition)
+</span><span class="hit">def _(object_: Composition) -&gt; signatures.Base:
+</span><span class="miss">    return signatures.factory(object_.functions[-1])
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def _compose(*functions: Callable[..., Any],
+</span><span class="noop">             function_name: str,
+</span><span class="noop">             file_path: str,
+</span><span class="noop">             line_number: int,
+</span><span class="noop">             line_offset: int) -&gt; Callable[..., Range]:
+</span><span class="hit">    def function_to_unique_name(function: Callable) -&gt; str:
+</span><span class="noop">        # we are not using ``__name__``/``__qualname__`` attributes
+</span><span class="noop">        # due to their potential non-uniqueness
+</span><span class="hit">        return &#39;_&#39; + str(id(function)).replace(&#39;-&#39;, &#39;_&#39;)
+</span><span class="noop">
+</span><span class="hit">    functions_names = list(map(function_to_unique_name, functions))
+</span><span class="noop">
+</span><span class="hit">    set_attributes = functools.partial(functools.partial,
+</span><span class="noop">                                       lineno=line_number,
+</span><span class="noop">                                       col_offset=line_offset)
+</span><span class="noop">
+</span><span class="hit">    variadic_positionals_name = &#39;args&#39;
+</span><span class="hit">    variadic_keywords_name = &#39;kwargs&#39;
+</span><span class="noop">
+</span><span class="hit">    def to_next_call_node(node: ast.Call, name: str) -&gt; ast.Call:
+</span><span class="hit">        return set_attributes(ast.Call)(to_name_node(name), [node], [])
+</span><span class="noop">
+</span><span class="hit">    def to_name_node(name: str,
+</span><span class="noop">                     *,
+</span><span class="noop">                     context_factory: Type[ast.expr_context] = ast.Load
+</span><span class="noop">                     ) -&gt; ast.Name:
+</span><span class="hit">        return set_attributes(ast.Name)(name, context_factory())
+</span><span class="noop">
+</span><span class="hit">    reversed_functions_names = reversed(functions_names)
+</span><span class="hit">    calls_node = set_attributes(ast.Call)(
+</span><span class="noop">            to_name_node(next(reversed_functions_names)),
+</span><span class="noop">            [set_attributes(ast.Starred)(
+</span><span class="noop">                    to_name_node(variadic_positionals_name),
+</span><span class="noop">                    ast.Load())],
+</span><span class="noop">            [ast.keyword(None,
+</span><span class="noop">                         to_name_node(variadic_keywords_name))])
+</span><span class="hit">    calls_node = functools.reduce(to_next_call_node,
+</span><span class="noop">                                  reversed_functions_names,
+</span><span class="noop">                                  calls_node)
+</span><span class="hit">    function_definition_node = set_attributes(ast.FunctionDef)(
+</span><span class="noop">            function_name,
+</span><span class="noop">            ast.arguments([],
+</span><span class="noop">                          set_attributes(ast.arg)(variadic_positionals_name,
+</span><span class="noop">                                                  None),
+</span><span class="noop">                          [],
+</span><span class="noop">                          [],
+</span><span class="noop">                          set_attributes(ast.arg)(variadic_keywords_name,
+</span><span class="noop">                                                  None),
+</span><span class="noop">                          []),
+</span><span class="noop">            [set_attributes(ast.Return)(calls_node)],
+</span><span class="noop">            [],
+</span><span class="noop">            None)
+</span><span class="hit">    tree = ast.Module([function_definition_node])
+</span><span class="hit">    code = compile(tree, file_path, &#39;exec&#39;)
+</span><span class="hit">    namespace = dict(zip(functions_names, functions))
+</span><span class="hit">    exec(code, namespace)
+</span><span class="hit">    return namespace[function_name]
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def combine(*maps: Map) -&gt; Map[Iterable[Domain], Iterable[Range]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that applies each map to corresponding argument.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return Combination(*maps)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">class Combination:
+</span><span class="hit">    def __init__(self, *maps: Map) -&gt; None:
+</span><span class="miss">        self.maps = maps
+</span><span class="noop">
+</span><span class="hit">    def __call__(self, arguments: Iterable[Domain]) -&gt; Iterable[Range]:
+</span><span class="miss">        yield from (map_(argument)
+</span><span class="noop">                    for map_, argument in zip(self.maps, arguments))
+</span><span class="noop">
+</span><span class="hit">    __repr__ = generate_repr(__init__)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@signatures.factory.register(Combination)
+</span><span class="hit">def _(object_: Combination) -&gt; signatures.Base:
+</span><span class="miss">    return signatures.factory(object_.__call__)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">class ApplierBase(abc.Callable):
+</span><span class="hit">    def __init__(self, function: Callable[..., Range],
+</span><span class="noop">                 *args: Domain,
+</span><span class="noop">                 **kwargs: Domain) -&gt; None:
+</span><span class="hit">        if isinstance(function, type(self)):
+</span><span class="miss">            args = function.args + args
+</span><span class="miss">            kwargs = {**function.keywords, **kwargs}
+</span><span class="miss">            function = function.func
+</span><span class="hit">        self._function = function
+</span><span class="hit">        self._args = args
+</span><span class="hit">        self._kwargs = kwargs
+</span><span class="noop">
+</span><span class="hit">    @property
+</span><span class="hit">    def func(self) -&gt; Callable[..., Range]:
+</span><span class="hit">        return self._function
+</span><span class="noop">
+</span><span class="hit">    @property
+</span><span class="hit">    def args(self) -&gt; Tuple[Domain, ...]:
+</span><span class="hit">        return self._args
+</span><span class="noop">
+</span><span class="hit">    @property
+</span><span class="hit">    def keywords(self) -&gt; Dict[str, Domain]:
+</span><span class="hit">        return self._kwargs
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">ApplierBase.register(functools.partial)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">class Curry(ApplierBase):
+</span><span class="hit">    def __init__(self,
+</span><span class="noop">                 function: Callable[..., Range],
+</span><span class="noop">                 signature: signatures.Base,
+</span><span class="noop">                 *args: Domain,
+</span><span class="noop">                 **kwargs: Domain) -&gt; None:
+</span><span class="hit">        super().__init__(function, *args, **kwargs)
+</span><span class="hit">        self.signature = signature
+</span><span class="noop">
+</span><span class="hit">    def __call__(self, *args: Domain, **kwargs: Domain
+</span><span class="noop">                 ) -&gt; Union[&#39;Curry&#39;, Range]:
+</span><span class="hit">        args = self.args + args
+</span><span class="hit">        kwargs = {**self.keywords, **kwargs}
+</span><span class="hit">        try:
+</span><span class="hit">            return self.func(*args, **kwargs)
+</span><span class="hit">        except TypeError:
+</span><span class="hit">            if (not self.signature.expects(*args, **kwargs)
+</span><span class="noop">                    or self.signature.all_set(*args, **kwargs)):
+</span><span class="hit">                raise
+</span><span class="miss">        return type(self)(self.func, self.signature, *args, **kwargs)
+</span><span class="noop">
+</span><span class="hit">    __repr__ = generate_repr(__init__,
+</span><span class="noop">                             field_seeker=seekers.complex_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@signatures.factory.register(Curry)
+</span><span class="hit">def _(object_: Curry) -&gt; signatures.Base:
+</span><span class="miss">    return object_.signature
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def curry(function: Callable[..., Range],
+</span><span class="noop">          *,
+</span><span class="noop">          signature: Optional[signatures.Base] = None) -&gt; Curry:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns curried version of given function.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="hit">    if signature is None:
+</span><span class="hit">        signature = signatures.factory(function)
+</span><span class="hit">    return Curry(function, signature)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def pack(function: Callable[..., Range]) -&gt; Map[Iterable[Domain], Range]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that works with single iterable parameter
+</span><span class="noop">    by unpacking elements to given function.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(apply, function)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def apply(function: Callable[..., Range],
+</span><span class="noop">          args: Iterable[Domain],
+</span><span class="noop">          kwargs: Dict[str, Any] = MappingProxyType({})) -&gt; Range:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Calls given function with given positional and keyword arguments.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return function(*args, **kwargs)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def to_constant(object_: Domain) -&gt; Callable[..., Domain]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that always returns given object.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="hit">    return Constant(object_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">class Constant:
+</span><span class="hit">    def __init__(self, object_: Domain) -&gt; None:
+</span><span class="hit">        self.object_ = object_
+</span><span class="noop">
+</span><span class="hit">    def __call__(self, *args: Any, **kwargs: Any) -&gt; Domain:
+</span><span class="miss">        return self.object_
+</span><span class="noop">
+</span><span class="hit">    __repr__ = generate_repr(__init__)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@signatures.factory.register(Constant)
+</span><span class="hit">def _(object_: Constant) -&gt; signatures.Base:
+</span><span class="miss">    return signatures.factory(object_.__call__)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def flip(function: Callable[..., Range]) -&gt; Callable[..., Range]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function with positional arguments flipped.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(call_flipped, function)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def call_flipped(function: Callable[..., Range],
+</span><span class="noop">                 *args: Domain,
+</span><span class="noop">                 **kwargs: Domain) -&gt; Range:
+</span><span class="miss">    return function(*args[::-1], **kwargs)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def cleave(*functions: Callable[..., Range]) -&gt; Callable[..., Iterable[Range]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that separately applies
+</span><span class="noop">    given functions to the same arguments.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">
+</span><span class="miss">    return Cleavage(*functions)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">class Cleavage:
+</span><span class="hit">    def __init__(self, *functions: Map) -&gt; None:
+</span><span class="miss">        self.functions = functions
+</span><span class="noop">
+</span><span class="hit">    def __call__(self, *args: Domain, **kwargs: Domain) -&gt; Iterable[Range]:
+</span><span class="miss">        yield from (function(*args, **kwargs)
+</span><span class="noop">                    for function in self.functions)
+</span><span class="noop">
+</span><span class="hit">    __repr__ = generate_repr(__init__)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@signatures.factory.register(Cleavage)
+</span><span class="hit">def _(object_: Cleavage) -&gt; signatures.Base:
+</span><span class="miss">    return signatures.factory(object_.__call__)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/hints.py">C:/Users/aibrakov/Projects/lz/lz/hints.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">from collections import abc
+</span><span class="hit">from typing import (Callable,
+</span><span class="noop">                    Container,
+</span><span class="noop">                    Iterable,
+</span><span class="noop">                    TypeVar)
+</span><span class="noop">
+</span><span class="hit">from typing_extensions import Protocol
+</span><span class="noop">
+</span><span class="hit">Domain = TypeVar(&#39;Domain&#39;)
+</span><span class="hit">Range = TypeVar(&#39;Range&#39;)
+</span><span class="hit">Map = Callable[[Domain], Range]
+</span><span class="hit">Operator = Map[Domain, Domain]
+</span><span class="hit">Predicate = Map[Domain, bool]
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">class Sortable(Protocol):
+</span><span class="hit">    def __lt__(self, other: &#39;Sortable&#39;) -&gt; bool:
+</span><span class="miss">        pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">try:
+</span><span class="hit">    from collections.abc import Collection
+</span><span class="hit">    from typing import Collection as FiniteIterable
+</span><span class="miss">except ImportError:
+</span><span class="noop">    # for Python 3.5
+</span><span class="miss">    class Collection(abc.Sized, abc.Iterable, abc.Container):
+</span><span class="miss">        __slots__ = ()
+</span><span class="noop">
+</span><span class="miss">        @classmethod
+</span><span class="miss">        def __subclasshook__(cls, subclass: type) -&gt; bool:
+</span><span class="miss">            if cls is Collection:
+</span><span class="miss">                mro = subclass.__mro__
+</span><span class="miss">                for method in (&#39;__len__&#39;, &#39;__iter__&#39;, &#39;__contains__&#39;):
+</span><span class="miss">                    for base_class in mro:
+</span><span class="miss">                        if method in base_class.__dict__:
+</span><span class="miss">                            if base_class.__dict__[method] is None:
+</span><span class="miss">                                return NotImplemented
+</span><span class="miss">                            break
+</span><span class="noop">                    else:
+</span><span class="miss">                        return NotImplemented
+</span><span class="miss">                return True
+</span><span class="miss">            return NotImplemented
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">    class FiniteIterable(abc.Sized, Iterable[Domain], Container[Domain],
+</span><span class="noop">                         extra=Collection):
+</span><span class="miss">        __slots__ = ()
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/iterating.py">C:/Users/aibrakov/Projects/lz/lz/iterating.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+65 &nbsp;
+66 &nbsp;
+67 &nbsp;
+68 &nbsp;
+69 &nbsp;
+70 &nbsp;
+71 &nbsp;
+72 &nbsp;
+73 &nbsp;
+74 &nbsp;
+75 &nbsp;
+76 &nbsp;
+77 &nbsp;
+78 &nbsp;
+79 &nbsp;
+80 &nbsp;
+81 &nbsp;
+82 &nbsp;
+83 &nbsp;
+84 &nbsp;
+85 &nbsp;
+86 &nbsp;
+87 &nbsp;
+88 &nbsp;
+89 &nbsp;
+90 &nbsp;
+91 &nbsp;
+92 &nbsp;
+93 &nbsp;
+94 &nbsp;
+95 &nbsp;
+96 &nbsp;
+97 &nbsp;
+98 &nbsp;
+99 &nbsp;
+100 &nbsp;
+101 &nbsp;
+102 &nbsp;
+103 &nbsp;
+104 &nbsp;
+105 &nbsp;
+106 &nbsp;
+107 &nbsp;
+108 &nbsp;
+109 &nbsp;
+110 &nbsp;
+111 &nbsp;
+112 &nbsp;
+113 &nbsp;
+114 &nbsp;
+115 &nbsp;
+116 &nbsp;
+117 &nbsp;
+118 &nbsp;
+119 &nbsp;
+120 &nbsp;
+121 &nbsp;
+122 &nbsp;
+123 &nbsp;
+124 &nbsp;
+125 &nbsp;
+126 &nbsp;
+127 &nbsp;
+128 &nbsp;
+129 &nbsp;
+130 &nbsp;
+131 &nbsp;
+132 &nbsp;
+133 &nbsp;
+134 &nbsp;
+135 &nbsp;
+136 &nbsp;
+137 &nbsp;
+138 &nbsp;
+139 &nbsp;
+140 &nbsp;
+141 &nbsp;
+142 &nbsp;
+143 &nbsp;
+144 &nbsp;
+145 &nbsp;
+146 &nbsp;
+147 &nbsp;
+148 &nbsp;
+149 &nbsp;
+150 &nbsp;
+151 &nbsp;
+152 &nbsp;
+153 &nbsp;
+154 &nbsp;
+155 &nbsp;
+156 &nbsp;
+157 &nbsp;
+158 &nbsp;
+159 &nbsp;
+160 &nbsp;
+161 &nbsp;
+162 &nbsp;
+163 &nbsp;
+164 &nbsp;
+165 &nbsp;
+166 &nbsp;
+167 &nbsp;
+168 &nbsp;
+169 &nbsp;
+170 &nbsp;
+171 &nbsp;
+172 &nbsp;
+173 &nbsp;
+174 &nbsp;
+175 &nbsp;
+176 &nbsp;
+177 &nbsp;
+178 &nbsp;
+179 &nbsp;
+180 &nbsp;
+181 &nbsp;
+182 &nbsp;
+183 &nbsp;
+184 &nbsp;
+185 &nbsp;
+186 &nbsp;
+187 &nbsp;
+188 &nbsp;
+189 &nbsp;
+190 &nbsp;
+191 &nbsp;
+192 &nbsp;
+193 &nbsp;
+194 &nbsp;
+195 &nbsp;
+196 &nbsp;
+197 &nbsp;
+198 &nbsp;
+199 &nbsp;
+200 &nbsp;
+201 &nbsp;
+202 &nbsp;
+203 &nbsp;
+204 &nbsp;
+205 &nbsp;
+206 &nbsp;
+207 &nbsp;
+208 &nbsp;
+209 &nbsp;
+210 &nbsp;
+211 &nbsp;
+212 &nbsp;
+213 &nbsp;
+214 &nbsp;
+215 &nbsp;
+216 &nbsp;
+217 &nbsp;
+218 &nbsp;
+219 &nbsp;
+220 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">import functools
+</span><span class="hit">import itertools
+</span><span class="hit">from collections import (abc,
+</span><span class="noop">                         defaultdict,
+</span><span class="noop">                         deque)
+</span><span class="hit">from functools import singledispatch
+</span><span class="hit">from operator import is_not
+</span><span class="hit">from typing import (Any,
+</span><span class="noop">                    Hashable,
+</span><span class="noop">                    Iterable,
+</span><span class="noop">                    List,
+</span><span class="noop">                    Mapping,
+</span><span class="noop">                    Sequence,
+</span><span class="noop">                    Sized,
+</span><span class="noop">                    Tuple)
+</span><span class="noop">
+</span><span class="hit">from .functional import compose
+</span><span class="hit">from .hints import (Domain,
+</span><span class="noop">                    Map,
+</span><span class="noop">                    Operator,
+</span><span class="noop">                    Range)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def mapper(map_: Map) -&gt; Map[Iterable[Domain], Iterable[Range]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that applies given map to the each element of iterable.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(map, map_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def flatmapper(map_: Map[Domain, Iterable[Range]]
+</span><span class="noop">               ) -&gt; Map[Iterable[Domain], Iterable[Range]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that applies map to the each element of iterable
+</span><span class="noop">    and flattens results.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return compose(flatten, mapper(map_))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def cutter(slice_: slice) -&gt; Operator[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that selects elements from iterable based on given slice.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(cut,
+</span><span class="noop">                             slice_=slice_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def cut(iterable: Iterable[Domain],
+</span><span class="noop">        *,
+</span><span class="noop">        slice_: slice) -&gt; Iterable[Domain]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Selects elements from iterable based on given slice.
+</span><span class="noop">
+</span><span class="noop">    Slice fields supposed to be unset or non-negative
+</span><span class="noop">    since it is hard to evaluate negative indices/step for arbitrary iterable
+</span><span class="noop">    which may be potentially infinite
+</span><span class="noop">    or change previous elements if iterating made backwards.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    yield from itertools.islice(iterable,
+</span><span class="noop">                                slice_.start, slice_.stop, slice_.step)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def chopper(size: int) -&gt; Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that splits iterable into chunks of given size.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(chop,
+</span><span class="noop">                             size=size)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@functools.singledispatch
+</span><span class="hit">def chop(iterable: Iterable[Domain],
+</span><span class="noop">         *,
+</span><span class="noop">         size: int) -&gt; Iterable[Sequence[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Splits iterable into chunks of given size.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    iterator = iter(iterable)
+</span><span class="miss">    yield from iter(lambda: tuple(itertools.islice(iterator, size)), ())
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@chop.register(abc.Sequence)
+</span><span class="hit">def chop_sequence(iterable: Sequence[Domain],
+</span><span class="noop">                  *,
+</span><span class="noop">                  size: int) -&gt; Iterable[Sequence[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Splits sequence into chunks of given size.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    if not size:
+</span><span class="miss">        return
+</span><span class="miss">    for start in range(0, len(iterable), size):
+</span><span class="miss">        yield iterable[start:start + size]
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def slider(size: int) -&gt; Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that slides over iterable with window of given size.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(slide,
+</span><span class="noop">                             size=size)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def slide(iterable: Iterable[Domain],
+</span><span class="noop">          *,
+</span><span class="noop">          size: int) -&gt; Iterable[Tuple[Domain, ...]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Slides over iterable with window of given size.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    iterator = iter(iterable)
+</span><span class="miss">    initial = tuple(itertools.islice(iterator, size))
+</span><span class="noop">
+</span><span class="miss">    def shift(previous: Tuple[Domain, ...],
+</span><span class="noop">              element: Domain) -&gt; Tuple[Domain, ...]:
+</span><span class="miss">        return previous[1:] + (element,)
+</span><span class="noop">
+</span><span class="miss">    yield from itertools.accumulate(itertools.chain([initial], iterator),
+</span><span class="noop">                                    shift)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">Group = Tuple[Hashable, Iterable[Domain]]
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def grouper(key: Map[Domain, Hashable]
+</span><span class="noop">            ) -&gt; Map[Iterable[Domain], Iterable[Group]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that groups iterable elements based on given key.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(group_by,
+</span><span class="noop">                             key=key)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def group_by(iterable: Iterable[Domain],
+</span><span class="noop">             *,
+</span><span class="noop">             key: Map[Domain, Hashable]) -&gt; Iterable[Group]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Groups iterable elements based on given key.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    groups = defaultdict(list)  # type: Mapping[Hashable, List[Domain]]
+</span><span class="miss">    for element in iterable:
+</span><span class="miss">        groups[key(element)].append(element)
+</span><span class="miss">    yield from groups.items()
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def expand(object_: Domain) -&gt; Iterable[Domain]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Wraps object into iterable.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    yield object_
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def interleave(iterable: Iterable[Iterable[Domain]]) -&gt; Iterable[Domain]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Interleaves elements from given iterable of iterables.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    iterators = itertools.cycle(map(iter, iterable))
+</span><span class="miss">    while True:
+</span><span class="miss">        try:
+</span><span class="miss">            for iterator in iterators:
+</span><span class="miss">                yield next(iterator)
+</span><span class="miss">        except StopIteration:
+</span><span class="miss">            is_not_exhausted = functools.partial(is_not, iterator)
+</span><span class="miss">            iterators = itertools.cycle(itertools.takewhile(is_not_exhausted,
+</span><span class="noop">                                                            iterators))
+</span><span class="noop">        else:
+</span><span class="miss">            return
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def flatten(iterable: Iterable[Iterable[Domain]]) -&gt; Iterable[Domain]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns plain iterable from iterable of iterables.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    yield from itertools.chain.from_iterable(iterable)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def header(size: int) -&gt; Operator[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that selects elements from the beginning of iterable.
+</span><span class="noop">    Resulted iterable will have size not greater than given one.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return cutter(slice(size))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def first(iterable: Iterable[Domain]) -&gt; Domain:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns first element of iterable.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    try:
+</span><span class="miss">        return next(iter(iterable))
+</span><span class="miss">    except StopIteration as error:
+</span><span class="miss">        raise ValueError(&#39;Argument supposed to be non-empty.&#39;) from error
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def trailer(size: int) -&gt; Operator[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that selects elements from the end of iterable.
+</span><span class="noop">    Resulted iterable will have size not greater than given one.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(deque,
+</span><span class="noop">                             maxlen=size)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def last(iterable: Iterable[Domain]) -&gt; Domain:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns last element of iterable.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    try:
+</span><span class="miss">        return deque(iterable,
+</span><span class="noop">                     maxlen=1)[0]
+</span><span class="miss">    except IndexError as error:
+</span><span class="miss">        raise ValueError(&#39;Argument supposed to be non-empty.&#39;) from error
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@singledispatch
+</span><span class="hit">def capacity(iterable: Iterable[Any]) -&gt; int:
+</span><span class="miss">    return sum(1 for _ in iterable)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@capacity.register(abc.Sized)
+</span><span class="hit">def sized_capacity(iterable: Sized) -&gt; int:
+</span><span class="miss">    return len(iterable)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/left.py">C:/Users/aibrakov/Projects/lz/lz/left.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+65 &nbsp;
+66 &nbsp;
+67 &nbsp;
+68 &nbsp;
+69 &nbsp;
+70 &nbsp;
+71 &nbsp;
+72 &nbsp;
+73 &nbsp;
+74 &nbsp;
+75 &nbsp;
+76 &nbsp;
+77 &nbsp;
+78 &nbsp;
+79 &nbsp;
+80 &nbsp;
+81 &nbsp;
+82 &nbsp;
+83 &nbsp;
+84 &nbsp;
+85 &nbsp;
+86 &nbsp;
+87 &nbsp;
+88 &nbsp;
+89 &nbsp;
+90 &nbsp;
+91 &nbsp;
+92 &nbsp;
+93 &nbsp;
+94 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">import functools
+</span><span class="hit">import itertools
+</span><span class="hit">from typing import (Callable,
+</span><span class="noop">                    Iterable,
+</span><span class="noop">                    List,
+</span><span class="noop">                    Tuple)
+</span><span class="noop">
+</span><span class="hit">from .hints import (Domain,
+</span><span class="noop">                    Map,
+</span><span class="noop">                    Range)
+</span><span class="hit">from .iterating import expand
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def accumulator(function: Callable[[Range, Domain], Range],
+</span><span class="noop">                initial: Range
+</span><span class="noop">                ) -&gt; Map[Iterable[Domain], Iterable[Range]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that yields cumulative results of given binary function
+</span><span class="noop">    starting from given initial object in direction from left to right.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(accumulate,
+</span><span class="noop">                             function=function,
+</span><span class="noop">                             initial=initial)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def accumulate(iterable: Iterable[Domain],
+</span><span class="noop">               function: Callable[[Range, Domain], Range],
+</span><span class="noop">               initial: Range) -&gt; Iterable[Range]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Yields cumulative results of given binary function
+</span><span class="noop">    starting from given initial object in direction from left to right.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    yield from itertools.accumulate(attach(iterable, initial), function)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def attacher(object_: Domain) -&gt; Map[Iterable[Domain], Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that prepends given object to iterable.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(attach,
+</span><span class="noop">                             object_=object_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@functools.singledispatch
+</span><span class="hit">def attach(iterable: Iterable[Domain],
+</span><span class="noop">           object_: Domain) -&gt; Iterable[Domain]:
+</span><span class="miss">    yield from itertools.chain(expand(object_), iterable)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@attach.register(list)
+</span><span class="hit">def attach_to_list(iterable: List[Domain],
+</span><span class="noop">                   object_: Domain) -&gt; List[Domain]:
+</span><span class="miss">    return [object_] + iterable
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@attach.register(tuple)
+</span><span class="hit">def attach_to_tuple(iterable: Tuple[Domain, ...],
+</span><span class="noop">                    object_: Domain) -&gt; Tuple[Domain, ...]:
+</span><span class="miss">    return (object_,) + iterable
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def folder(function: Callable[[Range, Domain], Range],
+</span><span class="noop">           initial: Range) -&gt; Map[Iterable[Domain], Range]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that cumulatively applies given binary function
+</span><span class="noop">    starting from given initial object in direction from left to right.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(fold,
+</span><span class="noop">                             function=function,
+</span><span class="noop">                             initial=initial)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def fold(iterable: Iterable[Domain],
+</span><span class="noop">         function: Callable[[Range, Domain], Range],
+</span><span class="noop">         initial: Range) -&gt; Range:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Cumulatively applies given binary function
+</span><span class="noop">    starting from given initial object in direction from left to right.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.reduce(function, iterable, initial)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">Applier = functools.partial
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def applier(function: Callable[..., Range],
+</span><span class="noop">            *args: Domain,
+</span><span class="noop">            **kwargs: Domain) -&gt; Callable[..., Range]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that behaves like given function
+</span><span class="noop">    with given arguments partially applied.
+</span><span class="noop">    Given positional arguments will be added to the left end.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return Applier(function, *args, **kwargs)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/logical.py">C:/Users/aibrakov/Projects/lz/lz/logical.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">from operator import (not_,
+</span><span class="noop">                      xor)
+</span><span class="noop">
+</span><span class="hit">from . import left
+</span><span class="hit">from .functional import (cleave,
+</span><span class="noop">                         compose)
+</span><span class="hit">from .hints import Predicate
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def conjoin(*predicates: Predicate) -&gt; Predicate:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns conjunction of given predicates.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return compose(all, cleave(*predicates))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def disjoin(*predicates: Predicate) -&gt; Predicate:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns disjunction of given predicates.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return compose(any, cleave(*predicates))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def exclusive_disjoin(*predicates: Predicate) -&gt; Predicate:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns exclusive disjunction of given predicates.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return compose(left.folder(xor, False), cleave(*predicates))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def negate(predicate: Predicate) -&gt; Predicate:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns negated version of given predicate.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="hit">    return compose(not_, predicate)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/replication.py">C:/Users/aibrakov/Projects/lz/lz/replication.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+65 &nbsp;
+66 &nbsp;
+67 &nbsp;
+68 &nbsp;
+69 &nbsp;
+70 &nbsp;
+71 &nbsp;
+72 &nbsp;
+73 &nbsp;
+74 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">import functools
+</span><span class="hit">import itertools
+</span><span class="hit">from collections import (abc,
+</span><span class="noop">                         deque)
+</span><span class="hit">from typing import Iterable
+</span><span class="noop">
+</span><span class="hit">from .hints import (Domain,
+</span><span class="noop">                    Map)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@functools.singledispatch
+</span><span class="hit">def replicate(object_: Domain,
+</span><span class="noop">              *,
+</span><span class="noop">              count: int) -&gt; Iterable[Domain]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns given number of object replicas.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    raise TypeError(&#39;Unsupported object type: {type}.&#39;
+</span><span class="noop">                    .format(type=type(object_)))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@replicate.register(object)
+</span><span class="noop"># immutable strings represent a special kind of iterables
+</span><span class="noop"># that can be replicated by simply repeating
+</span><span class="hit">@replicate.register(bytes)
+</span><span class="hit">@replicate.register(str)
+</span><span class="noop"># mappings cannot be replicated as other iterables
+</span><span class="noop"># since they are iterable only by key
+</span><span class="hit">@replicate.register(abc.Mapping)
+</span><span class="hit">def replicate_object(object_: Domain,
+</span><span class="noop">                     *,
+</span><span class="noop">                     count: int) -&gt; Iterable[Domain]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns object repeated given number of times.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return itertools.repeat(object_, count)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@replicate.register(abc.Iterable)
+</span><span class="hit">def replicate_iterable(object_: Iterable[Domain],
+</span><span class="noop">                       *,
+</span><span class="noop">                       count: int) -&gt; Iterable[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns given number of iterable replicas.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    iterator = iter(object_)
+</span><span class="miss">    queues = [deque() for _ in itertools.repeat(None, count)]
+</span><span class="noop">
+</span><span class="miss">    def replica(queue: deque) -&gt; Iterable[Domain]:
+</span><span class="miss">        while True:
+</span><span class="miss">            if not queue:
+</span><span class="miss">                try:
+</span><span class="miss">                    element = next(iterator)
+</span><span class="miss">                except StopIteration:
+</span><span class="miss">                    return
+</span><span class="miss">                element_copies = replicate(element,
+</span><span class="noop">                                           count=count)
+</span><span class="miss">                for sub_queue, element_copy in zip(queues, element_copies):
+</span><span class="miss">                    sub_queue.append(element_copy)
+</span><span class="miss">            yield queue.popleft()
+</span><span class="noop">
+</span><span class="miss">    yield from map(replica, queues)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def replicator(count: int) -&gt; Map[Domain, Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that replicates passed object.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="hit">    return functools.partial(replicate,
+</span><span class="noop">                             count=count)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">duplicate = replicator(2)
+</span><span class="hit">duplicate.__doc__ = &#39;Duplicates given object.&#39;
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/reversal.py">C:/Users/aibrakov/Projects/lz/lz/reversal.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+65 &nbsp;
+66 &nbsp;
+67 &nbsp;
+68 &nbsp;
+69 &nbsp;
+70 &nbsp;
+71 &nbsp;
+72 &nbsp;
+73 &nbsp;
+74 &nbsp;
+75 &nbsp;
+76 &nbsp;
+77 &nbsp;
+78 &nbsp;
+79 &nbsp;
+80 &nbsp;
+81 &nbsp;
+82 &nbsp;
+83 &nbsp;
+84 &nbsp;
+85 &nbsp;
+86 &nbsp;
+87 &nbsp;
+88 &nbsp;
+89 &nbsp;
+90 &nbsp;
+91 &nbsp;
+92 &nbsp;
+93 &nbsp;
+94 &nbsp;
+95 &nbsp;
+96 &nbsp;
+97 &nbsp;
+98 &nbsp;
+99 &nbsp;
+100 &nbsp;
+101 &nbsp;
+102 &nbsp;
+103 &nbsp;
+104 &nbsp;
+105 &nbsp;
+106 &nbsp;
+107 &nbsp;
+108 &nbsp;
+109 &nbsp;
+110 &nbsp;
+111 &nbsp;
+112 &nbsp;
+113 &nbsp;
+114 &nbsp;
+115 &nbsp;
+116 &nbsp;
+117 &nbsp;
+118 &nbsp;
+119 &nbsp;
+120 &nbsp;
+121 &nbsp;
+122 &nbsp;
+123 &nbsp;
+124 &nbsp;
+125 &nbsp;
+126 &nbsp;
+127 &nbsp;
+128 &nbsp;
+129 &nbsp;
+130 &nbsp;
+131 &nbsp;
+132 &nbsp;
+133 &nbsp;
+134 &nbsp;
+135 &nbsp;
+136 &nbsp;
+137 &nbsp;
+138 &nbsp;
+139 &nbsp;
+140 &nbsp;
+141 &nbsp;
+142 &nbsp;
+143 &nbsp;
+144 &nbsp;
+145 &nbsp;
+146 &nbsp;
+147 &nbsp;
+148 &nbsp;
+149 &nbsp;
+150 &nbsp;
+151 &nbsp;
+152 &nbsp;
+153 &nbsp;
+154 &nbsp;
+155 &nbsp;
+156 &nbsp;
+157 &nbsp;
+158 &nbsp;
+159 &nbsp;
+160 &nbsp;
+161 &nbsp;
+162 &nbsp;
+163 &nbsp;
+164 &nbsp;
+165 &nbsp;
+166 &nbsp;
+167 &nbsp;
+168 &nbsp;
+169 &nbsp;
+170 &nbsp;
+171 &nbsp;
+172 &nbsp;
+173 &nbsp;
+174 &nbsp;
+175 &nbsp;
+176 &nbsp;
+177 &nbsp;
+178 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">import functools
+</span><span class="hit">import io
+</span><span class="hit">import itertools
+</span><span class="hit">import os
+</span><span class="hit">import sys
+</span><span class="hit">from collections import abc
+</span><span class="hit">from operator import (methodcaller,
+</span><span class="noop">                      sub)
+</span><span class="hit">from typing import (Any,
+</span><span class="noop">                    BinaryIO,
+</span><span class="noop">                    Iterable,
+</span><span class="noop">                    List,
+</span><span class="noop">                    Optional,
+</span><span class="noop">                    Sequence,
+</span><span class="noop">                    TextIO,
+</span><span class="noop">                    overload)
+</span><span class="noop">
+</span><span class="hit">from .arithmetical import ceil_division
+</span><span class="hit">from .hints import (Domain,
+</span><span class="noop">                    Range)
+</span><span class="hit">from .textual import (code_units_sizes,
+</span><span class="noop">                      decoder,
+</span><span class="noop">                      read_batch_from_end)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@overload
+</span><span class="hit">def reverse(object_: Sequence[Domain]) -&gt; Sequence[Domain]:
+</span><span class="miss">    pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">if sys.version_info &gt;= (3, 6):
+</span><span class="hit">    from typing import Reversible
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">    @overload
+</span><span class="hit">    def reverse(object_: Reversible[Domain]) -&gt; Iterable[Domain]:
+</span><span class="miss">        pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@overload
+</span><span class="hit">def reverse(object_: TextIO,
+</span><span class="noop">            *,
+</span><span class="noop">            batch_size: Optional[int] = ...,
+</span><span class="noop">            lines_separator: Optional[str] = ...,
+</span><span class="noop">            keep_lines_separator: bool = ...) -&gt; Iterable[str]:
+</span><span class="miss">    pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@overload
+</span><span class="hit">def reverse(object_: BinaryIO,
+</span><span class="noop">            *,
+</span><span class="noop">            batch_size: Optional[int] = ...,
+</span><span class="noop">            lines_separator: Optional[bytes] = ...,
+</span><span class="noop">            keep_lines_separator: bool = ...,
+</span><span class="noop">            code_unit_size: int = ...) -&gt; Iterable[bytes]:
+</span><span class="miss">    pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@overload
+</span><span class="hit">def reverse(object_: Domain) -&gt; Range:
+</span><span class="miss">    pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@functools.singledispatch
+</span><span class="hit">def reverse(object_: Domain, **_: Any) -&gt; Range:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns reversed object.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    raise TypeError(&#39;Unsupported object type: {type}.&#39;
+</span><span class="noop">                    .format(type=type(object_)))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@reverse.register(abc.Sequence)
+</span><span class="hit">def reverse_sequence(object_: Sequence[Domain]) -&gt; Sequence[Domain]:
+</span><span class="miss">    return object_[::-1]
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">if sys.version_info &gt;= (3, 6):
+</span><span class="hit">    from typing import Reversible
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">    @reverse.register(abc.Reversible)
+</span><span class="hit">    def reverse_reversible(object_: Reversible[Domain]) -&gt; Iterable[Domain]:
+</span><span class="miss">        yield from reversed(object_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@reverse.register(io.TextIOWrapper)
+</span><span class="hit">def reverse_file(object_: TextIO,
+</span><span class="noop">                 *,
+</span><span class="noop">                 batch_size: Optional[int] = None,
+</span><span class="noop">                 lines_separator: Optional[str] = None,
+</span><span class="noop">                 keep_lines_separator: bool = True) -&gt; Iterable[str]:
+</span><span class="miss">    encoding = object_.encoding
+</span><span class="miss">    if lines_separator is not None:
+</span><span class="miss">        lines_separator = lines_separator.encode(encoding)
+</span><span class="miss">    code_unit_size = code_units_sizes[encoding]
+</span><span class="miss">    if batch_size is not None:
+</span><span class="miss">        batch_size = ceil_division(batch_size, code_unit_size) * code_unit_size
+</span><span class="miss">    yield from map(decoder(encoding),
+</span><span class="noop">                   reverse(object_.buffer,
+</span><span class="noop">                           batch_size=batch_size,
+</span><span class="noop">                           lines_separator=lines_separator,
+</span><span class="noop">                           keep_lines_separator=keep_lines_separator,
+</span><span class="noop">                           code_unit_size=code_unit_size))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@reverse.register(io.BufferedReader)
+</span><span class="hit">@reverse.register(io.BytesIO)
+</span><span class="hit">def reverse_binary_stream(object_: BinaryIO,
+</span><span class="noop">                          *,
+</span><span class="noop">                          batch_size: Optional[int] = None,
+</span><span class="noop">                          lines_separator: Optional[bytes] = None,
+</span><span class="noop">                          keep_lines_separator: bool = True,
+</span><span class="noop">                          code_unit_size: int = 1
+</span><span class="noop">                          ) -&gt; Iterable[bytes]:
+</span><span class="miss">    if lines_separator is None:
+</span><span class="miss">        lines_separator = (b&#39;\r&#39;, b&#39;\n&#39;, b&#39;\r\n&#39;)
+</span><span class="miss">        lines_splitter = methodcaller(bytes.splitlines.__name__,
+</span><span class="noop">                                      keep_lines_separator)
+</span><span class="noop">    else:
+</span><span class="miss">        def lines_splitter(byte_sequence: bytes) -&gt; List[bytes]:
+</span><span class="miss">            result = []
+</span><span class="miss">            part = bytearray()
+</span><span class="miss">            offset = 0
+</span><span class="miss">            add_part = result.append
+</span><span class="miss">            while offset &lt; len(byte_sequence):
+</span><span class="miss">                if (byte_sequence[offset:offset + len(lines_separator)]
+</span><span class="noop">                        != lines_separator):
+</span><span class="miss">                    part += byte_sequence[offset:offset + code_unit_size]
+</span><span class="miss">                    offset += code_unit_size
+</span><span class="noop">                else:
+</span><span class="miss">                    add_part(part + keep_lines_separator * lines_separator)
+</span><span class="miss">                    part.clear()
+</span><span class="miss">                    offset += len(lines_separator)
+</span><span class="miss">            add_part(part)
+</span><span class="miss">            return result
+</span><span class="miss">    stream_size = object_.seek(0, os.SEEK_END)
+</span><span class="miss">    if batch_size is None:
+</span><span class="miss">        batch_size = stream_size or 1
+</span><span class="miss">    batches_count = ceil_division(stream_size, batch_size)
+</span><span class="miss">    remaining_bytes_indicator = itertools.islice(
+</span><span class="noop">            itertools.accumulate(itertools.chain([stream_size],
+</span><span class="noop">                                                 itertools.repeat(batch_size)),
+</span><span class="noop">                                 sub),
+</span><span class="noop">            batches_count)
+</span><span class="miss">    try:
+</span><span class="miss">        remaining_bytes_count = next(remaining_bytes_indicator)
+</span><span class="miss">    except StopIteration:
+</span><span class="miss">        return
+</span><span class="noop">
+</span><span class="miss">    def read_batch(position: int) -&gt; bytes:
+</span><span class="miss">        result = read_batch_from_end(object_,
+</span><span class="noop">                                     size=batch_size,
+</span><span class="noop">                                     end_position=position)
+</span><span class="miss">        while result.startswith(lines_separator):
+</span><span class="miss">            try:
+</span><span class="miss">                position = next(remaining_bytes_indicator)
+</span><span class="miss">            except StopIteration:
+</span><span class="miss">                break
+</span><span class="miss">            result = (read_batch_from_end(object_,
+</span><span class="noop">                                          size=batch_size,
+</span><span class="noop">                                          end_position=position)
+</span><span class="noop">                      + result)
+</span><span class="miss">        return result
+</span><span class="noop">
+</span><span class="miss">    batch = read_batch(remaining_bytes_count)
+</span><span class="miss">    segment, *lines = lines_splitter(batch)
+</span><span class="miss">    yield from reverse(lines)
+</span><span class="miss">    for remaining_bytes_count in remaining_bytes_indicator:
+</span><span class="miss">        batch = read_batch(remaining_bytes_count)
+</span><span class="miss">        lines = lines_splitter(batch)
+</span><span class="miss">        if batch.endswith(lines_separator):
+</span><span class="miss">            yield segment
+</span><span class="noop">        else:
+</span><span class="miss">            lines[-1] += segment
+</span><span class="miss">        segment, *lines = lines
+</span><span class="miss">        yield from reverse(lines)
+</span><span class="miss">    yield segment
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/right.py">C:/Users/aibrakov/Projects/lz/lz/right.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+65 &nbsp;
+66 &nbsp;
+67 &nbsp;
+68 &nbsp;
+69 &nbsp;
+70 &nbsp;
+71 &nbsp;
+72 &nbsp;
+73 &nbsp;
+74 &nbsp;
+75 &nbsp;
+76 &nbsp;
+77 &nbsp;
+78 &nbsp;
+79 &nbsp;
+80 &nbsp;
+81 &nbsp;
+82 &nbsp;
+83 &nbsp;
+84 &nbsp;
+85 &nbsp;
+86 &nbsp;
+87 &nbsp;
+88 &nbsp;
+89 &nbsp;
+90 &nbsp;
+91 &nbsp;
+92 &nbsp;
+93 &nbsp;
+94 &nbsp;
+95 &nbsp;
+96 &nbsp;
+97 &nbsp;
+98 &nbsp;
+99 &nbsp;
+100 &nbsp;
+101 &nbsp;
+102 &nbsp;
+103 &nbsp;
+104 &nbsp;
+105 &nbsp;
+106 &nbsp;
+107 &nbsp;
+108 &nbsp;
+109 &nbsp;
+110 &nbsp;
+111 &nbsp;
+112 &nbsp;
+113 &nbsp;
+114 &nbsp;
+115 &nbsp;
+116 &nbsp;
+117 &nbsp;
+118 &nbsp;
+119 &nbsp;
+120 &nbsp;
+121 &nbsp;
+122 &nbsp;
+123 &nbsp;
+124 &nbsp;
+125 &nbsp;
+126 &nbsp;
+127 &nbsp;
+128 &nbsp;
+129 &nbsp;
+130 &nbsp;
+131 &nbsp;
+132 &nbsp;
+133 &nbsp;
+134 &nbsp;
+135 &nbsp;
+136 &nbsp;
+137 &nbsp;
+138 &nbsp;
+139 &nbsp;
+140 &nbsp;
+141 &nbsp;
+142 &nbsp;
+143 &nbsp;
+144 &nbsp;
+145 &nbsp;
+146 &nbsp;
+147 &nbsp;
+148 &nbsp;
+149 &nbsp;
+150 &nbsp;
+151 &nbsp;
+152 &nbsp;
+153 &nbsp;
+154 &nbsp;
+155 &nbsp;
+156 &nbsp;
+157 &nbsp;
+158 &nbsp;
+159 &nbsp;
+160 &nbsp;
+161 &nbsp;
+162 &nbsp;
+163 &nbsp;
+164 &nbsp;
+165 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">import functools
+</span><span class="hit">import itertools
+</span><span class="hit">from operator import attrgetter
+</span><span class="hit">from typing import (Callable,
+</span><span class="noop">                    Iterable,
+</span><span class="noop">                    List,
+</span><span class="noop">                    Tuple)
+</span><span class="noop">
+</span><span class="hit">from paradigm import signatures
+</span><span class="hit">from reprit import seekers
+</span><span class="hit">from reprit.base import generate_repr
+</span><span class="noop">
+</span><span class="hit">from . import left
+</span><span class="hit">from .functional import (ApplierBase,
+</span><span class="noop">                         compose,
+</span><span class="noop">                         flip)
+</span><span class="hit">from .hints import (Domain,
+</span><span class="noop">                    Map,
+</span><span class="noop">                    Range)
+</span><span class="hit">from .iterating import expand
+</span><span class="hit">from .reversal import reverse
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def accumulator(function: Callable[[Domain, Range], Range],
+</span><span class="noop">                initial: Range
+</span><span class="noop">                ) -&gt; Map[Iterable[Domain], Iterable[Iterable[Range]]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that yields cumulative results of given binary function
+</span><span class="noop">    starting from given initial object in direction from right to left.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    left_accumulator = left.accumulator(flip(function), initial)
+</span><span class="miss">    return compose(left_accumulator, reverse)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def attacher(object_: Domain) -&gt; Map[Iterable[Domain], Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that appends given object to iterable.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return functools.partial(attach,
+</span><span class="noop">                             object_=object_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@functools.singledispatch
+</span><span class="hit">def attach(iterable: Iterable[Domain],
+</span><span class="noop">           object_: Domain) -&gt; Iterable[Domain]:
+</span><span class="miss">    yield from itertools.chain(iterable, expand(object_))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@attach.register(list)
+</span><span class="hit">def attach_to_list(iterable: List[Domain],
+</span><span class="noop">                   object_: Domain) -&gt; List[Domain]:
+</span><span class="miss">    return iterable + [object_]
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@attach.register(tuple)
+</span><span class="hit">def attach_to_tuple(iterable: Tuple[Domain, ...],
+</span><span class="noop">                    object_: Domain) -&gt; Tuple[Domain, ...]:
+</span><span class="miss">    return iterable + (object_,)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def folder(function: Callable[[Domain, Range], Range],
+</span><span class="noop">           initial: Range) -&gt; Map[Iterable[Domain], Range]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that cumulatively applies given binary function
+</span><span class="noop">    starting from given initial object in direction from right to left.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    left_folder = left.folder(flip(function), initial)
+</span><span class="miss">    return compose(left_folder, reverse)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">class Applier(ApplierBase):
+</span><span class="hit">    def __init__(self, function: Callable[..., Range],
+</span><span class="noop">                 *args: Domain,
+</span><span class="noop">                 **kwargs: Domain) -&gt; None:
+</span><span class="hit">        super().__init__(function, *args, **kwargs)
+</span><span class="noop">
+</span><span class="hit">    def __call__(self, *args: Domain, **kwargs: Domain) -&gt; Range:
+</span><span class="hit">        return self.func(*args, *self.args, **self.keywords, **kwargs)
+</span><span class="noop">
+</span><span class="hit">    __repr__ = generate_repr(__init__,
+</span><span class="noop">                             field_seeker=seekers.complex_)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@signatures.factory.register(Applier)
+</span><span class="hit">def _(object_: Applier) -&gt; signatures.Base:
+</span><span class="hit">    return _bind_positionals(signatures.factory(object_.func)
+</span><span class="noop">                             .bind(**object_.keywords),
+</span><span class="noop">                             object_.args)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@functools.singledispatch
+</span><span class="hit">def _bind_positionals(signature: signatures.Base,
+</span><span class="noop">                      args: Tuple[Domain, ...]) -&gt; signatures.Base:
+</span><span class="miss">    raise TypeError(&#39;Unsupported signature type: {type}.&#39;
+</span><span class="noop">                    .format(type=type(signature)))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@_bind_positionals.register(signatures.Plain)
+</span><span class="hit">def _(signature: signatures.Plain,
+</span><span class="noop">      args: Tuple[Domain, ...]) -&gt; signatures.Base:
+</span><span class="hit">    if not args:
+</span><span class="hit">        return signature
+</span><span class="hit">    variadic_positionals = signature.parameters_by_kind[
+</span><span class="noop">        signatures.Parameter.Kind.VARIADIC_POSITIONAL]
+</span><span class="hit">    positionals = (signature.parameters_by_kind[
+</span><span class="noop">                       signatures.Parameter.Kind.POSITIONAL_ONLY]
+</span><span class="noop">                   + signature.parameters_by_kind[
+</span><span class="noop">                       signatures.Parameter.Kind.POSITIONAL_OR_KEYWORD])
+</span><span class="hit">    if len(args) &gt; len(positionals) and not variadic_positionals:
+</span><span class="miss">        value = &#39;argument&#39; + &#39;s&#39; * (len(positionals) != 1)
+</span><span class="miss">        raise TypeError(&#39;Takes {parameters_count} positional {value}, &#39;
+</span><span class="noop">                        &#39;but {arguments_count} {verb} given.&#39;
+</span><span class="noop">                        .format(parameters_count=len(positionals),
+</span><span class="noop">                                value=value,
+</span><span class="noop">                                arguments_count=len(args),
+</span><span class="noop">                                verb=&#39;was&#39; if len(args) == 1 else &#39;were&#39;))
+</span><span class="hit">    non_positionals = (signature.parameters_by_kind[
+</span><span class="noop">                           signatures.Parameter.Kind.KEYWORD_ONLY]
+</span><span class="noop">                       + signature.parameters_by_kind[
+</span><span class="noop">                           signatures.Parameter.Kind.VARIADIC_KEYWORD])
+</span><span class="hit">    signatures_parameters = []
+</span><span class="hit">    if len(args) &lt;= len(positionals):
+</span><span class="hit">        signatures_parameters.append(positionals[:-len(args)]
+</span><span class="noop">                                     + non_positionals)
+</span><span class="hit">    if variadic_positionals:
+</span><span class="hit">        signatures_parameters.append(signature.parameters)
+</span><span class="hit">        for limit in range(1, len(args)):
+</span><span class="hit">            signatures_parameters.append(positionals[:-limit]
+</span><span class="noop">                                         + variadic_positionals
+</span><span class="noop">                                         + non_positionals)
+</span><span class="hit">    positionals_or_keywords = signature.parameters_by_kind[
+</span><span class="noop">        signatures.Parameter.Kind.POSITIONAL_OR_KEYWORD]
+</span><span class="hit">    positionals_or_keywords_with_defaults_count = sum(
+</span><span class="noop">            map(attrgetter(&#39;has_default&#39;), positionals_or_keywords))
+</span><span class="hit">    for offset in range(1, positionals_or_keywords_with_defaults_count + 1):
+</span><span class="miss">        signatures_parameters.append(
+</span><span class="noop">                positionals[:-(len(args) + offset)]
+</span><span class="noop">                + [signatures.Parameter(
+</span><span class="noop">                        name=parameter.name,
+</span><span class="noop">                        kind=signatures.Parameter.Kind.KEYWORD_ONLY,
+</span><span class="noop">                        has_default=parameter.has_default)
+</span><span class="noop">                    for parameter in positionals_or_keywords[-offset:]]
+</span><span class="noop">                + non_positionals)
+</span><span class="hit">    return signatures.Overloaded(*(signatures.Plain(*parameters)
+</span><span class="noop">                                   for parameters in signatures_parameters))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">@_bind_positionals.register(signatures.Overloaded)
+</span><span class="hit">def _(signature: signatures.Overloaded,
+</span><span class="noop">      args: Tuple[Domain, ...]) -&gt; signatures.Base:
+</span><span class="hit">    return signatures.Overloaded(*map(functools.partial(_bind_positionals,
+</span><span class="noop">                                                        args=args),
+</span><span class="noop">                                      signature.signatures))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def applier(function: Callable[..., Range],
+</span><span class="noop">            *args: Domain,
+</span><span class="noop">            **kwargs: Domain) -&gt; Callable[..., Range]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that behaves like given function
+</span><span class="noop">    with given arguments partially applied.
+</span><span class="noop">    Given positional arguments will be added to the right end.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">
+</span><span class="hit">    return Applier(function, *args, **kwargs)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/sorting.py">C:/Users/aibrakov/Projects/lz/lz/sorting.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="miss">import functools
+</span><span class="miss">from collections import ChainMap
+</span><span class="miss">from typing import (Callable,
+</span><span class="noop">                    Iterable,
+</span><span class="noop">                    Optional,
+</span><span class="noop">                    Union)
+</span><span class="noop">
+</span><span class="miss">from .hints import (Domain,
+</span><span class="noop">                    Map,
+</span><span class="noop">                    Operator,
+</span><span class="noop">                    Sortable)
+</span><span class="noop">
+</span><span class="miss">Key = Optional[Map[Domain, Sortable]]
+</span><span class="miss">Implementation = Callable[..., Iterable[Domain]]
+</span><span class="noop">
+</span><span class="miss">stable_implementations = {}
+</span><span class="miss">unstable_implementations = {}
+</span><span class="miss">implementations = ChainMap(stable_implementations,
+</span><span class="noop">                           unstable_implementations)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">def search_implementation(algorithm: str) -&gt; Implementation:
+</span><span class="miss">    try:
+</span><span class="miss">        return implementations[algorithm]
+</span><span class="miss">    except KeyError as error:
+</span><span class="miss">        algorithms_str = &#39;, &#39;.join(map(repr, implementations))
+</span><span class="miss">        error_message = (&#39;Algorithm is not found: {algorithm}. &#39;
+</span><span class="noop">                         &#39;Available algorithms are: {algorithms}.&#39;
+</span><span class="noop">                         .format(algorithm=algorithm,
+</span><span class="noop">                                 algorithms=algorithms_str))
+</span><span class="miss">        raise LookupError(error_message) from error
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">def register_implementation(algorithm: str,
+</span><span class="noop">                            implementation: Optional[Implementation] = None,
+</span><span class="noop">                            *,
+</span><span class="noop">                            stable: bool = False
+</span><span class="noop">                            ) -&gt; Union[Operator[Implementation],
+</span><span class="noop">                                       Implementation]:
+</span><span class="miss">    if implementation is None:
+</span><span class="miss">        return functools.partial(register_implementation, algorithm,
+</span><span class="noop">                                 stable=stable)
+</span><span class="miss">    if stable:
+</span><span class="miss">        stable_implementations[algorithm] = implementation
+</span><span class="noop">    else:
+</span><span class="miss">        unstable_implementations[algorithm] = implementation
+</span><span class="miss">    return implementation
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">DEFAULT_ALGORITHM = &#39;TIMSORT&#39;
+</span><span class="miss">register_implementation(DEFAULT_ALGORITHM, sorted,
+</span><span class="noop">                        stable=True)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">def sorter(*,
+</span><span class="noop">           algorithm: str = DEFAULT_ALGORITHM,
+</span><span class="noop">           key: Map[Domain, Sortable] = None) -&gt; Operator[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that generates sorted iterable
+</span><span class="noop">    by given key with specified algorithm.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    implementation = search_implementation(algorithm)
+</span><span class="miss">    return functools.partial(implementation,
+</span><span class="noop">                             key=key)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/textual.py">C:/Users/aibrakov/Projects/lz/lz/textual.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">import codecs
+</span><span class="hit">from collections import defaultdict
+</span><span class="hit">from functools import partial
+</span><span class="hit">from typing import BinaryIO
+</span><span class="noop">
+</span><span class="hit">from .hints import Map
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def decoder(encoding: str) -&gt; Map[bytes, str]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that decodes byte sequence
+</span><span class="noop">    with codec registered for given encoding.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return partial(codecs.decode,
+</span><span class="noop">                   encoding=encoding)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def encoder(encoding: str) -&gt; Map[str, bytes]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Returns function that encodes string
+</span><span class="noop">    with codec registered for given encoding.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    return partial(codecs.encode,
+</span><span class="noop">                   encoding=encoding)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def read_batch_from_end(byte_stream: BinaryIO,
+</span><span class="noop">                        *,
+</span><span class="noop">                        size: int,
+</span><span class="noop">                        end_position: int) -&gt; bytes:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Reads batch from the end of given byte stream.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    if end_position &gt; size:
+</span><span class="miss">        offset = end_position - size
+</span><span class="noop">    else:
+</span><span class="miss">        offset = 0
+</span><span class="miss">        size = end_position
+</span><span class="miss">    byte_stream.seek(offset)
+</span><span class="miss">    return byte_stream.read(size)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="noop"># in bytes
+</span><span class="hit">code_units_sizes = defaultdict(lambda: 1,
+</span><span class="noop">                               {&#39;utf_16&#39;: 2,
+</span><span class="noop">                                &#39;utf_16_be&#39;: 2,
+</span><span class="noop">                                &#39;utf_16_le&#39;: 2,
+</span><span class="noop">                                &#39;utf_32&#39;: 4,
+</span><span class="noop">                                &#39;utf_32_be&#39;: 4,
+</span><span class="noop">                                &#39;utf_32_le&#39;: 4})
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/transposition.py">C:/Users/aibrakov/Projects/lz/lz/transposition.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+47 &nbsp;
+48 &nbsp;
+49 &nbsp;
+50 &nbsp;
+51 &nbsp;
+52 &nbsp;
+53 &nbsp;
+54 &nbsp;
+55 &nbsp;
+56 &nbsp;
+57 &nbsp;
+58 &nbsp;
+59 &nbsp;
+60 &nbsp;
+61 &nbsp;
+62 &nbsp;
+63 &nbsp;
+64 &nbsp;
+65 &nbsp;
+66 &nbsp;
+67 &nbsp;
+68 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="miss">import functools
+</span><span class="miss">from collections import (abc,
+</span><span class="noop">                         deque)
+</span><span class="miss">from typing import (Iterable,
+</span><span class="noop">                    overload)
+</span><span class="noop">
+</span><span class="miss">from .hints import (Collection,
+</span><span class="noop">                    Domain,
+</span><span class="noop">                    FiniteIterable,
+</span><span class="noop">                    Range)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">@overload
+</span><span class="miss">def transpose(object_: Iterable[FiniteIterable[Domain]]
+</span><span class="noop">              ) -&gt; FiniteIterable[Iterable[Domain]]:
+</span><span class="miss">    pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">@overload
+</span><span class="miss">def transpose(object_: FiniteIterable[Iterable[Domain]]
+</span><span class="noop">              ) -&gt; Iterable[FiniteIterable[Domain]]:
+</span><span class="miss">    pass
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">@functools.singledispatch
+</span><span class="miss">def transpose(object_: Domain) -&gt; Range:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Transposes given object.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    raise TypeError(&#39;Unsupported object type: {type}.&#39;
+</span><span class="noop">                    .format(type=type))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">@transpose.register(abc.Iterable)
+</span><span class="miss">def transpose_finite_iterables(object_: Iterable[FiniteIterable[Domain]]
+</span><span class="noop">                               ) -&gt; FiniteIterable[Iterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Transposes given iterable of finite iterables.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    iterator = iter(object_)
+</span><span class="miss">    try:
+</span><span class="miss">        first_elements = next(iterator)
+</span><span class="miss">    except StopIteration:
+</span><span class="miss">        return ()
+</span><span class="miss">    queues = [deque([element])
+</span><span class="noop">              for element in first_elements]
+</span><span class="noop">
+</span><span class="miss">    def coordinate(queue: deque) -&gt; Iterable[Domain]:
+</span><span class="miss">        while True:
+</span><span class="miss">            if not queue:
+</span><span class="miss">                try:
+</span><span class="miss">                    elements = next(iterator)
+</span><span class="miss">                except StopIteration:
+</span><span class="miss">                    return
+</span><span class="miss">                for sub_queue, element in zip(queues, elements):
+</span><span class="miss">                    sub_queue.append(element)
+</span><span class="miss">            yield queue.popleft()
+</span><span class="noop">
+</span><span class="miss">    return tuple(map(coordinate, queues))
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="miss">@transpose.register(Collection)
+</span><span class="miss">def transpose_finite_iterable(object_: FiniteIterable[Iterable[Domain]]
+</span><span class="noop">                              ) -&gt; Iterable[FiniteIterable[Domain]]:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Transposes given finite iterable of iterables.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    yield from zip(*object_)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="C:/Users/aibrakov/Projects/lz/lz/typology.py">C:/Users/aibrakov/Projects/lz/lz/typology.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 &nbsp;
+7 &nbsp;
+8 &nbsp;
+9 &nbsp;
+10 &nbsp;
+11 &nbsp;
+12 &nbsp;
+13 &nbsp;
+14 &nbsp;
+15 &nbsp;
+16 &nbsp;
+17 &nbsp;
+18 &nbsp;
+19 &nbsp;
+20 &nbsp;
+21 &nbsp;
+22 &nbsp;
+23 &nbsp;
+24 &nbsp;
+25 &nbsp;
+26 &nbsp;
+27 &nbsp;
+28 &nbsp;
+29 &nbsp;
+30 &nbsp;
+31 &nbsp;
+32 &nbsp;
+33 &nbsp;
+34 &nbsp;
+35 &nbsp;
+36 &nbsp;
+37 &nbsp;
+38 &nbsp;
+39 &nbsp;
+40 &nbsp;
+41 &nbsp;
+42 &nbsp;
+43 &nbsp;
+44 &nbsp;
+45 &nbsp;
+46 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">from functools import partial
+</span><span class="hit">from operator import attrgetter
+</span><span class="hit">from typing import (Any,
+</span><span class="noop">                    Tuple)
+</span><span class="noop">
+</span><span class="hit">from .hints import Predicate
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def instance_of(*types: type) -&gt; Predicate:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Creates predicate that checks if object is instance of given types.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    predicate = partial(is_instance_of,
+</span><span class="noop">                        types=types)
+</span><span class="miss">    types_names = list(map(attrgetter(&#39;__name__&#39;), types))
+</span><span class="miss">    predicate.__name__ = &#39;is_instance_of_&#39; + &#39;_or_&#39;.join(types_names)
+</span><span class="miss">    predicate.__qualname__ = &#39;is_instance_of_&#39; + &#39;_or_&#39;.join(types_names)
+</span><span class="miss">    types_full_names = map(attrgetter(&#39;__qualname__&#39;), types)
+</span><span class="miss">    predicate.__doc__ = (&#39;Checks if given object is instance &#39;
+</span><span class="noop">                         &#39;of one of types: &#34;{types}&#34;.&#39;
+</span><span class="noop">                         .format(types=&#39;&#34;, &#34;&#39;.join(types_full_names)))
+</span><span class="miss">    return predicate
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def subclass_of(*types: type) -&gt; Predicate:
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="noop">    Creates predicate that checks if type is subclass of given types.
+</span><span class="noop">    &#34;&#34;&#34;
+</span><span class="miss">    predicate = partial(is_subclass_of,
+</span><span class="noop">                        types=types)
+</span><span class="miss">    types_names = list(map(attrgetter(&#39;__name__&#39;), types))
+</span><span class="miss">    predicate.__name__ = &#39;is_subclass_of_&#39; + &#39;_or_&#39;.join(types_names)
+</span><span class="miss">    predicate.__qualname__ = &#39;is_subclass_of_&#39; + &#39;_or_&#39;.join(types_names)
+</span><span class="miss">    types_full_names = map(attrgetter(&#39;__qualname__&#39;), types)
+</span><span class="miss">    predicate.__doc__ = (&#39;Checks if given type is subclass &#39;
+</span><span class="noop">                         &#39;of one of types: &#34;{types}&#34;.&#39;
+</span><span class="noop">                         .format(types=&#39;&#34;, &#34;&#39;.join(types_full_names)))
+</span><span class="miss">    return predicate
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def is_instance_of(object_: Any, types: Tuple[type, ...]) -&gt; bool:
+</span><span class="miss">    return isinstance(object_, types)
+</span><span class="noop">
+</span><span class="noop">
+</span><span class="hit">def is_subclass_of(type_: type, types: Tuple[type, ...]) -&gt; bool:
+</span><span class="miss">    return issubclass(type_, types)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+  </body>
+</html>
