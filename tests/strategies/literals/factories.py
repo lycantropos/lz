@@ -21,6 +21,7 @@ from hypothesis import strategies
 
 from lz.functional import pack
 from lz.hints import Domain
+from lz.textual import code_units_sizes
 from tests.configs import MAX_ITERABLES_SIZE
 from tests.hints import (ByteSequence,
                          Strategy)
@@ -120,7 +121,7 @@ def to_byte_strings(encoding: str,
                     *,
                     min_size: int = 0,
                     max_size: Optional[int] = None) -> Strategy[bytes]:
-    length = encodings_lengths[encoding]
+    length = code_units_sizes[encoding]
     min_characters_count = (min_size + length - 1) // length
     max_characters_count = max_size
     if max_characters_count is not None:
@@ -150,19 +151,10 @@ def to_characters_bytes(encoding: str,
                       else little_byte_order_name)
     else:
         byte_order = sys.byteorder
-    length = encodings_lengths[encoding]
+    length = code_units_sizes[encoding]
     to_bytes = methodcaller(int.to_bytes.__name__, length, byte_order)
     code_points = strategies.integers(0, 256 ** length - 1)
     return code_points.filter(is_code_point_supported).map(to_bytes)
-
-
-encodings_lengths = defaultdict(lambda: 1,
-                                {'utf_16': 2,
-                                 'utf_16_be': 2,
-                                 'utf_16_le': 2,
-                                 'utf_32': 4,
-                                 'utf_32_be': 4,
-                                 'utf_32_le': 4})
 
 
 class ContainersChain:
@@ -241,13 +233,13 @@ encodings_unsupported_code_points = defaultdict(
          'utf_16_le': range(0xd800, 0xe000),
          'utf_32': ContainersChain(
                  range(0xd800, 0xe000),
-                 range(0x110000, 256 ** encodings_lengths['utf_32'])),
+                 range(0x110000, 256 ** code_units_sizes['utf_32'])),
          'utf_32_be': ContainersChain(
                  range(0xd800, 0xe000),
-                 range(0x110000, 256 ** encodings_lengths['utf_32_be'])),
+                 range(0x110000, 256 ** code_units_sizes['utf_32_be'])),
          'utf_32_le': ContainersChain(
                  range(0xd800, 0xe000),
-                 range(0x110000, 256 ** encodings_lengths['utf_32_le'])),
+                 range(0x110000, 256 ** code_units_sizes['utf_32_le'])),
          'utf_8': range(128, 256),
          'utf_8_sig': range(128, 256),
          'cp65001': range(128, 256),
@@ -341,7 +333,7 @@ def strings_sizes_to_bytes_sizes(min_size: int,
                                  max_size: Optional[int],
                                  *,
                                  encoding: str) -> Tuple[int, Optional[int]]:
-    encoding_length = encodings_lengths[encoding]
+    encoding_length = code_units_sizes[encoding]
     bom = encoding_to_bom(encoding)
     result_min_size = min_size * encoding_length + len(bom)
     result_max_size = max_size
