@@ -91,7 +91,7 @@ def _(object_: Applier) -> signatures.Base:
 @functools.singledispatch
 def _bind_positionals(signature: signatures.Base,
                       args: Tuple[Domain, ...]) -> signatures.Base:
-    raise TypeError('Unknown signature type: {type}.'
+    raise TypeError('Unsupported signature type: {type}.'
                     .format(type=type(signature)))
 
 
