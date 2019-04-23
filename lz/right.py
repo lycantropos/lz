@@ -1,6 +1,7 @@
 import functools
 import itertools
-from operator import attrgetter
+from operator import (attrgetter,
+                      methodcaller)
 from typing import (Callable,
                     Iterable,
                     List,
@@ -148,9 +149,14 @@ def _(signature: signatures.Plain,
 @_bind_positionals.register(signatures.Overloaded)
 def _(signature: signatures.Overloaded,
       args: Tuple[Domain, ...]) -> signatures.Base:
+    sub_signatures = list(filter(methodcaller(signatures.Base.expects.__name__,
+                                              *args),
+                                 signature.signatures))
+    if not sub_signatures:
+        raise TypeError('No corresponding signature found.')
     return signatures.Overloaded(*map(functools.partial(_bind_positionals,
                                                         args=args),
-                                      signature.signatures))
+                                      sub_signatures))
 
 
 def applier(function: Callable[..., Range],
