@@ -25,7 +25,6 @@ from typing import (Any,
                     Tuple)
 
 from hypothesis import strategies
-from hypothesis.searchstrategy import SearchStrategy
 from paradigm import (models,
                       signatures)
 
@@ -87,7 +86,7 @@ maps_arguments = (strategies.integers()
                                       allow_infinity=False))
 
 
-def extend_suitable_maps(maps_tuples: SearchStrategy
+def extend_suitable_maps(maps_tuples: Strategy[Tuple[Map, ...]]
                          ) -> Strategy[Tuple[Map, ...]]:
     def expand(maps_tuple: Tuple[Map, ...]) -> Strategy[Tuple[Map, ...]]:
         return strategies.tuples(to_one_of_suitable_maps(maps_tuple[0]),
@@ -243,8 +242,8 @@ partitioned_transparent_functions_calls = (transparent_functions_calls
 
 def to_invalid_args(function: Callable[..., Any],
                     *,
-                    values: SearchStrategy[Domain] = strategies.none()
-                    ) -> SearchStrategy[Tuple[Domain, ...]]:
+                    values: Strategy[Domain] = strategies.none()
+                    ) -> Strategy[Tuple[Domain, ...]]:
     signature = signatures.factory(function)
     count = signature_to_max_positionals_count(signature) + 1
     return to_homogeneous_tuples(values,
