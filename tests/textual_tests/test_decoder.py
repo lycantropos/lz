@@ -5,9 +5,9 @@ from hypothesis import given
 from lz.functional import compose
 from lz.textual import (decoder,
                         encoder)
-from tests.textual_tests import strategies
-from tests.utils import (encoding_to_bom)
 from tests.hints import ByteSequence
+from tests.textual_tests import strategies
+from tests.utils import encoding_to_bom
 
 
 @given(strategies.byte_sequences_with_encodings)

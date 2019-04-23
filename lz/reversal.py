@@ -18,8 +18,8 @@ from typing import (Any,
 from .arithmetical import ceil_division
 from .hints import (Domain,
                     Range)
-from .textual import (decoder,
-                      code_units_sizes,
+from .textual import (code_units_sizes,
+                      decoder,
                       read_batch_from_end)
 
 
