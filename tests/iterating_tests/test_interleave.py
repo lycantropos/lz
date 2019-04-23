@@ -9,11 +9,9 @@ from lz.iterating import (first,
 from lz.replication import duplicate
 from tests import strategies
 from tests.utils import (are_iterables_similar,
-                         are_objects_similar,
-                         slow_data_generation)
+                         are_objects_similar)
 
 
-@slow_data_generation
 @given(strategies.empty.iterables, strategies.nested_iterables)
 def test_basic(empty_iterable: Iterable[Any],
                nested_iterable: Iterable[Iterable[Any]]) -> None:
@@ -24,7 +22,6 @@ def test_basic(empty_iterable: Iterable[Any],
     assert are_iterables_similar(result, interleave(original))
 
 
-@slow_data_generation
 @given(strategies.nested_iterables, strategies.non_empty_iterables)
 def test_step(nested_iterable: Iterable[Iterable[Any]],
               non_empty_iterable: Iterable[Any]) -> None:

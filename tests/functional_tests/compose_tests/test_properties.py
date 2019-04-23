@@ -9,7 +9,6 @@ from lz.hints import (Domain,
                       Map,
                       Range)
 from tests.hints import CompositionCall
-from tests.utils import slow_data_generation
 from . import strategies
 
 
@@ -38,7 +37,6 @@ def test_associativity(maps_triplet_call: CompositionCall) -> None:
 
 
 @given(strategies.maps_chain_calls)
-@slow_data_generation
 def test_currying(maps_chain_call: CompositionCall) -> None:
     (next_suitable_map, *suitable_maps), map_argument = maps_chain_call
     composition = compose(next_suitable_map, *suitable_maps)

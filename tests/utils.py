@@ -20,8 +20,6 @@ from typing import (Any,
                     Type)
 
 import pytest
-from hypothesis import (HealthCheck,
-                        settings)
 
 from lz.hints import (Domain,
                       Map,
@@ -32,12 +30,6 @@ try:
     from typing import ContextManager
 except ImportError:
     from typing_extensions import ContextManager
-
-slow_data_generation = settings(
-        deadline=None,
-        max_examples=10,
-        suppress_health_check=[HealthCheck.filter_too_much,
-                               HealthCheck.too_slow])
 
 
 def iterable_starts_with(iterable: Iterable[Any],
