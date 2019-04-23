@@ -43,8 +43,8 @@ def read_batch_from_end(byte_stream: BinaryIO,
 # in bytes
 code_units_sizes = defaultdict(lambda: 1,
                                {'utf_16': 2,
-                                   'utf_16_be': 2,
-                                   'utf_16_le': 2,
-                                   'utf_32': 4,
-                                   'utf_32_be': 4,
-                                   'utf_32_le': 4})
+                                'utf_16_be': 2,
+                                'utf_16_le': 2,
+                                'utf_32': 4,
+                                'utf_32_be': 4,
+                                'utf_32_le': 4})
