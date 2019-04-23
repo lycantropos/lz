@@ -83,9 +83,9 @@ class Applier(ApplierBase):
 
 @signatures.factory.register(Applier)
 def _(object_: Applier) -> signatures.Base:
-    return (_bind_positionals(signatures.factory(object_.func)
-                              .bind(**object_.keywords),
-                              object_.args))
+    return _bind_positionals(signatures.factory(object_.func)
+                             .bind(**object_.keywords),
+                             object_.args)
 
 
 @functools.singledispatch
