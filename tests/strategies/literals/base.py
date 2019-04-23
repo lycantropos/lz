@@ -10,9 +10,9 @@ from typing import (Any,
 
 from hypothesis import strategies
 
-from tests.configs import MAX_MIN_ITERABLES_SIZE
 from tests.hints import Strategy
 from .factories import (to_any_streams,
+                        to_any_strings,
                         to_byte_sequences,
                         to_byte_strings,
                         to_dictionaries,
@@ -87,28 +87,18 @@ json_serializable_objects = strategies.recursive(
 positionals_arguments = tuples
 keywords_arguments = to_dictionaries(strings, scalars)
 sortable_domains = [byte_sequences, real_numbers, sets, strings]
-min_iterables_sizes = strategies.integers(0, MAX_MIN_ITERABLES_SIZE)
 
 
 def to_iterables(min_size: int) -> Strategy[Iterable[Any]]:
     limit_min_size = partial(partial,
                              min_size=min_size)
     return (encodings.flatmap(limit_min_size(to_any_streams))
-            | encodings.flatmap(limit_min_size(to_byte_sequences))
-            | limit_min_size(to_homogeneous_iterables)(scalars)
-            | encodings.flatmap(limit_min_size(to_strings)))
+            | encodings.flatmap(limit_min_size(to_any_strings))
+            | limit_min_size(to_homogeneous_iterables)(scalars))
 
 
-iterables = min_iterables_sizes.flatmap(to_iterables)
-non_empty_iterables = strategies.just(1).flatmap(to_iterables)
-
-
-def to_nested_iterables(min_size: int) -> Strategy[Iterable[Iterable[Any]]]:
-    limit_min_size = partial(partial,
-                             min_size=min_size)
-    return (limit_min_size(to_homogeneous_iterables)(iterables)
-            | encodings.flatmap(limit_min_size(to_strings))
-            | encodings.flatmap(limit_min_size(to_text_streams)))
-
-
-nested_iterables = min_iterables_sizes.flatmap(to_nested_iterables)
+iterables = to_iterables(0)
+non_empty_iterables = to_iterables(1)
+nested_iterables = (to_homogeneous_iterables(iterables)
+                    | encodings.flatmap(to_strings)
+                    | encodings.flatmap(to_text_streams))

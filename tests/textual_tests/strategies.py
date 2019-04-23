@@ -1,5 +1,4 @@
-from typing import (AnyStr,
-                    BinaryIO,
+from typing import (BinaryIO,
                     Tuple)
 
 from hypothesis import strategies
@@ -8,10 +7,8 @@ from tests.hints import (ByteSequence,
                          ByteStreamWithBatchParameters,
                          Strategy)
 from tests.strategies import (encodings,
-                              to_any_strings,
                               to_byte_sequences,
-                              to_byte_streams,
-                              to_separator)
+                              to_byte_streams)
 from tests.utils import (to_stream_contents,
                          to_stream_size)
 
@@ -36,16 +33,6 @@ def to_strings_with_encoding(encoding: str
 
 
 strings_with_encodings = encodings.flatmap(to_strings_with_encoding)
-
-
-def to_any_string_with_separator(any_string: AnyStr
-                                 ) -> Strategy[Tuple[AnyStr, AnyStr]]:
-    return strategies.tuples(strategies.just(any_string),
-                             to_separator(any_string))
-
-
-any_strings_with_separators = (encodings.flatmap(to_any_strings)
-                               .flatmap(to_any_string_with_separator))
 
 
 def to_byte_stream_with_batch_parameters(

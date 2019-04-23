@@ -12,7 +12,7 @@ from tests.utils import (are_iterables_similar,
 from . import strategies
 
 
-@given(strategies.plain_hashables_iterables, strategies.keys_functions)
+@given(strategies.hashables_iterables, strategies.keys_functions)
 def test_round_trip(iterable: Iterable[Hashable],
                     key_function: Map[Any, Hashable]) -> None:
     original, target = duplicate(iterable)

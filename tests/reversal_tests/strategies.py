@@ -9,34 +9,27 @@ from tests.hints import (Strategy,
                          StreamWithReverseParameters)
 from tests.strategies import (empty,
                               encodings,
-                              min_iterables_sizes,
                               scalars,
-                              to_byte_sequences,
+                              to_any_strings,
                               to_byte_streams,
                               to_homogeneous_sequences,
                               to_separator,
-                              to_strings,
                               to_text_streams)
 from tests.utils import (to_stream_contents,
                          to_stream_size)
 
 empty_sequences = empty.sequences
-to_non_empty = partial(partial,
-                       min_size=1)
-non_empty_sequences = (encodings.flatmap(to_non_empty(to_byte_sequences))
-                       | to_non_empty(to_homogeneous_sequences)(scalars)
-                       | encodings.flatmap(to_non_empty(to_strings)))
 
 
 def to_sequences(min_size: int) -> Strategy[Sequence[Any]]:
     limit_min_size = partial(partial,
                              min_size=min_size)
-    return (encodings.flatmap(limit_min_size(to_byte_sequences))
-            | limit_min_size(to_homogeneous_sequences)(scalars)
-            | encodings.flatmap(limit_min_size(to_strings)))
+    return (encodings.flatmap(limit_min_size(to_any_strings))
+            | limit_min_size(to_homogeneous_sequences)(scalars))
 
 
-sequences = min_iterables_sizes.flatmap(to_sequences)
+non_empty_sequences = to_sequences(1)
+sequences = to_sequences(0)
 
 
 def to_stream_with_reverse_parameters(
