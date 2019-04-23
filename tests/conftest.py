@@ -63,7 +63,6 @@ pytest_plugins = list(explore_pytest_plugins(fixtures_package_path))
 
 settings.register_profile('default',
                           deadline=None,
-                          max_examples=10,
                           suppress_health_check=[HealthCheck.filter_too_much,
                                                  HealthCheck.too_slow])
 
