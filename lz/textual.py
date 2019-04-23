@@ -1,27 +1,5 @@
-import codecs
 from collections import defaultdict
-from functools import partial
 from typing import BinaryIO
-
-from .hints import Map
-
-
-def decoder(encoding: str) -> Map[bytes, str]:
-    """
-    Returns function that decodes byte sequence
-    with codec registered for given encoding.
-    """
-    return partial(codecs.decode,
-                   encoding=encoding)
-
-
-def encoder(encoding: str) -> Map[str, bytes]:
-    """
-    Returns function that encodes string
-    with codec registered for given encoding.
-    """
-    return partial(codecs.encode,
-                   encoding=encoding)
 
 
 def read_batch_from_end(byte_stream: BinaryIO,

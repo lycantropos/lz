@@ -1,3 +1,4 @@
+import codecs
 import functools
 import io
 import itertools
@@ -19,7 +20,6 @@ from .arithmetical import ceil_division
 from .hints import (Domain,
                     Range)
 from .textual import (code_units_sizes,
-                      decoder,
                       read_batch_from_end)
 
 
@@ -96,7 +96,8 @@ def reverse_file(object_: TextIO,
     code_unit_size = code_units_sizes[encoding]
     if batch_size is not None:
         batch_size = ceil_division(batch_size, code_unit_size) * code_unit_size
-    yield from map(decoder(encoding),
+    yield from map(functools.partial(codecs.decode,
+                                     encoding=encoding),
                    reverse(object_.buffer,
                            batch_size=batch_size,
                            lines_separator=lines_separator,

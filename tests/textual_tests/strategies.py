@@ -1,38 +1,13 @@
-from typing import (BinaryIO,
-                    Tuple)
+from typing import BinaryIO
 
 from hypothesis import strategies
 
-from tests.hints import (ByteSequence,
-                         ByteStreamWithBatchParameters,
+from tests.hints import (ByteStreamWithBatchParameters,
                          Strategy)
 from tests.strategies import (encodings,
-                              to_byte_sequences,
                               to_byte_streams)
 from tests.utils import (to_stream_contents,
                          to_stream_size)
-
-
-def to_byte_sequences_with_encoding(encoding: str
-                                    ) -> Strategy[Tuple[ByteSequence, str]]:
-    return strategies.tuples(to_byte_sequences(encoding),
-                             strategies.just(encoding))
-
-
-byte_sequences_with_encodings = (encodings
-                                 .flatmap(to_byte_sequences_with_encoding))
-
-
-def to_strings_with_encoding(encoding: str
-                             ) -> Strategy[Tuple[ByteSequence, str]]:
-    def decode(byte_sequence: ByteSequence) -> str:
-        return byte_sequence.decode(encoding)
-
-    return strategies.tuples(to_byte_sequences(encoding).map(decode),
-                             strategies.just(encoding))
-
-
-strings_with_encodings = encodings.flatmap(to_strings_with_encoding)
 
 
 def to_byte_stream_with_batch_parameters(
