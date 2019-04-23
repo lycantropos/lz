@@ -22,7 +22,8 @@ def to_combination_calls(maps_sequence: Sequence[Map]
                                      max_size=len(maps_sequence)))
 
 
-combinations_calls = to_homogeneous_sequences(maps).flatmap(to_combination_calls)
+combinations_calls = (to_homogeneous_sequences(maps)
+                      .flatmap(to_combination_calls))
 non_empty_combination_calls = (to_homogeneous_sequences(maps,
                                                         min_size=1)
                                .flatmap(to_combination_calls))
