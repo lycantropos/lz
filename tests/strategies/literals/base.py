@@ -6,11 +6,13 @@ from typing import (Any,
                     Dict,
                     Iterable,
                     List,
+                    Tuple,
                     Union)
 
 from hypothesis import strategies
 
-from tests.hints import Strategy
+from tests.hints import (ByteSequence,
+                         Strategy)
 from .factories import (to_any_streams,
                         to_any_strings,
                         to_byte_sequences,
@@ -102,3 +104,25 @@ non_empty_iterables = to_iterables(1)
 nested_iterables = (to_homogeneous_iterables(iterables)
                     | encodings.flatmap(to_strings)
                     | encodings.flatmap(to_text_streams))
+
+
+def to_byte_sequences_with_encoding(encoding: str
+                                    ) -> Strategy[Tuple[ByteSequence, str]]:
+    return strategies.tuples(to_byte_sequences(encoding),
+                             strategies.just(encoding))
+
+
+byte_sequences_with_encodings = (encodings
+                                 .flatmap(to_byte_sequences_with_encoding))
+
+
+def to_strings_with_encoding(encoding: str
+                             ) -> Strategy[Tuple[ByteSequence, str]]:
+    def decode(byte_sequence: ByteSequence) -> str:
+        return byte_sequence.decode(encoding)
+
+    return strategies.tuples(to_byte_sequences(encoding).map(decode),
+                             strategies.just(encoding))
+
+
+strings_with_encodings = encodings.flatmap(to_strings_with_encoding)

@@ -4,6 +4,7 @@ import json
 import os
 import random
 import string
+import textwrap
 from collections import (OrderedDict,
                          abc)
 from decimal import Decimal
@@ -43,6 +44,7 @@ from tests.hints import (Args,
                          Strategy)
 from .literals import empty
 from .literals.base import (byte_sequences,
+                            byte_sequences_with_encodings,
                             integers,
                             json_serializable_objects,
                             lists,
@@ -52,6 +54,7 @@ from .literals.base import (byte_sequences,
                             sets,
                             sortable_domains,
                             strings,
+                            strings_with_encodings,
                             tuples)
 from .literals.factories import to_homogeneous_tuples
 from .utils import identifiers
@@ -105,9 +108,11 @@ def is_various(sequence: Sequence) -> bool:
 
 various_suitable_maps = suitable_maps.filter(is_various)
 # "transparent" is an abbr. of "referential transparent"
-non_variadic_transparent_functions = strategies.sampled_from([bool, complex,
-                                                              float, identity,
-                                                              int, str])
+non_variadic_transparent_functions = strategies.sampled_from([bool, bytes,
+                                                              complex, float,
+                                                              identity,
+                                                              int, str,
+                                                              textwrap.indent])
 variadic_transparent_functions = strategies.sampled_from([json.dumps,
                                                           json.loads,
                                                           os.path.join])
@@ -117,6 +122,7 @@ paths_names_parts = strategies.text(
         strategies.sampled_from(string.digits + string.ascii_letters + '_'))
 to_transparent_function_args = {
     bool: strategies.tuples(scalars),
+    bytes: strings_with_encodings,
     complex: strategies.tuples(numbers),
     float: strategies.tuples(real_numbers),
     identity: strategies.tuples(scalars),
@@ -125,10 +131,12 @@ to_transparent_function_args = {
     json.loads: strategies.tuples(json_serializable_objects.map(json.dumps)),
     os.path.join: to_homogeneous_tuples(paths_names_parts,
                                         min_size=1),
-    str: strategies.tuples(scalars),
+    str: byte_sequences_with_encodings,
+    textwrap.indent: strategies.tuples(strings, strings),
 }.__getitem__
 to_transparent_function_kwargs = {
     bool: empty.dictionaries,
+    bytes: empty.dictionaries,
     complex: empty.dictionaries,
     float: empty.dictionaries,
     identity: empty.dictionaries,
@@ -145,6 +153,7 @@ to_transparent_function_kwargs = {
                       | strategies.sampled_from([int, float]))}),
     os.path.join: empty.dictionaries,
     str: empty.dictionaries,
+    textwrap.indent: empty.dictionaries,
 }.__getitem__
 projectors = strategies.sampled_from([add, and_, max, min, or_,
                                       os.path.join, sub, xor])
