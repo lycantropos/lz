@@ -13,4 +13,4 @@ def test_round_trip(function_call: FunctionCall) -> None:
 
     result = round_trip_pickle(flipped)
 
-    assert result(*args, **kwargs) == flipped(*args, **kwargs)
+    assert result(*args[::-1], **kwargs) == flipped(*args[::-1], **kwargs)

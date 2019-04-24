@@ -23,6 +23,6 @@ def test_currying(function_call: FunctionCall) -> None:
     flipped = flip(function)
     curried_flipped = curry(flipped)
 
-    result = curried_flipped(*args, **kwargs)
+    result = curried_flipped(*args[::-1], **kwargs)
 
-    assert result == flipped(*args, **kwargs)
+    assert result == flipped(*args[::-1], **kwargs)
