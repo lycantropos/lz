@@ -1,16 +1,19 @@
 from typing import Iterable
 
 import pytest
+from hypothesis import given
 
 from lz.filtration import grabber
 from lz.hints import (Domain,
                       Predicate)
 from lz.replication import duplicate
+from tests import strategies
 from tests.utils import (are_iterables_similar,
                          are_objects_similar,
                          is_empty)
 
 
+@given(strategies.iterables)
 def test_basic(iterable: Iterable[Domain]) -> None:
     original, target = duplicate(iterable)
     grab = grabber()
@@ -27,6 +30,7 @@ def test_basic(iterable: Iterable[Domain]) -> None:
         next(result_iterator)
 
 
+@given(strategies.iterables, strategies.false_predicates)
 def test_false_predicate(iterable: Iterable[Domain],
                          false_predicate: Predicate) -> None:
     skip_all = grabber(false_predicate)
@@ -36,6 +40,7 @@ def test_false_predicate(iterable: Iterable[Domain],
     assert is_empty(result)
 
 
+@given(strategies.iterables, strategies.true_predicates)
 def test_true_predicate(iterable: Iterable[Domain],
                         true_predicate: Predicate) -> None:
     original, target = duplicate(iterable)

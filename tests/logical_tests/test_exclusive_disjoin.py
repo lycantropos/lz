@@ -1,8 +1,12 @@
+from hypothesis import given
+
 from lz.hints import (Domain,
                       Predicate)
 from lz.logical import exclusive_disjoin
+from tests import strategies
 
 
+@given(strategies.predicates, strategies.predicates_arguments)
 def test_idempotency(predicate: Predicate,
                      predicate_argument: Domain) -> None:
     self_disjunction = exclusive_disjoin(predicate)
@@ -12,6 +16,9 @@ def test_idempotency(predicate: Predicate,
     assert result is predicate(predicate_argument)
 
 
+@given(strategies.predicates,
+       strategies.false_predicates,
+       strategies.predicates_arguments)
 def test_neutral_element(predicate: Predicate,
                          false_predicate: Predicate,
                          predicate_argument: Domain) -> None:
@@ -24,6 +31,9 @@ def test_neutral_element(predicate: Predicate,
     assert left_result is right_result is predicate(predicate_argument)
 
 
+@given(strategies.predicates,
+       strategies.predicates,
+       strategies.predicates_arguments)
 def test_commutativity(left_predicate: Predicate,
                        right_predicate: Predicate,
                        predicate_argument: Domain) -> None:
@@ -36,6 +46,10 @@ def test_commutativity(left_predicate: Predicate,
     assert left_result is right_result
 
 
+@given(strategies.predicates,
+       strategies.predicates,
+       strategies.predicates,
+       strategies.predicates_arguments)
 def test_associativity(left_predicate: Predicate,
                        mid_predicate: Predicate,
                        right_predicate: Predicate,

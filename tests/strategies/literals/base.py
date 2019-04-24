@@ -1,30 +1,29 @@
-import builtins
-import inspect
 import platform
 import string
 import sys
-from collections import abc
-from types import ModuleType
-from typing import (Dict,
+from functools import partial
+from typing import (Any,
+                    Dict,
+                    Iterable,
                     List,
+                    Tuple,
                     Union)
 
 from hypothesis import strategies
-from hypothesis.searchstrategy import SearchStrategy
 
-from tests.configs import MAX_ITERABLES_SIZE
-from .factories import (to_byte_sequences,
+from tests.hints import (ByteSequence,
+                         Strategy)
+from .factories import (to_any_streams,
+                        to_any_strings,
+                        to_byte_sequences,
                         to_byte_strings,
-                        to_characters,
                         to_dictionaries,
-                        to_homogeneous_frozensets,
                         to_homogeneous_iterables,
-                        to_homogeneous_iterators,
                         to_homogeneous_lists,
                         to_homogeneous_sets,
                         to_homogeneous_tuples,
-                        to_integers,
-                        to_strings)
+                        to_strings,
+                        to_text_streams)
 
 Serializable = Union[None, bool, float, int, str]
 Serializable = Union[Dict[str, Serializable], List[Serializable]]
@@ -68,64 +67,62 @@ if sys.platform == 'win32' and platform.python_implementation() != 'PyPy':
     encodings.append('cp65001')
 encodings = strategies.sampled_from(encodings)
 byte_strings = encodings.flatmap(to_byte_strings)
-strings = to_strings(to_characters())
-
-
-def module_to_classes(module: ModuleType) -> List[type]:
-    return list(filter(inspect.isclass,
-                       vars(module).values()))
-
-
-abstract_base_classes = strategies.sampled_from(module_to_classes(abc))
-built_in_classes = strategies.sampled_from(module_to_classes(builtins))
-classes = abstract_base_classes | built_in_classes
-
-deferred_hashables = strategies.deferred(lambda: hashables)
-deferred_objects = strategies.deferred(lambda: objects)
-hashables = (scalars
-             | byte_strings
-             | strings
-             | classes
-             | to_homogeneous_frozensets(deferred_hashables)
-             | to_homogeneous_iterators(deferred_objects)
-             | to_homogeneous_tuples(deferred_hashables))
-indices = strategies.integers(-MAX_ITERABLES_SIZE, MAX_ITERABLES_SIZE - 1)
-slices_fields = strategies.none() | indices
-slices = strategies.builds(slice,
-                           slices_fields,
-                           slices_fields,
-                           slices_fields)
+strings = encodings.flatmap(to_strings)
 byte_sequences = encodings.flatmap(to_byte_sequences)
-any_strings = strings | byte_sequences
-iterables = (any_strings
-             | to_homogeneous_iterables(deferred_objects))
-sets = to_homogeneous_sets(hashables)
-objects = (hashables
-           | slices
-           | iterables
-           | sets
-           | to_dictionaries(hashables, deferred_objects))
-tuples = to_homogeneous_tuples(objects)
-lists = to_homogeneous_lists(objects)
+sets = to_homogeneous_sets(scalars)
+tuples = to_homogeneous_tuples(scalars)
+lists = to_homogeneous_lists(scalars)
 
 
-def extend_json(children: SearchStrategy[Serializable]
-                ) -> SearchStrategy[Serializable]:
+def extend_json(children: Strategy[Serializable]) -> Strategy[Serializable]:
     return (strategies.lists(children)
-            | to_dictionaries(to_strings(string.printable),
+            | to_dictionaries(strategies.text(strategies
+                                              .sampled_from(string.printable)),
                               children))
 
 
 json_serializable_objects = strategies.recursive(
         strategies.none()
         | real_numbers
-        | to_strings(string.printable),
+        | strategies.text(strategies.sampled_from(string.printable)),
         extend_json)
 positionals_arguments = tuples
-keywords_arguments = to_dictionaries(strings, objects)
-
+keywords_arguments = to_dictionaries(strings, scalars)
 sortable_domains = [byte_sequences, real_numbers, sets, strings]
-sortable_iterables = strategies.one_of(*map(to_homogeneous_iterables,
-                                            sortable_domains))
 
-iterables_sizes = to_integers(0, MAX_ITERABLES_SIZE)
+
+def to_iterables(min_size: int) -> Strategy[Iterable[Any]]:
+    limit_min_size = partial(partial,
+                             min_size=min_size)
+    return (encodings.flatmap(limit_min_size(to_any_streams))
+            | encodings.flatmap(limit_min_size(to_any_strings))
+            | limit_min_size(to_homogeneous_iterables)(scalars))
+
+
+iterables = to_iterables(0)
+non_empty_iterables = to_iterables(1)
+nested_iterables = (to_homogeneous_iterables(iterables)
+                    | encodings.flatmap(to_strings)
+                    | encodings.flatmap(to_text_streams))
+
+
+def to_byte_sequences_with_encoding(encoding: str
+                                    ) -> Strategy[Tuple[ByteSequence, str]]:
+    return strategies.tuples(to_byte_sequences(encoding),
+                             strategies.just(encoding))
+
+
+byte_sequences_with_encodings = (encodings
+                                 .flatmap(to_byte_sequences_with_encoding))
+
+
+def to_strings_with_encoding(encoding: str
+                             ) -> Strategy[Tuple[ByteSequence, str]]:
+    def decode(byte_sequence: ByteSequence) -> str:
+        return byte_sequence.decode(encoding)
+
+    return strategies.tuples(to_byte_sequences(encoding).map(decode),
+                             strategies.just(encoding))
+
+
+strings_with_encodings = encodings.flatmap(to_strings_with_encoding)

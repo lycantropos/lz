@@ -1,62 +1,35 @@
 import codecs
+import os
+import pickle
 from collections import (abc,
                          defaultdict,
                          deque)
 from contextlib import contextmanager
 from functools import singledispatch
-from itertools import (starmap,
+from itertools import (chain,
+                       starmap,
                        zip_longest)
 from operator import methodcaller
 from typing import (Any,
+                    AnyStr,
                     Hashable,
+                    IO,
                     Iterable,
                     Mapping,
                     Set,
-                    Type,
-                    TypeVar)
+                    Type)
+
+import pytest
+
+from lz.hints import (Domain,
+                      Map,
+                      Range)
+from lz.replication import duplicate
 
 try:
     from typing import ContextManager
 except ImportError:
     from typing_extensions import ContextManager
-
-import pytest
-from hypothesis import (Phase,
-                        core,
-                        settings)
-from hypothesis.errors import (NoSuchExample,
-                               Unsatisfiable)
-from hypothesis.searchstrategy import SearchStrategy
-
-from lz.hints import Domain
-from lz.replication import duplicate
-
-Intermediate = TypeVar('Intermediate')
-
-
-def find(strategy: SearchStrategy[Domain]) -> Domain:
-    first_object_list = []
-
-    def condition(object_: Any) -> bool:
-        if first_object_list:
-            return True
-        else:
-            first_object_list.append(object_)
-            return False
-
-    try:
-        return core.find(strategy,
-                         condition,
-                         settings=settings(database=None,
-                                           phases=tuple(set(Phase)
-                                                        - {Phase.shrink})))
-    except (NoSuchExample, Unsatisfiable) as search_error:
-        try:
-            result, = first_object_list
-        except ValueError as unpacking_error:
-            raise unpacking_error from search_error
-        else:
-            return result
 
 
 def iterable_starts_with(iterable: Iterable[Any],
@@ -195,6 +168,8 @@ def are_sets_similar(object_: Set[Any], *rest: Set[Any]) -> bool:
 
 
 def has_similar_types(left_object: Any, right_object: Any) -> bool:
+    if isinstance(left_object, abc.Iterator):
+        return isinstance(right_object, abc.Iterator)
     left_type = type(left_object)
     right_type = type(right_object)
     return (issubclass(left_type, right_type)
@@ -235,8 +210,17 @@ encoding_to_bom = (defaultdict(bytes,
                    .__getitem__)
 
 
+def flatmap(function: Map[Domain, Iterable[Range]],
+            *iterables: Iterable[Domain]) -> Iterable[Range]:
+    yield from chain.from_iterable(map(function, *iterables))
+
+
 def equivalence(left_statement: bool, right_statement: bool) -> bool:
     return not left_statement ^ right_statement
+
+
+def implication(antecedent: bool, consequent: bool) -> bool:
+    return not antecedent or consequent
 
 
 @contextmanager
@@ -245,3 +229,28 @@ def not_raises(*exceptions_classes: Type[Exception]) -> ContextManager[None]:
         yield
     except exceptions_classes as error:
         raise pytest.fail('RAISED {}'.format(type(error)))
+
+
+def round_trip_pickle(object_: Any) -> Any:
+    return pickle.loads(pickle.dumps(object_))
+
+
+def is_pickleable(object_: Any) -> bool:
+    try:
+        pickle.dumps(object_)
+    except pickle.PicklingError:
+        return False
+    else:
+        return True
+
+
+def to_stream_contents(stream: IO[AnyStr]) -> AnyStr:
+    result = stream.read()
+    stream.seek(0)
+    return result
+
+
+def to_stream_size(stream: IO[AnyStr]) -> int:
+    result = stream.seek(0, os.SEEK_END)
+    stream.seek(0)
+    return result

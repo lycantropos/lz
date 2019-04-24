@@ -5,7 +5,6 @@ from typing import (Callable,
                     List,
                     Tuple)
 
-from .functional import ApplierBase
 from .hints import (Domain,
                     Map,
                     Range)
@@ -19,12 +18,19 @@ def accumulator(function: Callable[[Range, Domain], Range],
     Returns function that yields cumulative results of given binary function
     starting from given initial object in direction from left to right.
     """
-    attach_initial = attacher(initial)
+    return functools.partial(accumulate,
+                             function=function,
+                             initial=initial)
 
-    def accumulate(iterable: Iterable[Domain]) -> Iterable[Range]:
-        yield from itertools.accumulate(attach_initial(iterable), function)
 
-    return accumulate
+def accumulate(iterable: Iterable[Domain],
+               function: Callable[[Range, Domain], Range],
+               initial: Range) -> Iterable[Range]:
+    """
+    Yields cumulative results of given binary function
+    starting from given initial object in direction from left to right.
+    """
+    yield from itertools.accumulate(attach(iterable, initial), function)
 
 
 def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
@@ -59,11 +65,19 @@ def folder(function: Callable[[Range, Domain], Range],
     Returns function that cumulatively applies given binary function
     starting from given initial object in direction from left to right.
     """
+    return functools.partial(fold,
+                             function=function,
+                             initial=initial)
 
-    def fold(iterable: Iterable[Domain]) -> Range:
-        return functools.reduce(function, iterable, initial)
 
-    return fold
+def fold(iterable: Iterable[Domain],
+         function: Callable[[Range, Domain], Range],
+         initial: Range) -> Range:
+    """
+    Cumulatively applies given binary function
+    starting from given initial object in direction from left to right.
+    """
+    return functools.reduce(function, iterable, initial)
 
 
 Applier = functools.partial

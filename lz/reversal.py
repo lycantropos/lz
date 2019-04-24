@@ -1,3 +1,4 @@
+import codecs
 import functools
 import io
 import itertools
@@ -7,10 +8,9 @@ from collections import abc
 from operator import (methodcaller,
                       sub)
 from typing import (Any,
-                    AnyStr,
                     BinaryIO,
-                    IO,
                     Iterable,
+                    List,
                     Optional,
                     Sequence,
                     TextIO,
@@ -19,9 +19,8 @@ from typing import (Any,
 from .arithmetical import ceil_division
 from .hints import (Domain,
                     Range)
-from .textual import (decoder,
-                      read_batch_from_end,
-                      split)
+from .textual import (code_units_sizes,
+                      read_batch_from_end)
 
 
 @overload
@@ -39,11 +38,21 @@ if sys.version_info >= (3, 6):
 
 
 @overload
-def reverse(object_: IO[AnyStr],
+def reverse(object_: TextIO,
             *,
             batch_size: Optional[int] = ...,
-            lines_separator: Optional[AnyStr] = ...,
-            keep_lines_separator: bool = ...) -> Iterable[AnyStr]:
+            lines_separator: Optional[str] = ...,
+            keep_lines_separator: bool = ...) -> Iterable[str]:
+    pass
+
+
+@overload
+def reverse(object_: BinaryIO,
+            *,
+            batch_size: Optional[int] = ...,
+            lines_separator: Optional[bytes] = ...,
+            keep_lines_separator: bool = ...,
+            code_unit_size: int = ...) -> Iterable[bytes]:
     pass
 
 
@@ -84,11 +93,16 @@ def reverse_file(object_: TextIO,
     encoding = object_.encoding
     if lines_separator is not None:
         lines_separator = lines_separator.encode(encoding)
-    yield from map(decoder(encoding),
+    code_unit_size = code_units_sizes[encoding]
+    if batch_size is not None:
+        batch_size = ceil_division(batch_size, code_unit_size) * code_unit_size
+    yield from map(functools.partial(codecs.decode,
+                                     encoding=encoding),
                    reverse(object_.buffer,
                            batch_size=batch_size,
                            lines_separator=lines_separator,
-                           keep_lines_separator=keep_lines_separator))
+                           keep_lines_separator=keep_lines_separator,
+                           code_unit_size=code_unit_size))
 
 
 @reverse.register(io.BufferedReader)
@@ -97,16 +111,30 @@ def reverse_binary_stream(object_: BinaryIO,
                           *,
                           batch_size: Optional[int] = None,
                           lines_separator: Optional[bytes] = None,
-                          keep_lines_separator: bool = True
+                          keep_lines_separator: bool = True,
+                          code_unit_size: int = 1
                           ) -> Iterable[bytes]:
     if lines_separator is None:
         lines_separator = (b'\r', b'\n', b'\r\n')
-        lines_splitter = methodcaller(str.splitlines.__name__,
+        lines_splitter = methodcaller(bytes.splitlines.__name__,
                                       keep_lines_separator)
     else:
-        lines_splitter = functools.partial(split,
-                                           separator=lines_separator,
-                                           keep_separator=keep_lines_separator)
+        def lines_splitter(byte_sequence: bytes) -> List[bytes]:
+            result = []
+            part = bytearray()
+            offset = 0
+            add_part = result.append
+            while offset < len(byte_sequence):
+                if (byte_sequence[offset:offset + len(lines_separator)]
+                        != lines_separator):
+                    part += byte_sequence[offset:offset + code_unit_size]
+                    offset += code_unit_size
+                else:
+                    add_part(part + keep_lines_separator * lines_separator)
+                    part.clear()
+                    offset += len(lines_separator)
+            add_part(part)
+            return result
     stream_size = object_.seek(0, os.SEEK_END)
     if batch_size is None:
         batch_size = stream_size or 1
@@ -120,15 +148,27 @@ def reverse_binary_stream(object_: BinaryIO,
         remaining_bytes_count = next(remaining_bytes_indicator)
     except StopIteration:
         return
-    batch = read_batch_from_end(object_,
-                                size=batch_size,
-                                end_position=remaining_bytes_count)
+
+    def read_batch(position: int) -> bytes:
+        result = read_batch_from_end(object_,
+                                     size=batch_size,
+                                     end_position=position)
+        while result.startswith(lines_separator):
+            try:
+                position = next(remaining_bytes_indicator)
+            except StopIteration:
+                break
+            result = (read_batch_from_end(object_,
+                                          size=batch_size,
+                                          end_position=position)
+                      + result)
+        return result
+
+    batch = read_batch(remaining_bytes_count)
     segment, *lines = lines_splitter(batch)
     yield from reverse(lines)
     for remaining_bytes_count in remaining_bytes_indicator:
-        batch = read_batch_from_end(object_,
-                                    size=batch_size,
-                                    end_position=remaining_bytes_count)
+        batch = read_batch(remaining_bytes_count)
         lines = lines_splitter(batch)
         if batch.endswith(lines_separator):
             yield segment

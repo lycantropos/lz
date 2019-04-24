@@ -1,32 +1,30 @@
-from functools import partial
+from collections import abc
 from typing import (Any,
-                    BinaryIO,
-                    Iterable,
-                    Sequence,
-                    TextIO)
+                    Sequence)
 
 import pytest
+from hypothesis import given
 
 from lz.iterating import (first,
                           last)
 from lz.replication import duplicate
 from lz.reversal import reverse
-from lz.textual import encoder
+from tests.hints import (ByteSequence,
+                         StreamWithReverseParameters)
 from tests.utils import (are_iterables_similar,
                          are_objects_similar,
                          is_empty)
+from . import strategies
 
 
+@given(strategies.empty_sequences)
 def test_empty(empty_sequence: Sequence[Any]) -> None:
     result = reverse(empty_sequence)
 
     assert is_empty(result)
 
 
-limit_min_size = partial(partial,
-                         min_size=1)
-
-
+@given(strategies.non_empty_sequences)
 def test_non_empty_left_end(non_empty_sequence: Sequence[Any]) -> None:
     original, target = duplicate(non_empty_sequence)
 
@@ -35,6 +33,7 @@ def test_non_empty_left_end(non_empty_sequence: Sequence[Any]) -> None:
     assert are_objects_similar(last(result), first(original))
 
 
+@given(strategies.non_empty_sequences)
 def test_non_empty_right_end(non_empty_sequence: Sequence[Any]) -> None:
     original, target = duplicate(non_empty_sequence)
 
@@ -43,6 +42,7 @@ def test_non_empty_right_end(non_empty_sequence: Sequence[Any]) -> None:
     assert are_objects_similar(first(result), last(original))
 
 
+@given(strategies.sequences)
 def test_involution(sequence: Sequence[Any]) -> None:
     original, target = duplicate(sequence)
 
@@ -51,42 +51,54 @@ def test_involution(sequence: Sequence[Any]) -> None:
     assert are_iterables_similar(result, original)
 
 
-def test_byte_stream(byte_stream: BinaryIO,
-                     byte_stream_batch_size: int,
-                     byte_stream_contents: bytes,
-                     byte_stream_lines_separator: bytes,
-                     keep_separator: bool) -> None:
-    result = reverse(byte_stream,
-                     batch_size=byte_stream_batch_size,
-                     lines_separator=byte_stream_lines_separator,
+@given(strategies.byte_streams_with_reverse_parameters)
+def test_byte_stream(
+        stream_with_reverse_parameters: StreamWithReverseParameters[bytes]
+) -> None:
+    (stream, contents,
+     (batch_size,
+      lines_separator,
+      keep_separator)) = stream_with_reverse_parameters
+    result = reverse(stream,
+                     batch_size=batch_size,
+                     lines_separator=lines_separator,
                      keep_lines_separator=keep_separator)
 
-    assert are_byte_substrings(result, byte_stream_contents)
+    assert isinstance(result, abc.Iterable)
+    assert all(remove_newline_characters_from_byte_sequence(line)
+               in remove_newline_characters_from_byte_sequence(contents)
+               for line in result)
 
 
-def test_text_stream(encoding: str,
-                     text_stream: TextIO,
-                     text_stream_batch_size: int,
-                     text_stream_raw_contents: bytes,
-                     text_stream_lines_separator: str,
-                     keep_separator: bool) -> None:
-    result = reverse(text_stream,
-                     batch_size=text_stream_batch_size,
-                     lines_separator=text_stream_lines_separator,
+@given(strategies.text_streams_with_reverse_parameters)
+def test_text_stream(
+        text_stream_with_reverse_parameters: StreamWithReverseParameters[str]
+) -> None:
+    (stream, contents,
+     (batch_size,
+      lines_separator,
+      keep_separator)) = text_stream_with_reverse_parameters
+    result = reverse(stream,
+                     batch_size=batch_size,
+                     lines_separator=lines_separator,
                      keep_lines_separator=keep_separator)
 
-    assert are_byte_substrings(map(encoder(encoding), result),
-                               text_stream_raw_contents)
+    assert isinstance(result, abc.Iterable)
+    assert all(remove_newline_characters_from_string(line)
+               in remove_newline_characters_from_string(contents)
+               for line in result)
 
 
-def are_byte_substrings(byte_strings: Iterable[bytes],
-                        target_string: bytes) -> bool:
-    if not target_string:
-        return True
-    return all(not line or set(line) & set(target_string)
-               for line in byte_strings)
+def remove_newline_characters_from_byte_sequence(byte_sequence: ByteSequence
+                                                 ) -> str:
+    return byte_sequence.translate(None, b'\r\n')
 
 
-def test_unsupported_type(irreversible_object: Any) -> None:
+def remove_newline_characters_from_string(string: str) -> str:
+    return string.translate(str.maketrans({'\r': None, '\n': None}))
+
+
+@given(strategies.scalars)
+def test_unsupported_type(object_: Any) -> None:
     with pytest.raises(TypeError):
-        reverse(irreversible_object)
+        reverse(object_)

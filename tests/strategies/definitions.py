@@ -1,8 +1,9 @@
 import importlib
 import inspect
-from types import ModuleType
-from typing import (Any,
-                    Union)
+from functools import partial
+from typing import Any
+
+from tests.utils import flatmap
 
 try:
     from typing import Protocol
@@ -10,7 +11,6 @@ except ImportError:
     from typing import _Protocol as Protocol
 
 from hypothesis import strategies
-from hypothesis.searchstrategy import SearchStrategy
 from paradigm.definitions import (is_supported,
                                   stdlib_modules_names,
                                   to_contents,
@@ -21,28 +21,23 @@ from paradigm.hints import (MethodDescriptorType,
 stdlib_modules = list(map(importlib.import_module,
                           stdlib_modules_names
                           - unsupported.stdlib_modules_names))
-modules = (strategies.sampled_from(stdlib_modules)
-           .filter(is_supported))
-
-
-def flatten_module_or_class(object_: Union[ModuleType, type]
-                            ) -> SearchStrategy:
-    return strategies.sampled_from(to_contents(object_))
-
-
-modules_callables = (modules.flatmap(flatten_module_or_class)
-                     .filter(callable))
+modules_callables_list = list(filter(callable, flatmap(
+        to_contents, filter(is_supported, stdlib_modules))))
+modules_callables = strategies.sampled_from(modules_callables_list)
 
 
 def is_not_protocol(class_: type) -> bool:
     return Protocol not in class_.__bases__
 
 
-classes = (modules_callables.filter(inspect.isclass)
-           .filter(is_supported)
-           .filter(is_not_protocol))
-classes_callables = (classes.flatmap(flatten_module_or_class)
-                     .filter(callable))
+classes_list = list(
+        filter(is_not_protocol,
+               filter(is_supported,
+                      filter(inspect.isclass, modules_callables_list))))
+classes = strategies.sampled_from(classes_list)
+classes_callables_list = list(filter(callable, flatmap(to_contents,
+                                                       classes_list)))
+classes_callables = strategies.sampled_from(classes_callables_list)
 methods = classes_callables.filter(inspect.isfunction)
 
 
@@ -69,3 +64,4 @@ callables = (built_in_functions
              | methods
              | methods_descriptors
              | wrappers_descriptors)
+partial_callables = callables.map(partial)

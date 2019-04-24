@@ -1,16 +1,19 @@
 from typing import Iterable
 
 import pytest
+from hypothesis import given
 
 from lz.filtration import kicker
 from lz.hints import (Domain,
                       Predicate)
 from lz.replication import duplicate
+from tests import strategies
 from tests.utils import (are_iterables_similar,
                          are_objects_similar,
                          is_empty)
 
 
+@given(strategies.iterables)
 def test_basic(iterable: Iterable[Domain]) -> None:
     original, target = duplicate(iterable)
     kick = kicker()
@@ -32,6 +35,7 @@ def test_basic(iterable: Iterable[Domain]) -> None:
         next(result_iterator)
 
 
+@given(strategies.iterables, strategies.false_predicates)
 def test_false_predicate(iterable: Iterable[Domain],
                          false_predicate: Predicate) -> None:
     original, target = duplicate(iterable)
@@ -42,6 +46,7 @@ def test_false_predicate(iterable: Iterable[Domain],
     assert are_iterables_similar(result, original)
 
 
+@given(strategies.iterables, strategies.true_predicates)
 def test_true_predicate(iterable: Iterable[Domain],
                         true_predicate: Predicate) -> None:
     kick_all = kicker(true_predicate)

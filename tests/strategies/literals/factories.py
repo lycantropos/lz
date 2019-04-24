@@ -1,4 +1,5 @@
 import io
+import os
 import sys
 from collections import defaultdict
 from functools import wraps
@@ -17,20 +18,21 @@ from typing import (AnyStr,
                     Union)
 
 from hypothesis import strategies
-from hypothesis.searchstrategy import SearchStrategy
 
+from lz.functional import pack
 from lz.hints import Domain
+from lz.textual import code_units_sizes
 from tests.configs import MAX_ITERABLES_SIZE
+from tests.hints import (ByteSequence,
+                         Strategy)
 from tests.utils import encoding_to_bom
 
-to_characters = strategies.characters
-to_integers = strategies.integers
 
-
-def limit_max_size(factory: Callable[..., SearchStrategy[Domain]]):
+def limit_max_size(factory: Callable[..., Strategy[Domain]]
+                   ) -> Callable[..., Strategy[Domain]]:
     @wraps(factory)
     def limited(*args, max_size: int = MAX_ITERABLES_SIZE, **kwargs
-                ) -> SearchStrategy[Domain]:
+                ) -> Strategy[Domain]:
         return factory(*args, max_size=max_size, **kwargs)
 
     return limited
@@ -41,7 +43,7 @@ def to_any_streams(encoding: str,
                    *,
                    min_size: int = 0,
                    max_size: Optional[int] = None
-                   ) -> SearchStrategy[IO[AnyStr]]:
+                   ) -> Strategy[IO[AnyStr]]:
     return (to_byte_streams(encoding,
                             min_size=min_size,
                             max_size=max_size)
@@ -51,11 +53,24 @@ def to_any_streams(encoding: str,
 
 
 @limit_max_size
-def to_byte_arrays(encoding: str,
+def to_any_strings(encoding: str,
                    *,
                    min_size: int = 0,
                    max_size: Optional[int] = None
-                   ) -> SearchStrategy[bytearray]:
+                   ) -> Strategy[Union[ByteSequence, str]]:
+    return (to_byte_sequences(encoding,
+                              min_size=min_size,
+                              max_size=max_size)
+            | to_strings(encoding,
+                         min_size=min_size,
+                         max_size=max_size))
+
+
+@limit_max_size
+def to_byte_arrays(encoding: str,
+                   *,
+                   min_size: int = 0,
+                   max_size: Optional[int] = None) -> Strategy[bytearray]:
     return (to_byte_strings(encoding,
                             min_size=min_size,
                             max_size=max_size)
@@ -67,7 +82,7 @@ def to_byte_sequences(encoding: str,
                       *,
                       min_size: int = 0,
                       max_size: Optional[int] = None
-                      ) -> SearchStrategy[Union[bytearray, bytes]]:
+                      ) -> Strategy[ByteSequence]:
     return (to_byte_arrays(encoding,
                            min_size=min_size,
                            max_size=max_size)
@@ -80,8 +95,7 @@ def to_byte_sequences(encoding: str,
 def to_byte_streams(encoding: str,
                     *,
                     min_size: int = 0,
-                    max_size: Optional[int] = None
-                    ) -> SearchStrategy[BinaryIO]:
+                    max_size: Optional[int] = None) -> Strategy[BinaryIO]:
     bom = encoding_to_bom(encoding)
 
     min_size_without_bom = max(min_size - len(bom), 0)
@@ -106,9 +120,8 @@ def to_byte_streams(encoding: str,
 def to_byte_strings(encoding: str,
                     *,
                     min_size: int = 0,
-                    max_size: Optional[int] = None
-                    ) -> SearchStrategy[bytes]:
-    length = encodings_lengths[encoding]
+                    max_size: Optional[int] = None) -> Strategy[bytes]:
+    length = code_units_sizes[encoding]
     min_characters_count = (min_size + length - 1) // length
     max_characters_count = max_size
     if max_characters_count is not None:
@@ -124,8 +137,7 @@ def to_characters_bytes(encoding: str,
                         little_byte_order_suffix: str = '_le',
                         big_byte_order_suffix: str = '_be',
                         little_byte_order_name: str = 'little',
-                        big_byte_order_name: str = 'big'
-                        ) -> SearchStrategy[bytes]:
+                        big_byte_order_name: str = 'big') -> Strategy[bytes]:
     unsupported_code_points = encodings_unsupported_code_points[encoding]
 
     def is_code_point_supported(code_point: int) -> bool:
@@ -139,19 +151,10 @@ def to_characters_bytes(encoding: str,
                       else little_byte_order_name)
     else:
         byte_order = sys.byteorder
-    length = encodings_lengths[encoding]
+    length = code_units_sizes[encoding]
     to_bytes = methodcaller(int.to_bytes.__name__, length, byte_order)
     code_points = strategies.integers(0, 256 ** length - 1)
     return code_points.filter(is_code_point_supported).map(to_bytes)
-
-
-encodings_lengths = defaultdict(lambda: 1,
-                                {'utf_16': 2,
-                                 'utf_16_be': 2,
-                                 'utf_16_le': 2,
-                                 'utf_32': 4,
-                                 'utf_32_be': 4,
-                                 'utf_32_le': 4})
 
 
 class ContainersChain:
@@ -230,28 +233,27 @@ encodings_unsupported_code_points = defaultdict(
          'utf_16_le': range(0xd800, 0xe000),
          'utf_32': ContainersChain(
                  range(0xd800, 0xe000),
-                 range(0x110000, 256 ** encodings_lengths['utf_32'])),
+                 range(0x110000, 256 ** code_units_sizes['utf_32'])),
          'utf_32_be': ContainersChain(
                  range(0xd800, 0xe000),
-                 range(0x110000, 256 ** encodings_lengths['utf_32_be'])),
+                 range(0x110000, 256 ** code_units_sizes['utf_32_be'])),
          'utf_32_le': ContainersChain(
                  range(0xd800, 0xe000),
-                 range(0x110000, 256 ** encodings_lengths['utf_32_le'])),
+                 range(0x110000, 256 ** code_units_sizes['utf_32_le'])),
          'utf_8': range(128, 256),
          'utf_8_sig': range(128, 256),
          'cp65001': range(128, 256),
          })
 
 to_dictionaries = limit_max_size(strategies.dictionaries)
-to_homogeneous_frozensets = limit_max_size(strategies.frozensets)
 
 
 @limit_max_size
-def to_homogeneous_iterables(elements: Optional[SearchStrategy[Domain]] = None,
+def to_homogeneous_iterables(elements: Optional[Strategy[Domain]] = None,
                              *,
                              min_size: int = 0,
                              max_size: Optional[int] = None
-                             ) -> SearchStrategy[Iterable[Domain]]:
+                             ) -> Strategy[Iterable[Domain]]:
     return (to_homogeneous_sequences(elements,
                                      min_size=min_size,
                                      max_size=max_size)
@@ -265,11 +267,11 @@ to_homogeneous_lists = limit_max_size(strategies.lists)
 
 
 @limit_max_size
-def to_homogeneous_sequences(elements: Optional[SearchStrategy[Domain]] = None,
+def to_homogeneous_sequences(elements: Optional[Strategy[Domain]] = None,
                              *,
                              min_size: int = 0,
                              max_size: Optional[int] = None
-                             ) -> SearchStrategy[Sequence[Domain]]:
+                             ) -> Strategy[Sequence[Domain]]:
     return (to_homogeneous_lists(elements,
                                  min_size=min_size,
                                  max_size=max_size)
@@ -282,33 +284,44 @@ to_homogeneous_sets = limit_max_size(strategies.sets)
 
 
 @limit_max_size
-def to_homogeneous_tuples(elements: Optional[SearchStrategy[Domain]] = None,
+def to_homogeneous_tuples(elements: Optional[Strategy[Domain]] = None,
                           *,
                           min_size: int = 0,
                           max_size: Optional[int] = None
-                          ) -> SearchStrategy[Tuple[Domain, ...]]:
+                          ) -> Strategy[Tuple[Domain, ...]]:
     return (to_homogeneous_lists(elements,
                                  min_size=min_size,
                                  max_size=max_size)
             .map(tuple))
 
 
-to_strings = limit_max_size(strategies.text)
+@limit_max_size
+def to_strings(encoding: str,
+               *,
+               min_size: int = 0,
+               max_size: Optional[int] = None) -> Strategy[str]:
+    bytes_min_size, bytes_max_size = strings_sizes_to_bytes_sizes(
+            min_size, max_size,
+            encoding=encoding)
+
+    def decode(byte_sequence: ByteSequence) -> str:
+        return byte_sequence.decode(encoding)
+
+    return (to_byte_sequences(encoding,
+                              min_size=bytes_min_size,
+                              max_size=bytes_max_size)
+            .map(decode))
 
 
 @limit_max_size
 def to_text_streams(encoding: str,
                     *,
                     min_size: int = 0,
-                    max_size: Optional[int] = None
-                    ) -> SearchStrategy[TextIO]:
-    encoding_length = encodings_lengths[encoding]
-    bom = encoding_to_bom(encoding)
-    byte_stream_min_size = min_size * encoding_length + len(bom)
-    byte_stream_max_size = max_size
-    if byte_stream_max_size is not None:
-        byte_stream_max_size = (byte_stream_max_size * encoding_length
-                                + len(bom))
+                    max_size: Optional[int] = None) -> Strategy[TextIO]:
+    byte_stream_min_size, byte_stream_max_size = strings_sizes_to_bytes_sizes(
+            min_size,
+            max_size,
+            encoding=encoding)
     return strategies.builds(io.TextIOWrapper,
                              to_byte_streams(encoding,
                                              min_size=byte_stream_min_size,
@@ -316,9 +329,22 @@ def to_text_streams(encoding: str,
                              encoding=strategies.just(encoding))
 
 
-def to_tuples(elements: Optional[SearchStrategy[Domain]] = None,
+def strings_sizes_to_bytes_sizes(min_size: int,
+                                 max_size: Optional[int],
+                                 *,
+                                 encoding: str) -> Tuple[int, Optional[int]]:
+    encoding_length = code_units_sizes[encoding]
+    bom = encoding_to_bom(encoding)
+    result_min_size = min_size * encoding_length + len(bom)
+    result_max_size = max_size
+    if result_max_size is not None:
+        result_max_size = result_max_size * encoding_length + len(bom)
+    return result_min_size, result_max_size
+
+
+def to_tuples(elements: Optional[Strategy[Domain]] = None,
               *,
-              size: int = 0) -> SearchStrategy[Tuple[Domain, ...]]:
+              size: int = 0) -> Strategy[Tuple[Domain, ...]]:
     if size > MAX_ITERABLES_SIZE:
         raise ValueError('Size should not be greater than {limit}.'
                          .format(limit=MAX_ITERABLES_SIZE))
@@ -326,3 +352,21 @@ def to_tuples(elements: Optional[SearchStrategy[Domain]] = None,
         raise ValueError('Either size should be zero '
                          'or elements should be specified.')
     return strategies.tuples(*repeat(elements, size))
+
+
+def to_separator(any_string: AnyStr) -> Strategy[AnyStr]:
+    if not any_string:
+        result = os.linesep
+        if not isinstance(any_string, str):
+            result = result.encode()
+        return strategies.just(result)
+    length = len(any_string)
+
+    def to_start_stop(start: int) -> Strategy[Tuple[int, int]]:
+        return strategies.tuples(strategies.just(start),
+                                 strategies.integers(start + 1, length))
+
+    return (strategies.integers(0, length - 1)
+            .flatmap(to_start_stop)
+            .map(pack(slice))
+            .map(any_string.__getitem__))

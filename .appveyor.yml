@@ -1,4 +1,5 @@
 environment:
+  EXECUTABLE: "python.exe"
   matrix:
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python35-x64"
@@ -8,9 +9,14 @@ environment:
     - PYTHON: "C:\\Python37-x64"
 
 install:
-  - "%PYTHON%\\python.exe -m pip install --upgrade pip wheel setuptools"
+  - "%PYTHON%\\%EXECUTABLE% -m ensurepip"
+  - "%PYTHON%\\%EXECUTABLE% -m pip install --upgrade pip setuptools"
+  - "%PYTHON%\\%EXECUTABLE% -m pip install --upgrade codecov"
 
 build: false
 
 test_script:
-  - "%PYTHON%\\python.exe setup.py test"
+  - "%PYTHON%\\%EXECUTABLE% setup.py test"
+
+on_success:
+  - "%PYTHON%\\%EXECUTABLE% -m codecov -f coverage.xml -X gcov"

@@ -3,8 +3,6 @@ import functools
 import inspect
 import itertools
 from collections import abc
-from contextlib import suppress
-from operator import add
 from types import MappingProxyType
 from typing import (Any,
                     Callable,
@@ -16,10 +14,11 @@ from typing import (Any,
                     Union)
 
 from paradigm import signatures
+from reprit import seekers
+from reprit.base import generate_repr
 
 from .hints import (Domain,
                     Map,
-                    Operator,
                     Range)
 
 
@@ -30,13 +29,24 @@ def identity(argument: Domain) -> Domain:
     return argument
 
 
+def compose(last_function: Map[Any, Range],
+            *front_functions: Callable[..., Any]) -> Callable[..., Range]:
+    """
+    Returns functions composition.
+    """
+    caller_frame_info = inspect.stack()[1]
+    return Composition(last_function, *front_functions,
+                       file_path=caller_frame_info.filename,
+                       line_number=caller_frame_info.lineno,
+                       line_offset=0)
+
+
 class Composition:
     def __new__(cls,
-                last_function: Map[Any, Range],
-                *front_functions: Callable[..., Any],
+                *functions: Callable[..., Any],
                 **kwargs: Any) -> Union['Composition', Callable[..., Range]]:
-        if not front_functions:
-            return last_function
+        if len(functions) == 1:
+            return functions[0]
         return super().__new__(cls)
 
     def __init__(self,
@@ -68,7 +78,7 @@ class Composition:
     def function(self) -> Callable[..., Range]:
         if self._function is None:
             self._function = _compose(*self.functions,
-                                      function_name='composed',
+                                      function_name='composition',
                                       file_path=self._file_path,
                                       line_number=self._line_number,
                                       line_offset=self._line_offset)
@@ -77,9 +87,13 @@ class Composition:
     def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
         return self.function(*args, **kwargs)
 
-    def __repr__(self) -> str:
-        return (type(self).__qualname__
-                + '(' + ', '.join(map(repr, self.functions)) + ')')
+    __repr__ = generate_repr(__init__,
+                             field_seeker=seekers.complex_)
+
+
+@signatures.factory.register(Composition)
+def _(object_: Composition) -> signatures.Base:
+    return signatures.factory(object_.functions[-1])
 
 
 def _compose(*functions: Callable[..., Any],
@@ -90,7 +104,7 @@ def _compose(*functions: Callable[..., Any],
     def function_to_unique_name(function: Callable) -> str:
         # we are not using ``__name__``/``__qualname__`` attributes
         # due to their potential non-uniqueness
-        return '_' + str(hash(function)).replace('-', '_')
+        return '_' + str(id(function)).replace('-', '_')
 
     functions_names = list(map(function_to_unique_name, functions))
 
@@ -141,28 +155,27 @@ def _compose(*functions: Callable[..., Any],
     return namespace[function_name]
 
 
-def compose(last_function: Map[Any, Range],
-            *front_functions: Callable[..., Any]) -> Callable[..., Range]:
-    """
-    Returns functions composition.
-    """
-    caller_frame_info = inspect.stack()[1]
-    return Composition(last_function, *front_functions,
-                       file_path=caller_frame_info.filename,
-                       line_number=caller_frame_info.lineno,
-                       line_offset=0)
-
-
 def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     """
     Returns function that applies each map to corresponding argument.
     """
+    return Combination(*maps)
 
-    def combined(arguments: Iterable[Domain]) -> Iterable[Range]:
+
+class Combination:
+    def __init__(self, *maps: Map) -> None:
+        self.maps = maps
+
+    def __call__(self, arguments: Iterable[Domain]) -> Iterable[Range]:
         yield from (map_(argument)
-                    for map_, argument in zip(maps, arguments))
+                    for map_, argument in zip(self.maps, arguments))
 
-    return combined
+    __repr__ = generate_repr(__init__)
+
+
+@signatures.factory.register(Combination)
+def _(object_: Combination) -> signatures.Base:
+    return signatures.factory(object_.__call__)
 
 
 class ApplierBase(abc.Callable):
@@ -189,14 +202,6 @@ class ApplierBase(abc.Callable):
     def keywords(self) -> Dict[str, Domain]:
         return self._kwargs
 
-    def __repr__(self) -> str:
-        arguments_strings = itertools.chain(
-                [repr(self.func)],
-                arguments_to_strings(self.args, self.keywords))
-        cls = type(self)
-        return (cls.__module__ + '.' + cls.__qualname__
-                + '(' + ', '.join(arguments_strings) + ')')
-
 
 ApplierBase.register(functools.partial)
 
@@ -217,15 +222,18 @@ class Curry(ApplierBase):
         try:
             return self.func(*args, **kwargs)
         except TypeError:
-            if not self.signature.has_unset_parameters(*args, **kwargs):
+            if (not self.signature.expects(*args, **kwargs)
+                    or self.signature.all_set(*args, **kwargs)):
                 raise
         return type(self)(self.func, self.signature, *args, **kwargs)
 
+    __repr__ = generate_repr(__init__,
+                             field_seeker=seekers.complex_)
 
-def arguments_to_strings(positional_arguments: Tuple[Any, ...],
-                         keyword_arguments: Dict[str, Any]) -> Iterable[str]:
-    yield from map(repr, positional_arguments)
-    yield from itertools.starmap('{}={!r}'.format, keyword_arguments.items())
+
+@signatures.factory.register(Curry)
+def _(object_: Curry) -> signatures.Base:
+    return object_.signature
 
 
 def curry(function: Callable[..., Range],
@@ -244,48 +252,51 @@ def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
     Returns function that works with single iterable parameter
     by unpacking elements to given function.
     """
+    return functools.partial(apply, function)
 
-    def packed(args: Iterable[Domain],
-               kwargs: Dict[str, Any] = MappingProxyType({})) -> Range:
-        return function(*args, **kwargs)
 
-    members_factories = dict(members_copiers)
-    members_factories['__name__'] = functools.partial(add, 'packed ')
-    members_factories['__qualname__'] = functools.partial(add, 'packed ')
-    update_metadata(function, packed,
-                    members_factories=members_factories)
-    return packed
+def apply(function: Callable[..., Range],
+          args: Iterable[Domain],
+          kwargs: Dict[str, Any] = MappingProxyType({})) -> Range:
+    """
+    Calls given function with given positional and keyword arguments.
+    """
+    return function(*args, **kwargs)
 
 
 def to_constant(object_: Domain) -> Callable[..., Domain]:
     """
-    Returns function that returns given object.
+    Returns function that always returns given object.
     """
+    return Constant(object_)
 
-    def constant(*_: Domain, **__: Domain) -> Domain:
-        return object_
 
-    object_repr = repr(object_)
-    constant.__name__ = object_repr + ' constant'
-    constant.__qualname__ = object_repr + ' constant'
-    constant.__doc__ = 'Returns {}.'.format(object_repr)
-    return constant
+class Constant:
+    def __init__(self, object_: Domain) -> None:
+        self.object_ = object_
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Domain:
+        return self.object_
+
+    __repr__ = generate_repr(__init__)
+
+
+@signatures.factory.register(Constant)
+def _(object_: Constant) -> signatures.Base:
+    return signatures.factory(object_.__call__)
 
 
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
     """
+    return functools.partial(call_flipped, function)
 
-    def flipped(*args, **kwargs) -> Range:
-        return function(*args[::-1], **kwargs)
 
-    members_factories = dict(members_copiers)
-    members_factories['__name__'] = functools.partial(add, 'flipped ')
-    members_factories['__qualname__'] = functools.partial(add, 'flipped ')
-    update_metadata(function, flipped,
-                    members_factories=members_factories)
-    return flipped
+def call_flipped(function: Callable[..., Range],
+                 *args: Domain,
+                 **kwargs: Domain) -> Range:
+    return function(*args[::-1], **kwargs)
 
 
 def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
@@ -294,28 +305,20 @@ def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
     given functions to the same arguments.
     """
 
-    def cleft(*args, **kwargs) -> Range:
+    return Cleavage(*functions)
+
+
+class Cleavage:
+    def __init__(self, *functions: Map) -> None:
+        self.functions = functions
+
+    def __call__(self, *args: Domain, **kwargs: Domain) -> Iterable[Range]:
         yield from (function(*args, **kwargs)
-                    for function in functions)
+                    for function in self.functions)
 
-    return cleft
-
-
-members_copiers = dict(itertools.chain(zip(functools.WRAPPER_ASSIGNMENTS,
-                                           itertools.repeat(identity))))
+    __repr__ = generate_repr(__init__)
 
 
-def update_metadata(source_function: Callable[..., Range],
-                    target_function: Callable[..., Range],
-                    *,
-                    members_factories: Dict[str, Operator]) -> None:
-    for member_name, member_factory in members_factories.items():
-        try:
-            source_member = getattr(source_function, member_name)
-        except AttributeError:
-            continue
-        else:
-            target_member = member_factory(source_member)
-            setattr(target_function, member_name, target_member)
-    with suppress(AttributeError):
-        target_function.__dict__.update(source_function.__dict__)
+@signatures.factory.register(Cleavage)
+def _(object_: Cleavage) -> signatures.Base:
+    return signatures.factory(object_.__call__)

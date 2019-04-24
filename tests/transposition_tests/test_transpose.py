@@ -2,6 +2,7 @@ from typing import (Any,
                     Iterable)
 
 import pytest
+from hypothesis import given
 
 from lz import (left,
                 right)
@@ -12,14 +13,18 @@ from tests.utils import (are_iterables_similar,
                          is_empty,
                          iterable_ends_with,
                          iterable_starts_with)
+from . import strategies
 
 
+@given(strategies.empty_iterables)
 def test_base_case(empty_iterable: Iterable[Any]) -> None:
     result = transpose(empty_iterable)
 
     assert is_empty(result)
 
 
+@given(strategies.transposable_iterables,
+       strategies.transposable_iterables_elements)
 def test_step_left(transposable_iterable: Iterable[FiniteIterable[Any]],
                    transposable_iterable_element: FiniteIterable[Any]) -> None:
     original_element, target_element = duplicate(transposable_iterable_element)
@@ -30,6 +35,8 @@ def test_step_left(transposable_iterable: Iterable[FiniteIterable[Any]],
                for iterable, coordinate in zip(result, original_element))
 
 
+@given(strategies.transposable_iterables,
+       strategies.transposable_iterables_elements)
 def test_step_right(transposable_iterable: Iterable[FiniteIterable[Any]],
                     transposable_iterable_element: FiniteIterable[Any]
                     ) -> None:
@@ -41,6 +48,7 @@ def test_step_right(transposable_iterable: Iterable[FiniteIterable[Any]],
                for iterable, coordinate in zip(result, original_element))
 
 
+@given(strategies.non_empty_transposable_iterables)
 def test_involution(
         non_empty_transposable_iterable: Iterable[FiniteIterable[Any]]
 ) -> None:
@@ -51,6 +59,7 @@ def test_involution(
     assert are_iterables_similar(result, original)
 
 
-def test_unsupported_type(untransposable_object: Any) -> None:
+@given(strategies.scalars)
+def test_unsupported_type(object_: Any) -> None:
     with pytest.raises(TypeError):
-        transpose(untransposable_object)
+        transpose(object_)
