@@ -3,7 +3,8 @@ import functools
 import inspect
 import itertools
 from collections import abc
-from types import MappingProxyType
+from types import (MappingProxyType,
+                   MethodType)
 from typing import (Any,
                     Callable,
                     Dict,
@@ -86,6 +87,11 @@ class Composition:
 
     def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
         return self.function(*args, **kwargs)
+
+    def __get__(self,
+                instance: Domain,
+                owner: Type[Domain]) -> Callable[..., Range]:
+        return MethodType(self.function, instance)
 
     __repr__ = generate_repr(__init__,
                              field_seeker=seekers.complex_)
