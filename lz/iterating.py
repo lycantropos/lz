@@ -14,7 +14,7 @@ from typing import (Any,
                     Tuple,
                     Type)
 
-from .functional import compose
+from .functional import flatmap
 from .hints import (Domain,
                     Map,
                     Operator,
@@ -34,7 +34,7 @@ def flatmapper(map_: Map[Domain, Iterable[Range]]
     Returns function that applies map to the each element of iterable
     and flattens results.
     """
-    return compose(flatten, mapper(map_))
+    return functools.partial(flatmap, map_)
 
 
 def cutter(slice_: slice) -> Operator[Iterable[Domain]]:

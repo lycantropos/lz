@@ -328,3 +328,8 @@ class Cleavage:
 @signatures.factory.register(Cleavage)
 def _(object_: Cleavage) -> signatures.Base:
     return signatures.factory(object_.__call__)
+
+
+def flatmap(function: Map[Domain, Iterable[Range]],
+            *iterables: Iterable[Domain]) -> Iterable[Range]:
+    yield from itertools.chain.from_iterable(map(function, *iterables))
