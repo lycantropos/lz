@@ -1,18 +1,18 @@
 import functools
 import itertools
-from collections import (abc,
-                         defaultdict,
+from collections import (OrderedDict,
+                         abc,
                          deque)
 from functools import singledispatch
 from operator import is_not
 from typing import (Any,
                     Hashable,
                     Iterable,
-                    List,
-                    Mapping,
+                    MutableMapping,
                     Sequence,
                     Sized,
-                    Tuple)
+                    Tuple,
+                    Type)
 
 from .functional import compose
 from .hints import (Domain,
@@ -120,24 +120,28 @@ def slide(iterable: Iterable[Domain],
 Group = Tuple[Hashable, Iterable[Domain]]
 
 
-def grouper(key: Map[Domain, Hashable]
+def grouper(key: Map[Domain, Hashable],
+            *,
+            mapping_cls: Type[MutableMapping] = OrderedDict
             ) -> Map[Iterable[Domain], Iterable[Group]]:
     """
     Returns function that groups iterable elements based on given key.
     """
     return functools.partial(group_by,
-                             key=key)
+                             key=key,
+                             mapping_cls=mapping_cls)
 
 
 def group_by(iterable: Iterable[Domain],
              *,
-             key: Map[Domain, Hashable]) -> Iterable[Group]:
+             key: Map[Domain, Hashable],
+             mapping_cls: Type[MutableMapping]) -> Iterable[Group]:
     """
     Groups iterable elements based on given key.
     """
-    groups = defaultdict(list)  # type: Mapping[Hashable, List[Domain]]
+    groups = mapping_cls()
     for element in iterable:
-        groups[key(element)].append(element)
+        groups.setdefault(key(element), []).append(element)
     yield from groups.items()
 
 
