@@ -66,12 +66,9 @@ Usage
 1. [function composition](https://en.wikipedia.org/wiki/Function_composition)
     ```python
     >>> from lz.functional import compose
-    >>> from functools import partial
-    >>> sum_of_digits = compose(sum,
-                                partial(map, int),
-                                str)
-    >>> sum_of_digits(1234)
-    10
+    >>> sum_of_first_n_natural_numbers = compose(sum, range)
+    >>> sum_of_first_n_natural_numbers(10)
+    45
     ```
 
 2. [currying](https://en.wikipedia.org/wiki/Currying)
@@ -79,8 +76,8 @@ Usage
     >>> from lz.functional import curry 
     >>> curried_power = curry(pow) 
     >>> two_to_power = curried_power(2) 
-    >>> list(map(two_to_power, range(10))) 
-    [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    >>> two_to_power(10)
+    1024
     ```
 
 3. flipping positional parameters order
