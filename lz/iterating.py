@@ -216,7 +216,10 @@ def last(iterable: Iterable[Domain]) -> Domain:
 
 @singledispatch
 def capacity(iterable: Iterable[Any]) -> int:
-    return sum(1 for _ in iterable)
+    counter = itertools.count()
+    deque(zip(counter, iterable),
+          maxlen=0)
+    return next(counter)
 
 
 @capacity.register(abc.Sized)
