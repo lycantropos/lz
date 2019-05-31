@@ -280,6 +280,8 @@ def capacity(iterable: Iterable[Any]) -> int:
     """
     Returns number of elements in iterable.
 
+    >>> capacity(range(0))
+    0
     >>> capacity(range(10))
     10
     """
