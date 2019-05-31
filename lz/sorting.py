@@ -34,7 +34,8 @@ def search_implementation(algorithm: str) -> Implementation:
 def register_implementation(algorithm: str,
                             implementation: Optional[Implementation] = None,
                             *,
-                            stable: bool = False
+                            stable: bool = False,
+                            overwrite: bool = False
                             ) -> Union[Operator[Implementation],
                                        Implementation]:
     """
@@ -51,6 +52,10 @@ def register_implementation(algorithm: str,
     if implementation is None:
         return functools.partial(register_implementation, algorithm,
                                  stable=stable)
+    if algorithm in implementations and not overwrite:
+        raise ValueError('Algorithm "{algorithm}" '
+                         'has been already registered.'
+                         .format(algorithm=algorithm))
     if stable:
         stable_implementations[algorithm] = implementation
     else:
