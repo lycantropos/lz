@@ -225,7 +225,7 @@ Usage
   
     ```
 
-and many more.
+and [many more](https://lz.readthedocs.io/en/latest).
 
 Development
 -----------
