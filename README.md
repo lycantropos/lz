@@ -146,7 +146,22 @@ Usage
     False
     ```
 
-10. reversing sequences and any string streams
+10. [exclusive disjoining](https://en.wikipedia.org/wiki/Exclusive_or) predicates
+    ```python
+    >>> from lz.logical import exclusive_disjoin
+    >>> from keyword import iskeyword
+    >>> valid_object_name = exclusive_disjoin(str.isidentifier, iskeyword)
+    >>> valid_object_name('valid_object_name')
+    True
+    >>> valid_object_name('_')
+    True
+    >>> valid_object_name('1')
+    False
+    >>> valid_object_name('lambda')
+    False
+    ```
+
+11. reversing sequences and any string streams
     ```python
     >>> from lz.reversal import reverse
     >>> list(reverse(range(10)))
@@ -156,7 +171,7 @@ Usage
     [b'World!', b'Hello\n']
     ```
 
-11. chunking iterable
+12. chunking iterable
     ```python
     >>> from lz.iterating import chopper
     >>> to_triplets = chopper(3)
@@ -164,7 +179,7 @@ Usage
     [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
     ```
 
-12. sliding over iterable
+13. sliding over iterable
     ```python
     >>> from lz.iterating import slider
     >>> slide_pairwise = slider(2)
@@ -172,21 +187,21 @@ Usage
     [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
     ```
 
-13. [interleaving](https://en.wikipedia.org/wiki/Interleave_sequence) iterables
+14. [interleaving](https://en.wikipedia.org/wiki/Interleave_sequence) iterables
     ```python
     >>> from lz.iterating import interleave
     >>> list(interleave([range(10), range(10, 20)]))
     [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 5, 15, 6, 16, 7, 17, 8, 18, 9, 19]
     ```
 
-14. iterable [transposition](https://en.wikipedia.org/wiki/Transpose)
+15. iterable [transposition](https://en.wikipedia.org/wiki/Transpose)
     ```python
     >>> from lz.transposition import transpose
     >>> list(map(tuple, transpose(zip(range(10), range(10, 20)))))
     [(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), (10, 11, 12, 13, 14, 15, 16, 17, 18, 19)]
     ```
 
-15. iterable duplication
+16. iterable duplication
     ```python
     >>> from lz.replication import duplicate
     >>> list(map(tuple, duplicate(range(10))))
