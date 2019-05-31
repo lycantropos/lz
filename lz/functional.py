@@ -173,7 +173,7 @@ def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     Returns function that applies each map to corresponding argument.
 
     >>> encoder_decoder = combine(str.encode, bytes.decode)
-    >>> encoder_decoder(['hello', b'world'])
+    >>> list(encoder_decoder(['hello', b'world']))
     [b'hello', 'world']
     """
     return Combination(*maps)
