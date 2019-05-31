@@ -9,7 +9,7 @@ from .hints import (Domain,
                     Map,
                     Operator,
                     Predicate)
-from .replication import duplicate
+from .replication import duplicate as _duplicate
 
 
 def sifter(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
@@ -72,7 +72,7 @@ def separator(predicate: Predicate = None
     """
     return compose(tuple,
                    combine(scavenger(predicate), sifter(predicate)),
-                   duplicate)
+                   _duplicate)
 
 
 def grabber(predicate: Predicate = None) -> Operator[Iterable[Domain]]:
