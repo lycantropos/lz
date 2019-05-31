@@ -69,6 +69,7 @@ Usage
     >>> sum_of_first_n_natural_numbers = compose(sum, range)
     >>> sum_of_first_n_natural_numbers(10)
     45
+
     ```
 
 2. [currying](https://en.wikipedia.org/wiki/Currying)
@@ -78,6 +79,7 @@ Usage
     >>> two_to_power = curried_power(2) 
     >>> two_to_power(10)
     1024
+
     ```
 
 3. flipping positional parameters order
@@ -86,6 +88,7 @@ Usage
     >>> flipped_power = flip(pow)
     >>> flipped_power(2, 4)
     16
+
     ```
 
 4. packing function's arguments
@@ -96,6 +99,7 @@ Usage
     10
     >>> packed_int(['10'], {'base': 2})
     2
+
     ```
 
 5. left [partial application](https://en.wikipedia.org/wiki/Partial_application)
@@ -104,6 +108,7 @@ Usage
     >>> count_from_zero_to = left.applier(range, 0)
     >>> list(count_from_zero_to(10))
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
     ```
 
 6. right [partial application](https://en.wikipedia.org/wiki/Partial_application)
@@ -112,6 +117,7 @@ Usage
     >>> square = right.applier(pow, 2)
     >>> square(10)
     100
+
     ```
 
 7. [negating](https://en.wikipedia.org/wiki/Negation) predicate
@@ -122,6 +128,7 @@ Usage
     True
     >>> false_like([0])
     False
+
     ```
 
 8. [conjoining](https://en.wikipedia.org/wiki/Logical_conjunction) predicates
@@ -132,6 +139,7 @@ Usage
     True
     >>> is_valid_constant_identifier('2ND_SECTION')
     False
+
     ```
 
 9. [disjoining](https://en.wikipedia.org/wiki/Logical_disjunction) predicates
@@ -144,6 +152,7 @@ Usage
     True
     >>> alphabetic_or_numeric('Hello42')
     False
+
     ```
 
 10. [exclusive disjoining](https://en.wikipedia.org/wiki/Exclusive_or) predicates
@@ -159,6 +168,7 @@ Usage
     False
     >>> valid_object_name('lambda')
     False
+
     ```
 
 11. reversing sequences and any string streams
@@ -169,14 +179,16 @@ Usage
     >>> import io
     >>> list(reverse(io.BytesIO(b'Hello\nWorld!')))
     [b'World!', b'Hello\n']
+
     ```
 
 12. chunking iterable
     ```python
     >>> from lz.iterating import chopper
     >>> to_triplets = chopper(3)
-    >>> list(to_triplets(range(10)))
+    >>> list(map(tuple, to_triplets(range(10))))
     [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
+
     ```
 
 13. sliding over iterable
@@ -185,6 +197,7 @@ Usage
     >>> slide_pairwise = slider(2)
     >>> list(slide_pairwise(range(10)))
     [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
+ 
     ```
 
 14. [interleaving](https://en.wikipedia.org/wiki/Interleave_sequence) iterables
@@ -192,6 +205,7 @@ Usage
     >>> from lz.iterating import interleave
     >>> list(interleave([range(10), range(10, 20)]))
     [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 5, 15, 6, 16, 7, 17, 8, 18, 9, 19]
+  
     ```
 
 15. iterable [transposition](https://en.wikipedia.org/wiki/Transpose)
@@ -199,6 +213,7 @@ Usage
     >>> from lz.transposition import transpose
     >>> list(map(tuple, transpose(zip(range(10), range(10, 20)))))
     [(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), (10, 11, 12, 13, 14, 15, 16, 17, 18, 19)]
+ 
     ```
 
 16. iterable duplication
@@ -206,6 +221,7 @@ Usage
     >>> from lz.replication import duplicate
     >>> list(map(tuple, duplicate(range(10))))
     [(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)]
+  
     ```
 
 and many more.
