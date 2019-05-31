@@ -37,6 +37,17 @@ def register_implementation(algorithm: str,
                             stable: bool = False
                             ) -> Union[Operator[Implementation],
                                        Implementation]:
+    """
+    Registers implementation of sorting algorithm.
+
+    >>> from typing import Any
+    >>> @register_implementation('CUSTOMSORTING')
+    ... def custom_sorting(iterable: Iterable[Domain],
+    ...                    *,
+    ...                    key: Optional[Callable[[Domain], Any]] = None,
+    ...                    reverse: bool = False) -> Iterable[Domain]:
+    ...     ...
+    """
     if implementation is None:
         return functools.partial(register_implementation, algorithm,
                                  stable=stable)
@@ -58,6 +69,10 @@ def sorter(*,
     """
     Returns function that generates sorted iterable
     by given key with specified algorithm.
+
+    >>> sort = sorter()
+    >>> sort('Hello World!')
+    [' ', '!', 'H', 'W', 'd', 'e', 'l', 'l', 'l', 'o', 'o', 'r']
     """
     implementation = search_implementation(algorithm)
     return functools.partial(implementation,
