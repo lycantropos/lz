@@ -284,7 +284,9 @@ def capacity(iterable: Iterable[Any]) -> int:
     10
     """
     counter = itertools.count()
-    deque(zip(counter, iterable),
+    # order matters: if `counter` goes first,
+    # then it will be incremented even for empty `iterable`
+    deque(zip(iterable, counter),
           maxlen=0)
     return next(counter)
 
