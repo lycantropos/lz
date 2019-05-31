@@ -350,7 +350,6 @@ def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
     >>> list(to_min_and_max(range(0), default=None))
     [None, None]
     """
-
     return Cleavage(*functions)
 
 
