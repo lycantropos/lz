@@ -52,10 +52,13 @@ def register_implementation(algorithm: str,
     if implementation is None:
         return functools.partial(register_implementation, algorithm,
                                  stable=stable)
-    if algorithm in implementations and not overwrite:
-        raise ValueError('Algorithm "{algorithm}" '
-                         'has been already registered.'
-                         .format(algorithm=algorithm))
+    if algorithm in implementations:
+        if overwrite:
+            del implementations[algorithm]
+        else:
+            raise ValueError('Algorithm "{algorithm}" '
+                             'has been already registered.'
+                             .format(algorithm=algorithm))
     if stable:
         stable_implementations[algorithm] = implementation
     else:
