@@ -69,8 +69,8 @@ def reverse(object_: Domain, **_: Any) -> Range:
     >>> list(reverse(range(10)))
     [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     >>> import io
-    >>> list(reverse(io.BytesIO(b'Hello\nWorld!')))
-    [b'World!', b'Hello\n']
+    >>> list(reverse(io.BytesIO(b'Hello\\nWorld!')))
+    [b'World!', b'Hello\\n']
     """
     raise TypeError('Unsupported object type: {type}.'
                     .format(type=type(object_)))
