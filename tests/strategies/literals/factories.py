@@ -319,8 +319,7 @@ def to_text_streams(encoding: str,
                     min_size: int = 0,
                     max_size: Optional[int] = None) -> Strategy[TextIO]:
     byte_stream_min_size, byte_stream_max_size = strings_sizes_to_bytes_sizes(
-            min_size,
-            max_size,
+            min_size, max_size,
             encoding=encoding)
     return strategies.builds(io.TextIOWrapper,
                              to_byte_streams(encoding,
