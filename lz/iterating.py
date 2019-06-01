@@ -3,7 +3,6 @@ import itertools
 from collections import (OrderedDict,
                          abc,
                          deque)
-from functools import singledispatch
 from operator import is_not
 from typing import (Any,
                     Hashable,
@@ -277,7 +276,7 @@ def last(iterable: Iterable[Domain]) -> Domain:
         raise ValueError('Argument supposed to be non-empty.') from error
 
 
-@singledispatch
+@functools.singledispatch
 def capacity(iterable: Iterable[Any]) -> int:
     """
     Returns number of elements in iterable.
