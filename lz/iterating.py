@@ -296,4 +296,7 @@ def capacity(iterable: Iterable[Any]) -> int:
 
 @capacity.register(abc.Sized)
 def sized_capacity(iterable: Sized) -> int:
+    """
+    Returns number of elements in sized iterable.
+    """
     return len(iterable)
