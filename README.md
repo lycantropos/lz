@@ -230,6 +230,36 @@ and [many more](https://lz.readthedocs.io/en/latest).
 Development
 -----------
 
+### Building docs
+
+Install project in editable mode
+
+- with `CPython`
+  ```bash
+  python -m pip install -e .
+  ```
+- with `PyPy`
+  ```bash
+  pypy -m pip install -e .
+  ```
+
+Install docs requirements
+
+- with `CPython`
+  ```bash
+  python -m pip install -r docs/requirements.txt
+  ```
+- with `PyPy`
+  ```bash
+  pypy -m pip install -r docs/requirements.txt
+  ```
+
+Build docs
+```bash
+cd docs
+make html
+```
+
 ### Bumping version
 
 #### Preparation
