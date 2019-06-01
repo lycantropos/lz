@@ -3,7 +3,6 @@ import itertools
 from collections import (OrderedDict,
                          abc,
                          deque)
-from functools import singledispatch
 from operator import is_not
 from typing import (Any,
                     Hashable,
@@ -146,6 +145,7 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
 
 
 pairwise = slider(2)
+pairwise.__doc__ = 'Slides over iterable with window of size 2.'
 
 Group = Tuple[Hashable, Iterable[Domain]]
 
@@ -277,7 +277,7 @@ def last(iterable: Iterable[Domain]) -> Domain:
         raise ValueError('Argument supposed to be non-empty.') from error
 
 
-@singledispatch
+@functools.singledispatch
 def capacity(iterable: Iterable[Any]) -> int:
     """
     Returns number of elements in iterable.
@@ -297,4 +297,7 @@ def capacity(iterable: Iterable[Any]) -> int:
 
 @capacity.register(abc.Sized)
 def sized_capacity(iterable: Sized) -> int:
+    """
+    Returns number of elements in sized iterable.
+    """
     return len(iterable)
