@@ -145,6 +145,7 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
 
 
 pairwise = slider(2)
+pairwise.__doc__ = 'Slides over iterable with window of size 2.'
 
 Group = Tuple[Hashable, Iterable[Domain]]
 
