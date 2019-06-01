@@ -45,8 +45,8 @@ def register_implementation(algorithm: str,
     >>> @register_implementation('CUSTOMSORTING')
     ... def custom_sorting(iterable: Iterable[Domain],
     ...                    *,
-    ...                    key: Optional[Callable[[Domain], Any]] = None,
-    ...                    reverse: bool = False) -> Iterable[Domain]:
+    ...                    key: Optional[Map[Domain, Any]] = None
+    ...                    ) -> Iterable[Domain]:
     ...     ...
     """
     if implementation is None:
