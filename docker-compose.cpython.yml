@@ -7,7 +7,7 @@ services:
       args:
         - PYTHON_IMAGE=${CPYTHON_IMAGE_NAME}
         - PYTHON_IMAGE_VERSION=${CPYTHON_IMAGE_VERSION}
-    image: lycantropos/lz-cpython:0.8.2-alpha
+    image: lycantropos/lz-cpython:0.8.2
     volumes:
       - ./lz/:/opt/lz/lz/
       - ./tests/:/opt/lz/tests/
