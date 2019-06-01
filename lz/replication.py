@@ -65,6 +65,10 @@ def replicate_iterable(object_: Iterable[Domain],
 def replicator(count: int) -> Map[Domain, Iterable[Domain]]:
     """
     Returns function that replicates passed object.
+
+    >>> triplicate = replicator(3)
+    >>> list(map(tuple, triplicate(range(5))))
+    [(0, 1, 2, 3, 4), (0, 1, 2, 3, 4), (0, 1, 2, 3, 4)]
     """
     return functools.partial(replicate,
                              count=count)

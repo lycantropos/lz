@@ -8,6 +8,11 @@ def read_batch_from_end(byte_stream: BinaryIO,
                         end_position: int) -> bytes:
     """
     Reads batch from the end of given byte stream.
+
+    >>> import io
+    >>> byte_stream = io.BytesIO(b'Hello\\nWorld!')
+    >>> read_batch_from_end(byte_stream, size=4, end_position=5)
+    b'ello'
     """
     if end_position > size:
         offset = end_position - size

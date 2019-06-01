@@ -3,17 +3,30 @@ from typing import overload
 
 
 @overload
-def ceil_division(left_number: int, right_number: int) -> int:
+def ceil_division(dividend: int, divisor: int) -> int:
     pass
 
 
 @overload
-def ceil_division(left_number: Real, right_number: Real) -> Real:
+def ceil_division(dividend: Real, divisor: Real) -> Real:
     pass
 
 
-def ceil_division(left_number: Real, right_number: Real) -> Real:
+def ceil_division(dividend: Real, divisor: Real) -> Real:
     """
     Divides given numbers with ceiling.
+
+    >>> ceil_division(10, 2)
+    5
+    >>> ceil_division(10, -2)
+    -5
+    >>> ceil_division(10, 3)
+    4
+    >>> ceil_division(10, -3)
+    -3
+    >>> ceil_division(-10, -3)
+    4
+    >>> ceil_division(-10, 3)
+    -3
     """
-    return -(-left_number // right_number)
+    return -(-dividend // divisor)

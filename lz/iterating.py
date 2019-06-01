@@ -1,20 +1,20 @@
 import functools
 import itertools
-from collections import (abc,
-                         defaultdict,
+from collections import (OrderedDict,
+                         abc,
                          deque)
 from functools import singledispatch
 from operator import is_not
 from typing import (Any,
                     Hashable,
                     Iterable,
-                    List,
-                    Mapping,
+                    MutableMapping,
                     Sequence,
                     Sized,
-                    Tuple)
+                    Tuple,
+                    Type)
 
-from .functional import compose
+from .functional import flatmap
 from .hints import (Domain,
                     Map,
                     Operator,
@@ -24,6 +24,10 @@ from .hints import (Domain,
 def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     """
     Returns function that applies given map to the each element of iterable.
+
+    >>> to_str = mapper(str)
+    >>> list(to_str(range(10)))
+    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     """
     return functools.partial(map, map_)
 
@@ -33,13 +37,29 @@ def flatmapper(map_: Map[Domain, Iterable[Range]]
     """
     Returns function that applies map to the each element of iterable
     and flattens results.
+
+    >>> relay = flatmapper(range)
+    >>> list(relay(range(5)))
+    [0, 0, 1, 0, 1, 2, 0, 1, 2, 3]
     """
-    return compose(flatten, mapper(map_))
+    return functools.partial(flatmap, map_)
 
 
 def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from iterable based on given slice.
+
+    >>> to_first_triplet = cutter(slice(3))
+    >>> list(to_first_triplet(range(10)))
+    [0, 1, 2]
+
+    >>> to_second_triplet = cutter(slice(3, 6))
+    >>> list(to_second_triplet(range(10)))
+    [3, 4, 5]
+
+    >>> cut_out_every_third = cutter(slice(0, None, 3))
+    >>> list(cut_out_every_third(range(10)))
+    [0, 3, 6, 9]
     """
     return functools.partial(cut,
                              slice_=slice_)
@@ -63,6 +83,10 @@ def cut(iterable: Iterable[Domain],
 def chopper(size: int) -> Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
     """
     Returns function that splits iterable into chunks of given size.
+
+    >>> to_triplets = chopper(3)
+    >>> list(map(tuple, to_triplets(range(10))))
+    [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
     """
     return functools.partial(chop,
                              size=size)
@@ -92,14 +116,6 @@ def chop_sequence(iterable: Sequence[Domain],
         yield iterable[start:start + size]
 
 
-def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
-    """
-    Returns function that slides over iterable with window of given size.
-    """
-    return functools.partial(slide,
-                             size=size)
-
-
 def slide(iterable: Iterable[Domain],
           *,
           size: int) -> Iterable[Tuple[Domain, ...]]:
@@ -117,33 +133,64 @@ def slide(iterable: Iterable[Domain],
                                     shift)
 
 
+def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
+    """
+    Returns function that slides over iterable with window of given size.
+
+    >>> slide_pairwise = slider(2)
+    >>> list(slide_pairwise(range(10)))
+    [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
+    """
+    return functools.partial(slide,
+                             size=size)
+
+
+pairwise = slider(2)
+
 Group = Tuple[Hashable, Iterable[Domain]]
 
 
-def grouper(key: Map[Domain, Hashable]
+def grouper(key: Map[Domain, Hashable],
+            *,
+            mapping_cls: Type[MutableMapping] = OrderedDict
             ) -> Map[Iterable[Domain], Iterable[Group]]:
     """
     Returns function that groups iterable elements based on given key.
+
+    >>> group_by_absolute_value = grouper(abs)
+    >>> list(group_by_absolute_value(range(-5, 5)))
+    [(5, [-5]), (4, [-4, 4]), (3, [-3, 3]), (2, [-2, 2]), (1, [-1, 1]), (0, [0])]
+
+    >>> def modulo_two(number: int) -> int:
+    ...     return number % 2
+    >>> group_by_evenness = grouper(modulo_two)
+    >>> list(group_by_evenness(range(10)))
+    [(0, [0, 2, 4, 6, 8]), (1, [1, 3, 5, 7, 9])]
     """
     return functools.partial(group_by,
-                             key=key)
+                             key=key,
+                             mapping_cls=mapping_cls)
 
 
 def group_by(iterable: Iterable[Domain],
              *,
-             key: Map[Domain, Hashable]) -> Iterable[Group]:
+             key: Map[Domain, Hashable],
+             mapping_cls: Type[MutableMapping]) -> Iterable[Group]:
     """
     Groups iterable elements based on given key.
     """
-    groups = defaultdict(list)  # type: Mapping[Hashable, List[Domain]]
+    groups = mapping_cls()
     for element in iterable:
-        groups[key(element)].append(element)
+        groups.setdefault(key(element), []).append(element)
     yield from groups.items()
 
 
 def expand(object_: Domain) -> Iterable[Domain]:
     """
     Wraps object into iterable.
+
+    >>> list(expand(0))
+    [0]
     """
     yield object_
 
@@ -151,6 +198,9 @@ def expand(object_: Domain) -> Iterable[Domain]:
 def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     """
     Interleaves elements from given iterable of iterables.
+
+    >>> list(interleave([range(5), range(10, 20)]))
+    [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 15, 16, 17, 18, 19]
     """
     iterators = itertools.cycle(map(iter, iterable))
     while True:
@@ -168,6 +218,9 @@ def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
 def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     """
     Returns plain iterable from iterable of iterables.
+
+    >>> list(flatten([range(5), range(10, 20)]))
+    [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     """
     yield from itertools.chain.from_iterable(iterable)
 
@@ -176,6 +229,10 @@ def header(size: int) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from the beginning of iterable.
     Resulted iterable will have size not greater than given one.
+
+    >>> to_first_pair = header(2)
+    >>> list(to_first_pair(range(10)))
+    [0, 1]
     """
     return cutter(slice(size))
 
@@ -183,6 +240,9 @@ def header(size: int) -> Operator[Iterable[Domain]]:
 def first(iterable: Iterable[Domain]) -> Domain:
     """
     Returns first element of iterable.
+
+    >>> first(range(10))
+    0
     """
     try:
         return next(iter(iterable))
@@ -194,6 +254,10 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
     """
     Returns function that selects elements from the end of iterable.
     Resulted iterable will have size not greater than given one.
+
+    >>> to_last_pair = trailer(2)
+    >>> list(to_last_pair(range(10)))
+    [8, 9]
     """
     return functools.partial(deque,
                              maxlen=size)
@@ -202,6 +266,9 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
 def last(iterable: Iterable[Domain]) -> Domain:
     """
     Returns last element of iterable.
+
+    >>> last(range(10))
+    9
     """
     try:
         return deque(iterable,
@@ -212,7 +279,20 @@ def last(iterable: Iterable[Domain]) -> Domain:
 
 @singledispatch
 def capacity(iterable: Iterable[Any]) -> int:
-    return sum(1 for _ in iterable)
+    """
+    Returns number of elements in iterable.
+
+    >>> capacity(range(0))
+    0
+    >>> capacity(range(10))
+    10
+    """
+    counter = itertools.count()
+    # order matters: if `counter` goes first,
+    # then it will be incremented even for empty `iterable`
+    deque(zip(iterable, counter),
+          maxlen=0)
+    return next(counter)
 
 
 @capacity.register(abc.Sized)

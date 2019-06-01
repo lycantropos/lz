@@ -3,7 +3,8 @@ import functools
 import inspect
 import itertools
 from collections import abc
-from types import MappingProxyType
+from types import (MappingProxyType,
+                   MethodType)
 from typing import (Any,
                     Callable,
                     Dict,
@@ -25,6 +26,9 @@ from .hints import (Domain,
 def identity(argument: Domain) -> Domain:
     """
     Returns object itself.
+
+    >>> identity(0)
+    0
     """
     return argument
 
@@ -33,6 +37,10 @@ def compose(last_function: Map[Any, Range],
             *front_functions: Callable[..., Any]) -> Callable[..., Range]:
     """
     Returns functions composition.
+
+    >>> sum_of_first_n_natural_numbers = compose(sum, range)
+    >>> sum_of_first_n_natural_numbers(10)
+    45
     """
     caller_frame_info = inspect.stack()[1]
     return Composition(last_function, *front_functions,
@@ -86,6 +94,11 @@ class Composition:
 
     def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
         return self.function(*args, **kwargs)
+
+    def __get__(self,
+                instance: Domain,
+                owner: Type[Domain]) -> Callable[..., Range]:
+        return MethodType(self.function, instance)
 
     __repr__ = generate_repr(__init__,
                              field_seeker=seekers.complex_)
@@ -158,6 +171,10 @@ def _compose(*functions: Callable[..., Any],
 def combine(*maps: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     """
     Returns function that applies each map to corresponding argument.
+
+    >>> encoder_decoder = combine(str.encode, bytes.decode)
+    >>> list(encoder_decoder(['hello', b'world']))
+    [b'hello', 'world']
     """
     return Combination(*maps)
 
@@ -241,6 +258,11 @@ def curry(function: Callable[..., Range],
           signature: Optional[signatures.Base] = None) -> Curry:
     """
     Returns curried version of given function.
+
+    >>> curried_pow = curry(pow)
+    >>> two_to_power = curried_pow(2)
+    >>> two_to_power(10)
+    1024
     """
     if signature is None:
         signature = signatures.factory(function)
@@ -251,6 +273,12 @@ def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
     """
     Returns function that works with single iterable parameter
     by unpacking elements to given function.
+
+    >>> packed_int = pack(int)
+    >>> packed_int(['10'])
+    10
+    >>> packed_int(['10'], {'base': 2})
+    2
     """
     return functools.partial(apply, function)
 
@@ -267,6 +295,14 @@ def apply(function: Callable[..., Range],
 def to_constant(object_: Domain) -> Callable[..., Domain]:
     """
     Returns function that always returns given object.
+
+    >>> always_zero = to_constant(0)
+    >>> always_zero()
+    0
+    >>> always_zero(1)
+    0
+    >>> always_zero(how_about=2)
+    0
     """
     return Constant(object_)
 
@@ -289,6 +325,10 @@ def _(object_: Constant) -> signatures.Base:
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
+
+    >>> flipped_power = flip(pow)
+    >>> flipped_power(2, 4)
+    16
     """
     return functools.partial(call_flipped, function)
 
@@ -303,8 +343,13 @@ def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
     """
     Returns function that separately applies
     given functions to the same arguments.
-    """
 
+    >>> to_min_and_max = cleave(min, max)
+    >>> list(to_min_and_max(range(10)))
+    [0, 9]
+    >>> list(to_min_and_max(range(0), default=None))
+    [None, None]
+    """
     return Cleavage(*functions)
 
 
@@ -322,3 +367,8 @@ class Cleavage:
 @signatures.factory.register(Cleavage)
 def _(object_: Cleavage) -> signatures.Base:
     return signatures.factory(object_.__call__)
+
+
+def flatmap(function: Map[Domain, Iterable[Range]],
+            *iterables: Iterable[Domain]) -> Iterable[Range]:
+    yield from itertools.chain.from_iterable(map(function, *iterables))

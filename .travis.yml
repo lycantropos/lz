@@ -13,10 +13,12 @@ matrix:
       sudo: true
 
 install:
-  - python -m pip install codecov>=2.0.9
+  - python -m pip install --upgrade codecov
 
 script:
   - python setup.py test
+  - python -m pip install -e .
+  - python -m doctest README.md
 
 after_success:
   - codecov
