@@ -16,7 +16,7 @@ setup_requires = [
     'pytest-runner>=4.2',
 ]
 tests_require = [
-    'pytest>=3.8.1',
+    'pytest<4.6.0',
     'pytest-cov>=2.6.0',
     'hypothesis>=4.0.0',
 ]
