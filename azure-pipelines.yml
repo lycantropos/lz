@@ -35,6 +35,8 @@ jobs:
         displayName: 'Install codecov'
       - script: python setup.py test
         displayName: 'Run tests'
-      - script: codecov
+      - script: python -m codecov -f coverage.xml -X gcov
         condition: succeeded()
         displayName: 'Upload coverage'
+        env:
+          CODECOV_TOKEN: $(CODECOV_TOKEN)
