@@ -35,8 +35,8 @@ def transpose(object_: Domain) -> Range:
 
 
 @transpose.register(abc.Iterable)
-def transpose_finite_iterables(object_: Iterable[FiniteIterable[Domain]]
-                               ) -> FiniteIterable[Iterable[Domain]]:
+def _(object_: Iterable[FiniteIterable[Domain]]
+      ) -> FiniteIterable[Iterable[Domain]]:
     """
     Transposes given iterable of finite iterables.
     """
@@ -63,8 +63,8 @@ def transpose_finite_iterables(object_: Iterable[FiniteIterable[Domain]]
 
 
 @transpose.register(Collection)
-def transpose_finite_iterable(object_: FiniteIterable[Iterable[Domain]]
-                              ) -> Iterable[FiniteIterable[Domain]]:
+def _(object_: FiniteIterable[Iterable[Domain]]
+      ) -> Iterable[FiniteIterable[Domain]]:
     """
     Transposes given finite iterable of iterables.
     """
