@@ -61,14 +61,14 @@ def attach(iterable: Iterable[Domain],
 
 
 @attach.register(list)
-def attach_to_list(iterable: List[Domain],
-                   object_: Domain) -> List[Domain]:
+def _(iterable: List[Domain],
+      object_: Domain) -> List[Domain]:
     return iterable + [object_]
 
 
 @attach.register(tuple)
-def attach_to_tuple(iterable: Tuple[Domain, ...],
-                    object_: Domain) -> Tuple[Domain, ...]:
+def _(iterable: Tuple[Domain, ...],
+      object_: Domain) -> Tuple[Domain, ...]:
     return iterable + (object_,)
 
 
