@@ -103,9 +103,9 @@ def chop(iterable: Iterable[Domain],
 
 
 @chop.register(abc.Sequence)
-def chop_sequence(iterable: Sequence[Domain],
-                  *,
-                  size: int) -> Iterable[Sequence[Domain]]:
+def _(iterable: Sequence[Domain],
+      *,
+      size: int) -> Iterable[Sequence[Domain]]:
     """
     Splits sequence into chunks of given size.
     """
