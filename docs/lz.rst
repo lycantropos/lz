@@ -30,7 +30,7 @@ left module
 
 .. automodule:: lz.left
     :members:
-    :exclude-members: Applier
+    :exclude-members: Applier, accumulate, fold
 
 logical module
 ~~~~~~~~~~~~~~
