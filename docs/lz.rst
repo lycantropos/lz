@@ -1,12 +1,6 @@
 Submodules
 ==========
 
-arithmetical module
-~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: lz.arithmetical
-    :members:
-
 filtration module
 ~~~~~~~~~~~~~~~~~
 
