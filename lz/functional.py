@@ -374,4 +374,11 @@ def _(object_: Cleavage) -> signatures.Base:
 
 def flatmap(function: Map[Domain, Iterable[Range]],
             *iterables: Iterable[Domain]) -> Iterable[Range]:
+    """
+    Applies given function to the arguments aggregated from given iterables
+    and concatenates results into plain iterable.
+
+    >>> list(flatmap(range, range(5)))
+    [0, 0, 1, 0, 1, 2, 0, 1, 2, 3]
+    """
     yield from itertools.chain.from_iterable(map(function, *iterables))
