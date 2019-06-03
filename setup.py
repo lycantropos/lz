@@ -17,7 +17,7 @@ setup_requires = [
 ]
 tests_require = [
     'pytest>=4.6.1',
-    'pytest-cov>=2.6.0',
+    'pytest-cov>=2.7.1',
     'hypothesis>=4.0.0',
 ]
 

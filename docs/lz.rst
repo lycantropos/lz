@@ -1,12 +1,6 @@
 Submodules
 ==========
 
-arithmetical module
-~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: lz.arithmetical
-    :members:
-
 filtration module
 ~~~~~~~~~~~~~~~~~
 
@@ -18,6 +12,7 @@ functional module
 
 .. automodule:: lz.functional
     :members:
+    :exclude-members: call_flipped
 
 iterating module
 ~~~~~~~~~~~~~~~~

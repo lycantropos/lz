@@ -307,10 +307,17 @@ def to_strings(encoding: str,
     def decode(byte_sequence: ByteSequence) -> str:
         return byte_sequence.decode(encoding)
 
+    def has_valid_size(string: str) -> bool:
+        result = min_size <= len(string)
+        if max_size is not None:
+            result &= len(string) <= max_size
+        return result
+
     return (to_byte_sequences(encoding,
                               min_size=bytes_min_size,
                               max_size=bytes_max_size)
-            .map(decode))
+            .map(decode)
+            .filter(has_valid_size))
 
 
 @limit_max_size

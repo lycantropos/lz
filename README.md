@@ -2,7 +2,7 @@ lz
 ==
 
 [![](https://travis-ci.org/lycantropos/lz.svg?branch=master)](https://travis-ci.org/lycantropos/lz "Travis CI")
-[![](https://ci.appveyor.com/api/projects/status/github/lycantropos/lz?branch=master&svg=true)](https://ci.appveyor.com/project/lycantropos/lz "AppVeyor")
+[![](https://dev.azure.com/azatibrakov/lz/_apis/build/status/lycantropos.lz?branchName=master)](https://dev.azure.com/azatibrakov/lz/_build/latest?definitionId=2&branchName=master "Azure Pipelines")
 [![](https://codecov.io/gh/lycantropos/lz/branch/master/graph/badge.svg)](https://codecov.io/gh/lycantropos/lz "Codecov")
 [![](https://readthedocs.org/projects/lz/badge/?version=latest)](https://lz.readthedocs.io/en/latest "Documentation")
 [![](https://img.shields.io/github/license/lycantropos/lz.svg)](https://github.com/lycantropos/lz/blob/master/LICENSE "License")
