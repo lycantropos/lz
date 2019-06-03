@@ -12,6 +12,7 @@ functional module
 
 .. automodule:: lz.functional
     :members:
+    :exclude-members: call_flipped
 
 iterating module
 ~~~~~~~~~~~~~~~~

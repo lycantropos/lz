@@ -336,6 +336,9 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
 def call_flipped(function: Callable[..., Range],
                  *args: Domain,
                  **kwargs: Domain) -> Range:
+    """
+    Calls given function with positional arguments flipped.
+    """
     return function(*args[::-1], **kwargs)
 
 
