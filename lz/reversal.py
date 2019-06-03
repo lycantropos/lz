@@ -77,7 +77,10 @@ def reverse(object_: Domain, **_: Any) -> Range:
 
 
 @reverse.register(abc.Sequence)
-def reverse_sequence(object_: Sequence[Domain]) -> Sequence[Domain]:
+def _(object_: Sequence[Domain]) -> Sequence[Domain]:
+    """
+    Returns reversed sequence.
+    """
     return object_[::-1]
 
 
@@ -86,16 +89,22 @@ if sys.version_info >= (3, 6):
 
 
     @reverse.register(abc.Reversible)
-    def reverse_reversible(object_: Reversible[Domain]) -> Iterable[Domain]:
+    def _(object_: Reversible[Domain]) -> Iterable[Domain]:
+        """
+        Returns reversed reversible iterable.
+        """
         yield from reversed(object_)
 
 
 @reverse.register(io.TextIOWrapper)
-def reverse_file(object_: TextIO,
-                 *,
-                 batch_size: Optional[int] = None,
-                 lines_separator: Optional[str] = None,
-                 keep_lines_separator: bool = True) -> Iterable[str]:
+def _(object_: TextIO,
+      *,
+      batch_size: Optional[int] = None,
+      lines_separator: Optional[str] = None,
+      keep_lines_separator: bool = True) -> Iterable[str]:
+    """
+    Returns reversed file object.
+    """
     encoding = object_.encoding
     if lines_separator is not None:
         lines_separator = lines_separator.encode(encoding)
@@ -113,13 +122,15 @@ def reverse_file(object_: TextIO,
 
 @reverse.register(io.BufferedReader)
 @reverse.register(io.BytesIO)
-def reverse_binary_stream(object_: BinaryIO,
-                          *,
-                          batch_size: Optional[int] = None,
-                          lines_separator: Optional[bytes] = None,
-                          keep_lines_separator: bool = True,
-                          code_unit_size: int = 1
-                          ) -> Iterable[bytes]:
+def _(object_: BinaryIO,
+      *,
+      batch_size: Optional[int] = None,
+      lines_separator: Optional[bytes] = None,
+      keep_lines_separator: bool = True,
+      code_unit_size: int = 1) -> Iterable[bytes]:
+    """
+    Returns reversed byte stream.
+    """
     if lines_separator is None:
         lines_separator = (b'\r', b'\n', b'\r\n')
         lines_splitter = methodcaller(bytes.splitlines.__name__,
