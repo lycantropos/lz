@@ -30,6 +30,7 @@ left module
 
 .. automodule:: lz.left
     :members:
+    :exclude-members: Applier
 
 logical module
 ~~~~~~~~~~~~~~
