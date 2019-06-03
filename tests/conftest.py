@@ -2,6 +2,7 @@ import io
 import os
 import pkgutil
 import sys
+from collections import abc
 from functools import partial
 from typing import (Any,
                     Dict,
@@ -13,8 +14,7 @@ import pytest
 from hypothesis import (HealthCheck,
                         settings)
 
-from lz.replication import (replicate,
-                            replicate_iterable)
+from lz.replication import replicate
 
 base_directory_path = os.path.dirname(__file__)
 sys.path.append(base_directory_path)
@@ -95,6 +95,7 @@ def patch_sized_replication() -> None:
                                  count=count))
 
     replicate.register(io.TextIOWrapper, replicate_text_stream)
+    replicate_iterable = replicate.dispatch(abc.Iterable)
 
     def replicate_sized(object_: Any,
                         *,

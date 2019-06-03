@@ -30,6 +30,7 @@ left module
 
 .. automodule:: lz.left
     :members:
+    :exclude-members: Applier, accumulate, fold
 
 logical module
 ~~~~~~~~~~~~~~
@@ -59,12 +60,6 @@ sorting module
 ~~~~~~~~~~~~~~
 
 .. automodule:: lz.sorting
-    :members:
-
-textual module
-~~~~~~~~~~~~~~
-
-.. automodule:: lz.textual
     :members:
 
 transposition module

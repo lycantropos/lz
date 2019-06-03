@@ -17,9 +17,7 @@ def test_basic(iterable: Iterable[Hashable],
     group_by = grouper(key_function)
 
     result = group_by(target)
-    result_list = list(result)
+    result_dict = dict(result)
 
-    assert all(element in group
-               for element in original
-               for key, group in result_list
-               if key_function(element) == key)
+    assert all(element in result_dict[key_function(element)]
+               for element in original)

@@ -60,14 +60,20 @@ def attach(iterable: Iterable[Domain],
 
 
 @attach.register(list)
-def attach_to_list(iterable: List[Domain],
-                   object_: Domain) -> List[Domain]:
+def _(iterable: List[Domain],
+      object_: Domain) -> List[Domain]:
+    """
+    Prepends given object to the list.
+    """
     return [object_] + iterable
 
 
 @attach.register(tuple)
-def attach_to_tuple(iterable: Tuple[Domain, ...],
-                    object_: Domain) -> Tuple[Domain, ...]:
+def _(iterable: Tuple[Domain, ...],
+      object_: Domain) -> Tuple[Domain, ...]:
+    """
+    Prepends given object to the tuple.
+    """
     return (object_,) + iterable
 
 

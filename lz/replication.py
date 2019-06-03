@@ -27,9 +27,9 @@ def replicate(object_: Domain,
 # mappings cannot be replicated as other iterables
 # since they are iterable only by key
 @replicate.register(abc.Mapping)
-def replicate_object(object_: Domain,
-                     *,
-                     count: int) -> Iterable[Domain]:
+def _(object_: Domain,
+      *,
+      count: int) -> Iterable[Domain]:
     """
     Returns object repeated given number of times.
     """
@@ -37,9 +37,9 @@ def replicate_object(object_: Domain,
 
 
 @replicate.register(abc.Iterable)
-def replicate_iterable(object_: Iterable[Domain],
-                       *,
-                       count: int) -> Iterable[Iterable[Domain]]:
+def _(object_: Iterable[Domain],
+      *,
+      count: int) -> Iterable[Iterable[Domain]]:
     """
     Returns given number of iterable replicas.
     """
