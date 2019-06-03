@@ -57,18 +57,27 @@ def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
 @functools.singledispatch
 def attach(iterable: Iterable[Domain],
            object_: Domain) -> Iterable[Domain]:
+    """
+    Appends given object to the iterable.
+    """
     yield from itertools.chain(iterable, expand(object_))
 
 
 @attach.register(list)
 def _(iterable: List[Domain],
       object_: Domain) -> List[Domain]:
+    """
+    Appends given object to the list.
+    """
     return iterable + [object_]
 
 
 @attach.register(tuple)
 def _(iterable: Tuple[Domain, ...],
       object_: Domain) -> Tuple[Domain, ...]:
+    """
+    Appends given object to the tuple.
+    """
     return iterable + (object_,)
 
 
