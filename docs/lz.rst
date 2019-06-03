@@ -62,12 +62,6 @@ sorting module
 .. automodule:: lz.sorting
     :members:
 
-textual module
-~~~~~~~~~~~~~~
-
-.. automodule:: lz.textual
-    :members:
-
 transposition module
 ~~~~~~~~~~~~~~~~~~~~
 
