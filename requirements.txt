@@ -1,0 +1,3 @@
+paradigm>=0.4.0
+reprit>=0.0.1
+typing_extensions>=3.6.5
