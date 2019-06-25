@@ -1,3 +1,3 @@
 """"Lazy" calculations support."""
 
-__version__ = '0.9.1-alpha'
+__version__ = '0.9.1'
