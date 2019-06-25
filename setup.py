@@ -7,19 +7,11 @@ import lz
 
 project_base_url = 'https://github.com/lycantropos/lz/'
 
-install_requires = [
-    'paradigm>=0.4.0',
-    'reprit>=0.0.1',
-    'typing_extensions>=3.6.5',
-]
+install_requires = Path('requirements.txt').read_text()
 setup_requires = [
     'pytest-runner>=4.2',
 ]
-tests_require = [
-    'pytest>=4.6.1',
-    'pytest-cov>=2.7.1',
-    'hypothesis>=4.0.0',
-]
+tests_require = Path('requirements-tests.txt').read_text()
 
 setup(name='lz',
       packages=find_packages(exclude=('tests', 'tests.*',)),

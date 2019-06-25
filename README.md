@@ -18,7 +18,6 @@ Installation
 ------------
 
 Install the latest `pip` & `setuptools` packages versions:
-
 - with `CPython`
   ```bash
   python -m pip install --upgrade pip setuptools
@@ -31,7 +30,6 @@ Install the latest `pip` & `setuptools` packages versions:
 ### User
 
 Download and install the latest stable version from `PyPI` repository:
-
 - with `CPython`
   ```bash
   python -m pip install --upgrade lz
@@ -48,6 +46,16 @@ Download the latest version from `GitHub` repository
 git clone https://github.com/lycantropos/lz.git
 cd lz
 ```
+
+Install dependencies:
+- with `CPython`
+  ```bash
+  python -m pip install -r requirements.txt
+  ```
+- with `PyPy`
+  ```bash
+  pypy -m pip install -r requirements.txt
+  ```
 
 Install:
 - with `CPython`
@@ -291,33 +299,32 @@ This will set version to `major.minor.patch-alpha`.
 
 Test bumping version
 ```bash
-bump2version --dry-run --verbose --tag release
+bump2version --dry-run --verbose release
 ```
 
 Bump version
 ```bash
-bump2version --verbose --tag release
+bump2version --verbose release
 ```
 
-This will set version to `major.minor.patch` and add `Git` tag.
-
-#### Notes
-
-To avoid inconsistency between branches and pull requests,
-bumping version should be merged into `master` branch as separate pull
-request.
+This will set version to `major.minor.patch`.
 
 ### Running tests
 
-Plain:
+Install dependencies:
 - with `CPython`
   ```bash
-  python setup.py test
+  python -m pip install -r requirements-tests.txt
   ```
 - with `PyPy`
   ```bash
-  pypy setup.py test
+  pypy -m pip install -r requirements-tests.txt
   ```
+
+Plain
+```bash
+pytest
+```
 
 Inside `Docker` container:
 - with `CPython`
@@ -343,7 +350,6 @@ Inside `Docker` container:
   ```bash
   ./run-tests.sh pypy
   ```
-
 
 `PowerShell` script (e.g. can be used in `Git` hooks):
 - with `CPython`
