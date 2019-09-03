@@ -148,12 +148,14 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
     >>> list(slide_pairwise(range(10)))
     [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
     """
-    return functools.partial(slide,
-                             size=size)
+    result = functools.partial(slide,
+                               size=size)
+    result.__doc__ = ('Slides over iterable with window of size {size}.'
+                      .format(size=size))
+    return result
 
 
 pairwise = slider(2)
-pairwise.__doc__ = 'Slides over iterable with window of size 2.'
 
 Group = Tuple[Hashable, Iterable[Domain]]
 
