@@ -156,6 +156,8 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
 
 
 pairwise = slider(2)
+triplewise = slider(3)
+quadruplewise = slider(4)
 
 Group = Tuple[Hashable, Iterable[Domain]]
 
