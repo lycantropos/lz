@@ -118,6 +118,11 @@ def _(iterable: Sequence[Domain],
         yield iterable[start:start + size]
 
 
+in_two = chopper(2)
+in_three = chopper(3)
+in_four = chopper(4)
+
+
 def slide(iterable: Iterable[Domain],
           *,
           size: int) -> Iterable[Tuple[Domain, ...]]:
