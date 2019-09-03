@@ -83,8 +83,8 @@ def chopper(size: int) -> Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
     """
     Returns function that splits iterable into chunks of given size.
 
-    >>> to_triplets = chopper(3)
-    >>> list(map(tuple, to_triplets(range(10))))
+    >>> in_three = chopper(3)
+    >>> list(map(tuple, in_three(range(10))))
     [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
     """
     result = functools.partial(chop,
