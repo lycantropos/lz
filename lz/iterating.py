@@ -144,8 +144,8 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
     """
     Returns function that slides over iterable with window of given size.
 
-    >>> slide_pairwise = slider(2)
-    >>> list(slide_pairwise(range(10)))
+    >>> pairwise = slider(2)
+    >>> list(pairwise(range(10)))
     [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
     """
     result = functools.partial(slide,
