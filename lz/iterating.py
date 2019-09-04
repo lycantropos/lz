@@ -318,7 +318,11 @@ def _(iterable: Sequence[Domain],
     Selects elements from the end of sequence.
     Resulted sequence will have size not greater than given one.
     """
-    return iterable[-size:]
+    return iterable[-size:] if size else iterable[:size]
+
+
+# deque do not support slice notation
+trail.register(deque, trail.registry[object])
 
 
 def last(iterable: Iterable[Domain]) -> Domain:
