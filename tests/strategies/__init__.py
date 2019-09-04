@@ -40,6 +40,5 @@ from .literals.factories import (to_any_strings,
                                  to_byte_streams,
                                  to_homogeneous_iterables,
                                  to_homogeneous_sequences,
-                                 to_separator,
                                  to_text_streams,
                                  to_tuples)
