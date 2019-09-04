@@ -272,7 +272,10 @@ def header(size: int) -> Operator[Iterable[Domain]]:
     >>> list(to_first_pair(range(10)))
     [0, 1]
     """
-    return cutter(slice(size))
+    result = cutter(slice(size))
+    result.__doc__ = ('Selects {size} elements from the beginning of iterable.'
+                      .format(size=size))
+    return result
 
 
 def first(iterable: Iterable[Domain]) -> Domain:
