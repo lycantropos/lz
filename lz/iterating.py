@@ -141,6 +141,9 @@ def _(iterable: Sequence[Domain],
         yield iterable[start:start + size]
 
 
+# deque do not support slice notation
+chop.register(deque, chop.registry[object])
+
 in_two = chopper(2)
 in_three = chopper(3)
 in_four = chopper(4)
