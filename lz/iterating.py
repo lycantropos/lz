@@ -300,8 +300,11 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
     >>> list(to_last_pair(range(10)))
     [8, 9]
     """
-    return functools.partial(trail,
-                             size=size)
+    result = functools.partial(trail,
+                               size=size)
+    result.__doc__ = ('Selects {size} elements from the end of iterable.'
+                      .format(size=size))
+    return result
 
 
 @functools.singledispatch
