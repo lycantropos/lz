@@ -60,8 +60,31 @@ def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
     >>> list(cut_out_every_third(range(10)))
     [0, 3, 6, 9]
     """
-    return functools.partial(cut,
-                             slice_=slice_)
+    result = functools.partial(cut,
+                               slice_=slice_)
+    result.__doc__ = ('Selects elements from iterable {slice}.'
+                      .format(slice=_slice_to_description(slice_)))
+    return result
+
+
+def _slice_to_description(slice_: slice) -> str:
+    """Generates human readable representation of `slice` object."""
+    slice_description_parts = []
+    start_is_specified = bool(slice_.start)
+    if start_is_specified:
+        slice_description_parts.append('starting from position {start}'
+                                       .format(start=slice_.start))
+    step_is_specified = slice_.step is not None
+    if step_is_specified:
+        slice_description_parts.append('with step {step}'
+                                       .format(step=slice_.step))
+    if slice_.stop is not None:
+        stop_description_part = ('stopping at position {stop}'
+                                 .format(stop=slice_.stop))
+        if start_is_specified or step_is_specified:
+            stop_description_part = 'and ' + stop_description_part
+        slice_description_parts.append(stop_description_part)
+    return ' '.join(slice_description_parts)
 
 
 def cut(iterable: Iterable[Domain],
