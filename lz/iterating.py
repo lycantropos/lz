@@ -294,8 +294,31 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
     >>> list(to_last_pair(range(10)))
     [8, 9]
     """
-    return functools.partial(deque,
-                             maxlen=size)
+    return functools.partial(trail,
+                             size=size)
+
+
+@functools.singledispatch
+def trail(iterable: Iterable[Domain],
+          *,
+          size: int) -> Iterable[Domain]:
+    """
+    Selects elements from the end of iterable.
+    Resulted iterable will have size not greater than given one.
+    """
+    return deque(iterable,
+                 maxlen=size)
+
+
+@trail.register(abc.Sequence)
+def _(iterable: Sequence[Domain],
+      *,
+      size: int) -> Sequence[Domain]:
+    """
+    Selects elements from the end of sequence.
+    Resulted sequence will have size not greater than given one.
+    """
+    return iterable[-size:]
 
 
 def last(iterable: Iterable[Domain]) -> Domain:
