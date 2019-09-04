@@ -1,10 +1,14 @@
+import os
 from functools import partial
 from typing import (Any,
+                    AnyStr,
                     IO,
-                    Sequence)
+                    Sequence,
+                    Tuple)
 
 from hypothesis import strategies
 
+from lz.functional import pack
 from tests.hints import (Strategy,
                          StreamWithReverseParameters)
 from tests.strategies import (empty,
@@ -13,7 +17,6 @@ from tests.strategies import (empty,
                               to_any_strings,
                               to_byte_streams,
                               to_homogeneous_sequences,
-                              to_separator,
                               to_text_streams)
 from tests.utils import (to_stream_contents,
                          to_stream_size)
@@ -42,6 +45,24 @@ def to_stream_with_reverse_parameters(
                              strategies.tuples(batches_sizes,
                                                to_separator(contents),
                                                strategies.booleans()))
+
+
+def to_separator(any_string: AnyStr) -> Strategy[AnyStr]:
+    if not any_string:
+        result = os.linesep
+        if not isinstance(any_string, str):
+            result = result.encode()
+        return strategies.just(result)
+    length = len(any_string)
+
+    def to_start_stop(start: int) -> Strategy[Tuple[int, int]]:
+        return strategies.tuples(strategies.just(start),
+                                 strategies.integers(start + 1, length))
+
+    return (strategies.integers(0, length - 1)
+            .flatmap(to_start_stop)
+            .map(pack(slice))
+            .map(any_string.__getitem__))
 
 
 byte_streams_with_reverse_parameters = (
