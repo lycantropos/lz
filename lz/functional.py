@@ -2,6 +2,7 @@ import ast
 import functools
 import inspect
 import itertools
+import sys
 from collections import abc
 from types import (MappingProxyType,
                    MethodType)
@@ -111,6 +112,15 @@ def _(object_: Composition) -> signatures.Base:
 
 def _compose(*functions: Callable[..., Any],
              function_name: str,
+             arguments_factory: Callable[..., ast.arguments] =
+             ast.arguments if sys.version_info < (3, 8)
+             # Python3.8 adds positional-only arguments
+             else functools.partial(ast.arguments, []),
+             module_factory: Callable[..., ast.Module] =
+             ast.Module if sys.version_info < (3, 8)
+             # Python3.8 adds `type_ignores` parameter
+             else functools.partial(ast.Module,
+                                    type_ignores=[]),
              file_path: str,
              line_number: int,
              line_offset: int) -> Callable[..., Range]:
@@ -150,18 +160,17 @@ def _compose(*functions: Callable[..., Any],
                                   calls_node)
     function_definition_node = set_attributes(ast.FunctionDef)(
             function_name,
-            ast.arguments([],
-                          set_attributes(ast.arg)(variadic_positionals_name,
-                                                  None),
-                          [],
-                          [],
-                          set_attributes(ast.arg)(variadic_keywords_name,
-                                                  None),
-                          []),
+            arguments_factory(
+                    [],
+                    set_attributes(ast.arg)(variadic_positionals_name, None),
+                    [],
+                    [],
+                    set_attributes(ast.arg)(variadic_keywords_name, None),
+                    []),
             [set_attributes(ast.Return)(calls_node)],
             [],
             None)
-    tree = ast.Module([function_definition_node])
+    tree = module_factory([function_definition_node])
     code = compile(tree, file_path, 'exec')
     namespace = dict(zip(functions_names, functions))
     exec(code, namespace)
