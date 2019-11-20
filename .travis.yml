@@ -1,21 +1,22 @@
 sudo: false
-distro: trusty
+distro: xenial
 
 language: python
 
 matrix:
   include:
-    - python: pypy3.5
+    - python: pypy3.5-6.0.0
+    - python: pypy3.6-7.0.0
     - python: 3.5
     - python: 3.6
     - python: 3.7
-      dist: xenial
-      sudo: true
+    - python: 3.8
 
 install:
-  - python -m pip install codecov
-  - python -m pip install -r requirements-tests.txt
-  - python -m pip install -r requirements.txt
+  - python -m pip install --upgrade pip setuptools
+  - python -m pip install --upgrade codecov
+  - python -m pip install --force-reinstall -r requirements.txt
+  - python -m pip install --force-reinstall -r requirements-tests.txt
 
 script:
   - pytest
