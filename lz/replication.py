@@ -2,7 +2,8 @@ import functools
 import itertools
 from collections import (abc,
                          deque)
-from typing import Iterable
+from typing import (Iterable,
+                    Tuple)
 
 from .hints import (Domain,
                     Map)
@@ -37,9 +38,9 @@ def _(object_: Domain,
 
 
 @replicate.register(abc.Iterable)
-def _(object_: Iterable[Domain],
-      *,
-      count: int) -> Iterable[Iterable[Domain]]:
+def _replicate_iterable(object_: Iterable[Domain],
+                        *,
+                        count: int) -> Iterable[Iterable[Domain]]:
     """
     Returns given number of iterable replicas.
     """
@@ -60,6 +61,14 @@ def _(object_: Iterable[Domain],
             yield queue.popleft()
 
     yield from map(replica, queues)
+
+
+@replicate.register(tuple)
+def _(object_: Tuple[Domain, ...],
+      *,
+      count: int) -> Iterable[Tuple[Domain, ...]]:
+    yield from map(tuple, _replicate_iterable(object_,
+                                              count=count))
 
 
 def replicator(count: int) -> Map[Domain, Iterable[Domain]]:
