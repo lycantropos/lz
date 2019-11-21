@@ -69,7 +69,7 @@ settings.register_profile('default',
 
 @pytest.fixture(scope='session',
                 autouse=True)
-def patch_sized_replication() -> None:
+def patch_replication() -> None:
     def replicate_byte_buffer(object_: io.BytesIO,
                               *,
                               count: int) -> Iterable[io.BytesIO]:
@@ -107,7 +107,6 @@ def patch_sized_replication() -> None:
     replicate.register(frozenset, replicate_sized)
     replicate.register(list, replicate_sized)
     replicate.register(set, replicate_sized)
-    replicate.register(tuple, replicate_sized)
 
     def replicate_dictionary(object_: Dict[Hashable, Any],
                              *,
