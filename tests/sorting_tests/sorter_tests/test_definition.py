@@ -1,4 +1,5 @@
-from typing import Iterable
+from typing import (Iterable,
+                    Optional)
 
 from hypothesis import given
 
@@ -17,7 +18,7 @@ from . import strategies
        strategies.sorting_keys)
 def test_order(sortable_iterable: Iterable[Sortable],
                registered_sorting_algorithm: str,
-               sorting_key: Key) -> None:
+               sorting_key: Optional[Key]) -> None:
     sort = sorter(algorithm=registered_sorting_algorithm,
                   key=sorting_key)
 
@@ -46,7 +47,7 @@ def objects_are_partially_ordered(left_object: Sortable,
        strategies.sorting_keys)
 def test_capacity(sortable_iterable: Iterable[Sortable],
                   registered_sorting_algorithm: str,
-                  sorting_key: Key) -> None:
+                  sorting_key: Optional[Key]) -> None:
     original, target = duplicate(sortable_iterable)
     sort = sorter(algorithm=registered_sorting_algorithm,
                   key=sorting_key)
@@ -61,7 +62,7 @@ def test_capacity(sortable_iterable: Iterable[Sortable],
        strategies.sorting_keys)
 def test_elements(sortable_iterable: Iterable[Sortable],
                   registered_sorting_algorithm: str,
-                  sorting_key: Key) -> None:
+                  sorting_key: Optional[Key]) -> None:
     original, target = duplicate(sortable_iterable)
     sort = sorter(algorithm=registered_sorting_algorithm,
                   key=sorting_key)

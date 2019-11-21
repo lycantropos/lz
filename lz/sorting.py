@@ -10,7 +10,7 @@ from .hints import (Domain,
                     Operator,
                     Sortable)
 
-Key = Optional[Map[Domain, Sortable]]
+Key = Map[Domain, Sortable]
 Implementation = Callable[..., Iterable[Domain]]
 
 stable_implementations = {}
@@ -73,7 +73,7 @@ register_implementation(DEFAULT_ALGORITHM, sorted,
 
 def sorter(*,
            algorithm: str = DEFAULT_ALGORITHM,
-           key: Map[Domain, Sortable] = None) -> Operator[Iterable[Domain]]:
+           key: Optional[Key] = None) -> Operator[Iterable[Domain]]:
     """
     Returns function that generates sorted iterable
     by given key with specified algorithm.
