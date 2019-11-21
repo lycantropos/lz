@@ -184,7 +184,7 @@ def are_iterables_similar(object_: Iterable[Any],
         return False
     return all(starmap(are_objects_similar,
                        zip_longest(object_, *rest,
-                                   # we're assuming that ``object()``
+                                   # we're assuming that `object()`
                                    # will create some unique object
                                    # not presented in any of arguments
                                    fillvalue=object())))

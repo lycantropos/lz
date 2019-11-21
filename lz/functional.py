@@ -125,7 +125,7 @@ def _compose(*functions: Callable[..., Any],
              line_number: int,
              line_offset: int) -> Callable[..., Range]:
     def function_to_unique_name(function: Callable) -> str:
-        # we are not using ``__name__``/``__qualname__`` attributes
+        # we are not using `__name__`/`__qualname__` attributes
         # due to their potential non-uniqueness
         return '_' + str(id(function)).replace('-', '_')
 
