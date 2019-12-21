@@ -9,7 +9,7 @@ from typing import (AnyStr,
                     TypeVar,
                     Union)
 
-from hypothesis.searchstrategy import SearchStrategy
+from hypothesis.strategies import SearchStrategy
 
 from lz.hints import (Domain,
                       Map,
