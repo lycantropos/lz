@@ -54,9 +54,7 @@ class Composition:
     def __new__(cls,
                 *functions: Callable[..., Any],
                 **kwargs: Any) -> Union['Composition', Callable[..., Range]]:
-        if len(functions) == 1:
-            return functions[0]
-        return super().__new__(cls)
+        return functions[0] if len(functions) == 1 else super().__new__(cls)
 
     def __init__(self,
                  *functions: Callable[..., Any],
