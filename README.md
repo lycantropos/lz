@@ -1,43 +1,29 @@
 lz
 ==
 
-[![](https://travis-ci.org/lycantropos/lz.svg?branch=master)](https://travis-ci.org/lycantropos/lz "Travis CI")
 [![](https://dev.azure.com/lycantropos/lz/_apis/build/status/lycantropos.lz?branchName=master)](https://dev.azure.com/lycantropos/lz/_build/latest?definitionId=2&branchName=master "Azure Pipelines")
 [![](https://codecov.io/gh/lycantropos/lz/branch/master/graph/badge.svg)](https://codecov.io/gh/lycantropos/lz "Codecov")
 [![](https://readthedocs.org/projects/lz/badge/?version=latest)](https://lz.readthedocs.io/en/latest "Documentation")
 [![](https://img.shields.io/github/license/lycantropos/lz.svg)](https://github.com/lycantropos/lz/blob/master/LICENSE "License")
 [![](https://badge.fury.io/py/lz.svg)](https://badge.fury.io/py/lz "PyPI")
 
-In what follows 
-- `python` is an alias for `python3.5` or any later
-version (`python3.6` and so on),
-- `pypy` is an alias for `pypy3.5` or any later
-version (`pypy3.6` and so on).
+In what follows `python` is an alias for `python3.5` or `pypy3.5`
+or any later version (`python3.6`, `pypy3.6` and so on).
 
 Installation
 ------------
 
-Install the latest `pip` & `setuptools` packages versions:
-- with `CPython`
-  ```bash
-  python -m pip install --upgrade pip setuptools
-  ```
-- with `PyPy`
-  ```bash
-  pypy -m pip install --upgrade pip setuptools
-  ```
+Install the latest `pip` & `setuptools` packages versions
+```bash
+python -m pip install --upgrade pip setuptools
+```
 
 ### User
 
-Download and install the latest stable version from `PyPI` repository:
-- with `CPython`
-  ```bash
-  python -m pip install --upgrade lz
-  ```
-- with `PyPy`
-  ```bash
-  pypy -m pip install --upgrade lz
-  ```
+Download and install the latest stable version from `PyPI` repository
+```bash
+python -m pip install --upgrade lz
+```
 
 ### Developer
 
@@ -47,25 +33,15 @@ git clone https://github.com/lycantropos/lz.git
 cd lz
 ```
 
-Install dependencies:
-- with `CPython`
-  ```bash
-  python -m pip install -r requirements.txt
-  ```
-- with `PyPy`
-  ```bash
-  pypy -m pip install -r requirements.txt
-  ```
+Install dependencies
+```bash
+python -m pip install -r requirements.txt
+```
 
-Install:
-- with `CPython`
-  ```bash
-  python setup.py install
-  ```
-- with `PyPy`
-  ```bash
-  pypy setup.py install
-  ```
+Install
+```bash
+python setup.py install
+```
 
 Usage 
 ----- 
@@ -241,26 +217,14 @@ Development
 ### Building docs
 
 Install project in editable mode
+```bash
+python -m pip install -e .
+```
 
-- with `CPython`
-  ```bash
-  python -m pip install -e .
-  ```
-- with `PyPy`
-  ```bash
-  pypy -m pip install -e .
-  ```
-
-Install docs requirements
-
-- with `CPython`
-  ```bash
-  python -m pip install -r docs/requirements.txt
-  ```
-- with `PyPy`
-  ```bash
-  pypy -m pip install -r docs/requirements.txt
-  ```
+Install dependencies
+```bash
+python -m pip install -r docs/requirements.txt
+```
 
 Build docs
 ```bash
@@ -311,15 +275,10 @@ This will set version to `major.minor.patch`.
 
 ### Running tests
 
-Install dependencies:
-- with `CPython`
-  ```bash
-  python -m pip install -r requirements-tests.txt
-  ```
-- with `PyPy`
-  ```bash
-  pypy -m pip install -r requirements-tests.txt
-  ```
+Install dependencies
+```bash
+python -m pip install -r requirements-tests.txt
+```
 
 Plain
 ```bash

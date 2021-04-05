@@ -5,15 +5,15 @@ services:
     build:
       context: .
       args:
-        - PYTHON_IMAGE=${CPYTHON_IMAGE_NAME}
-        - PYTHON_IMAGE_VERSION=${CPYTHON_IMAGE_VERSION}
+        - IMAGE_NAME=${CPYTHON_IMAGE_NAME}
+        - IMAGE_VERSION=${CPYTHON_IMAGE_VERSION}
     image: lycantropos/lz-cpython:0.10.2
     volumes:
-      - ./lz/:/opt/lz/lz/
-      - ./tests/:/opt/lz/tests/
+      - ./lz:/opt/lz/lz
+      - ./pytest.ini:/opt/lz/pytest.ini
       - ./README.md:/opt/lz/README.md
-      - ./requirements.txt:/opt/lz/requirements.txt
       - ./requirements-tests.txt:/opt/lz/requirements-tests.txt
+      - ./requirements.txt:/opt/lz/requirements.txt
       - ./setup.py:/opt/lz/setup.py
-      - ./setup.cfg:/opt/lz/setup.cfg
+      - ./tests:/opt/lz/tests
     entrypoint: pytest
