@@ -130,11 +130,9 @@ def _compose(*functions: Callable[..., Any],
         return '_' + str(id(function)).replace('-', '_')
 
     functions_names = list(map(function_to_unique_name, functions))
-
     set_attributes = functools.partial(functools.partial,
                                        lineno=line_number,
                                        col_offset=line_offset)
-
     variadic_positionals_name = 'args'
     variadic_keywords_name = 'kwargs'
 
@@ -153,8 +151,8 @@ def _compose(*functions: Callable[..., Any],
             [set_attributes(ast.Starred)(
                     to_name_node(variadic_positionals_name),
                     ast.Load())],
-            [ast.keyword(None,
-                         to_name_node(variadic_keywords_name))])
+            [set_attributes(ast.keyword)(
+                    None, to_name_node(variadic_keywords_name))])
     calls_node = functools.reduce(to_next_call_node,
                                   reversed_functions_names,
                                   calls_node)
