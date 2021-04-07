@@ -1,4 +1,6 @@
 import io
+import os
+import platform
 from collections import abc
 from functools import partial
 from typing import (Any,
@@ -13,7 +15,13 @@ from hypothesis import (HealthCheck,
 
 from lz.replication import replicate
 
+on_azure_pipelines = bool(os.getenv('TF_BUILD', False))
+is_pypy = platform.python_implementation() == 'PyPy'
 settings.register_profile('default',
+                          max_examples=((settings.default.max_examples
+                                         // (1 + 4 * is_pypy))
+                                        if on_azure_pipelines
+                                        else settings.default.max_examples),
                           deadline=None,
                           suppress_health_check=[HealthCheck.filter_too_much,
                                                  HealthCheck.too_slow])
