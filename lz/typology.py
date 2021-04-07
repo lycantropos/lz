@@ -1,5 +1,4 @@
 from functools import partial
-from operator import attrgetter
 from typing import (Any,
                     Tuple)
 
@@ -18,16 +17,15 @@ def instance_of(*types: type) -> Predicate:
     >>> is_any_string(1)
     False
     """
-    predicate = partial(is_instance_of,
-                        types=types)
-    types_names = list(map(attrgetter('__name__'), types))
-    predicate.__name__ = 'is_instance_of_' + '_or_'.join(types_names)
-    predicate.__qualname__ = 'is_instance_of_' + '_or_'.join(types_names)
-    types_full_names = map(attrgetter('__qualname__'), types)
-    predicate.__doc__ = ('Checks if given object is instance '
-                         'of one of types: "{types}".'
-                         .format(types='", "'.join(types_full_names)))
-    return predicate
+    result = partial(is_instance_of,
+                     types=types)
+    result.__name__ = result.__qualname__ = (
+            'is_instance_of_' + '_or_'.join(type_.__name__ for type_ in types))
+    result.__doc__ = ('Checks if given object is instance '
+                      'of one of types: "{types}".'
+                      .format(types='", "'.join(type_.__qualname__
+                                                for type_ in types)))
+    return result
 
 
 def subclass_of(*types: type) -> Predicate:
@@ -40,16 +38,15 @@ def subclass_of(*types: type) -> Predicate:
     >>> is_metaclass(object)
     False
     """
-    predicate = partial(is_subclass_of,
-                        types=types)
-    types_names = list(map(attrgetter('__name__'), types))
-    predicate.__name__ = 'is_subclass_of_' + '_or_'.join(types_names)
-    predicate.__qualname__ = 'is_subclass_of_' + '_or_'.join(types_names)
-    types_full_names = map(attrgetter('__qualname__'), types)
-    predicate.__doc__ = ('Checks if given type is subclass '
-                         'of one of types: "{types}".'
-                         .format(types='", "'.join(types_full_names)))
-    return predicate
+    result = partial(is_subclass_of,
+                     types=types)
+    result.__name__ = result.__qualname__ = (
+            'is_subclass_of_' + '_or_'.join(type_.__name__ for type_ in types))
+    result.__doc__ = ('Checks if given type is subclass '
+                      'of one of types: "{types}".'
+                      .format(types='", "'.join(type_.__qualname__
+                                                for type_ in types)))
+    return result
 
 
 def is_instance_of(object_: Any, types: Tuple[type, ...]) -> bool:
