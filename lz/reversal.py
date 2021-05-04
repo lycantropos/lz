@@ -99,7 +99,7 @@ if sys.version_info >= (3, 6):
 @reverse.register(io.TextIOWrapper)
 def _(object_: TextIO,
       *,
-      batch_size: Optional[int] = None,
+      batch_size: int = io.DEFAULT_BUFFER_SIZE,
       lines_separator: Optional[str] = None,
       keep_lines_separator: bool = True) -> Iterable[str]:
     """
@@ -109,8 +109,6 @@ def _(object_: TextIO,
     if lines_separator is not None:
         lines_separator = lines_separator.encode(encoding)
     code_unit_size = code_units_sizes[encoding]
-    if batch_size is not None:
-        batch_size = ceil_division(batch_size, code_unit_size) * code_unit_size
     yield from map(functools.partial(codecs.decode,
                                      encoding=encoding),
                    reverse(object_.buffer,
