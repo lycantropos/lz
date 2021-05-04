@@ -7,7 +7,7 @@ services:
       args:
         - IMAGE_NAME=${PYPY_IMAGE_NAME}
         - IMAGE_VERSION=${PYPY_IMAGE_VERSION}
-    image: lycantropos/lz-pypy:0.11.0
+    image: lycantropos/lz-pypy:0.11.1-alpha
     volumes:
       - ./lz:/opt/lz/lz
       - ./pytest.ini:/opt/lz/pytest.ini
