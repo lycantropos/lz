@@ -40,7 +40,7 @@ if sys.version_info >= (3, 6):
 @overload
 def reverse(object_: TextIO,
             *,
-            batch_size: Optional[int] = ...,
+            batch_size: int = ...,
             lines_separator: Optional[str] = ...,
             keep_lines_separator: bool = ...) -> Iterable[str]:
     pass
@@ -124,7 +124,7 @@ def _(object_: TextIO,
 @reverse.register(io.BytesIO)
 def _(object_: BinaryIO,
       *,
-      batch_size: Optional[int] = None,
+      batch_size: int = io.DEFAULT_BUFFER_SIZE,
       lines_separator: Optional[bytes] = None,
       keep_lines_separator: bool = True,
       code_unit_size: int = 1) -> Iterable[bytes]:
@@ -153,8 +153,6 @@ def _(object_: BinaryIO,
             add_part(part)
             return result
     stream_size = object_.seek(0, os.SEEK_END)
-    if batch_size is None:
-        batch_size = stream_size or 1
     batches_count = ceil_division(stream_size, batch_size)
     remaining_bytes_indicator = itertools.islice(
             itertools.accumulate(itertools.chain([stream_size],
