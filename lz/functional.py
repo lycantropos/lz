@@ -15,10 +15,11 @@ from typing import (Any,
                     Type,
                     Union)
 
-from paradigm import signatures
 from reprit import seekers
 from reprit.base import generate_repr
 
+from ._core.signatures import (Signature,
+                               to_signature)
 from .hints import (Domain,
                     Map,
                     Range)
@@ -103,9 +104,9 @@ class Composition:
                              field_seeker=seekers.complex_)
 
 
-@signatures.factory.register(Composition)
-def _(object_: Composition) -> signatures.Base:
-    return signatures.factory(object_.functions[-1])
+@to_signature.register(Composition)
+def _(object_: Composition) -> Signature:
+    return to_signature(object_.functions[-1])
 
 
 def _compose(*functions: Callable[..., Any],
@@ -195,9 +196,9 @@ class Combination:
     __repr__ = generate_repr(__init__)
 
 
-@signatures.factory.register(Combination)
-def _(object_: Combination) -> signatures.Base:
-    return signatures.factory(object_.__call__)
+@to_signature.register(Combination)
+def _(object_: Combination) -> Signature:
+    return to_signature(object_.__call__)
 
 
 class ApplierBase(abc.Callable):
@@ -231,14 +232,15 @@ ApplierBase.register(functools.partial)
 class Curry(ApplierBase):
     def __init__(self,
                  function: Callable[..., Range],
-                 signature: signatures.Base,
+                 signature: Signature,
                  *args: Domain,
                  **kwargs: Domain) -> None:
         super().__init__(function, *args, **kwargs)
         self.signature = signature
 
-    def __call__(self, *args: Domain, **kwargs: Domain
-                 ) -> Union['Curry', Range]:
+    def __call__(self,
+                 *args: Domain,
+                 **kwargs: Domain) -> Union['Curry', Range]:
         args = self.args + args
         kwargs = {**self.keywords, **kwargs}
         try:
@@ -253,14 +255,12 @@ class Curry(ApplierBase):
                              field_seeker=seekers.complex_)
 
 
-@signatures.factory.register(Curry)
-def _(object_: Curry) -> signatures.Base:
+@to_signature.register(Curry)
+def _(object_: Curry) -> Signature:
     return object_.signature
 
 
-def curry(function: Callable[..., Range],
-          *,
-          signature: Optional[signatures.Base] = None) -> Curry:
+def curry(function: Callable[..., Range]) -> Curry:
     """
     Returns curried version of given function.
 
@@ -269,9 +269,7 @@ def curry(function: Callable[..., Range],
     >>> two_to_power(10)
     1024
     """
-    if signature is None:
-        signature = signatures.factory(function)
-    return Curry(function, signature)
+    return Curry(function, to_signature(function))
 
 
 def pack(function: Callable[..., Range]) -> Map[Iterable[Domain], Range]:
@@ -322,9 +320,9 @@ class Constant:
     __repr__ = generate_repr(__init__)
 
 
-@signatures.factory.register(Constant)
-def _(object_: Constant) -> signatures.Base:
-    return signatures.factory(object_.__call__)
+@to_signature.register(Constant)
+def _(object_: Constant) -> Signature:
+    return to_signature(object_.__call__)
 
 
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
@@ -372,9 +370,9 @@ class Cleavage:
     __repr__ = generate_repr(__init__)
 
 
-@signatures.factory.register(Cleavage)
-def _(object_: Cleavage) -> signatures.Base:
-    return signatures.factory(object_.__call__)
+@to_signature.register(Cleavage)
+def _(object_: Cleavage) -> Signature:
+    return to_signature(object_.functions[0])
 
 
 def flatmap(function: Map[Domain, Iterable[Range]],

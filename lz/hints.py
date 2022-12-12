@@ -4,10 +4,7 @@ from typing import (Callable,
                     Iterable,
                     TypeVar)
 
-try:
-    from typing import Protocol
-except ImportError:
-    from typing_extensions import Protocol
+from typing_extensions import Protocol
 
 Domain = TypeVar('Domain')
 Range = TypeVar('Range')
