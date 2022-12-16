@@ -1,7 +1,7 @@
 lz
 ==
 
-[![](https://dev.azure.com/lycantropos/lz/_apis/build/status/lycantropos.lz?branchName=master)](https://dev.azure.com/lycantropos/lz/_build/latest?definitionId=2&branchName=master "Azure Pipelines")
+[![](https://github.com/lycantropos/lz/workflows/CI/badge.svg)](https://github.com/lycantropos/lz/actions/workflows/ci.yml "Github Actions")
 [![](https://codecov.io/gh/lycantropos/lz/branch/master/graph/badge.svg)](https://codecov.io/gh/lycantropos/lz "Codecov")
 [![](https://readthedocs.org/projects/lz/badge/?version=latest)](https://lz.readthedocs.io/en/latest "Documentation")
 [![](https://img.shields.io/github/license/lycantropos/lz.svg)](https://github.com/lycantropos/lz/blob/master/LICENSE "License")
