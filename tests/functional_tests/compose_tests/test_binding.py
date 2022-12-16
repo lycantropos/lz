@@ -13,7 +13,7 @@ from . import strategies
 @given(strategies.identifiers,
        strategies.empty.tuples,
        strategies.identifiers,
-       strategies.maps_chain_calls)
+       strategies.two_maps_calls)
 def test_method_definition(class_name: str,
                            class_bases: Tuple[Type, ...],
                            method_name: str,

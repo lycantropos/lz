@@ -1,4 +1,5 @@
-from .definitions import callables
+from .definitions import (callables,
+                          classes)
 from .functional import (
     false_predicates,
     maps,
@@ -9,12 +10,15 @@ from .functional import (
     predicates,
     predicates_arguments,
     projectors,
+    three_or_more_suitable_maps,
     to_projectors_domains,
     to_projectors_domains_initials,
     transparent_functions,
     transparent_functions_calls,
     true_predicates,
-    various_suitable_maps)
+    two_or_more_suitable_maps,
+    two_suitable_maps
+)
 from .iterating import (non_negative_indices,
                         positive_indices)
 from .literals import empty

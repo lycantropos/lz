@@ -1,4 +1,5 @@
 from typing import (Any,
+                    Collection,
                     Iterable)
 
 import pytest
@@ -6,7 +7,6 @@ from hypothesis import given
 
 from lz import (left,
                 right)
-from lz.hints import FiniteIterable
 from lz.replication import duplicate
 from lz.transposition import transpose
 from tests.utils import (are_iterables_similar,
@@ -25,8 +25,8 @@ def test_base_case(empty_iterable: Iterable[Any]) -> None:
 
 @given(strategies.transposable_iterables,
        strategies.transposable_iterables_elements)
-def test_step_left(transposable_iterable: Iterable[FiniteIterable[Any]],
-                   transposable_iterable_element: FiniteIterable[Any]) -> None:
+def test_step_left(transposable_iterable: Iterable[Collection[Any]],
+                   transposable_iterable_element: Collection[Any]) -> None:
     original_element, target_element = duplicate(transposable_iterable_element)
 
     result = transpose(left.attacher(target_element)(transposable_iterable))
@@ -37,8 +37,8 @@ def test_step_left(transposable_iterable: Iterable[FiniteIterable[Any]],
 
 @given(strategies.transposable_iterables,
        strategies.transposable_iterables_elements)
-def test_step_right(transposable_iterable: Iterable[FiniteIterable[Any]],
-                    transposable_iterable_element: FiniteIterable[Any]
+def test_step_right(transposable_iterable: Iterable[Collection[Any]],
+                    transposable_iterable_element: Collection[Any]
                     ) -> None:
     original_element, target_element = duplicate(transposable_iterable_element)
 
@@ -50,7 +50,7 @@ def test_step_right(transposable_iterable: Iterable[FiniteIterable[Any]],
 
 @given(strategies.non_empty_transposable_iterables)
 def test_involution(
-        non_empty_transposable_iterable: Iterable[FiniteIterable[Any]]
+        non_empty_transposable_iterable: Iterable[Collection[Any]]
 ) -> None:
     original, target = duplicate(non_empty_transposable_iterable)
 

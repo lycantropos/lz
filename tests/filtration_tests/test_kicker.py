@@ -16,7 +16,7 @@ from tests.utils import (are_iterables_similar,
 @given(strategies.iterables)
 def test_basic(iterable: Iterable[Domain]) -> None:
     original, target = duplicate(iterable)
-    kick = kicker()
+    kick = kicker(bool)
 
     result = kick(target)
     result_iterator = iter(result)

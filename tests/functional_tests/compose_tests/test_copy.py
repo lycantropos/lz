@@ -7,7 +7,7 @@ from tests.hints import CompositionCall
 from . import strategies
 
 
-@given(strategies.maps_chain_calls)
+@given(strategies.two_maps_calls)
 def test_shallow(maps_chain_call: CompositionCall) -> None:
     various_suitable_maps, map_argument = maps_chain_call
     composition = compose(*various_suitable_maps)
@@ -18,7 +18,7 @@ def test_shallow(maps_chain_call: CompositionCall) -> None:
     assert shallow_copy(map_argument) == composition(map_argument)
 
 
-@given(strategies.maps_chain_calls)
+@given(strategies.two_maps_calls)
 def test_deep(maps_chain_call: CompositionCall) -> None:
     various_suitable_maps, map_argument = maps_chain_call
     composition = compose(*various_suitable_maps)

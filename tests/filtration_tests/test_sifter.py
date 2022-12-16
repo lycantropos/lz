@@ -10,7 +10,7 @@ from tests import strategies
 
 @given(strategies.iterables)
 def test_default_predicate(iterable: Iterable[Any]) -> None:
-    sift = sifter()
+    sift = sifter(bool)
 
     result = sift(iterable)
 

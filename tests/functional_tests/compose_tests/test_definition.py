@@ -1,6 +1,3 @@
-from typing import (Any,
-                    Callable)
-
 from hypothesis import given
 
 from lz.functional import compose
@@ -8,14 +5,16 @@ from tests.hints import CompositionCall
 from . import strategies
 
 
-@given(strategies.callables)
-def test_base_case(callable_: Callable[..., Any]) -> None:
-    composition = compose(callable_)
+@given(strategies.two_maps_calls)
+def test_base_case(maps_chain_call: CompositionCall) -> None:
+    (next_suitable_map, suitable_map), map_argument = maps_chain_call
+    composition = compose(next_suitable_map, suitable_map)
 
-    assert composition is callable_
+    assert (composition(map_argument)
+            == next_suitable_map(suitable_map(map_argument)))
 
 
-@given(strategies.maps_chain_calls)
+@given(strategies.three_or_more_maps_calls)
 def test_step(maps_chain_call: CompositionCall) -> None:
     (next_suitable_map, *suitable_maps), map_argument = maps_chain_call
     composition = compose(*suitable_maps)

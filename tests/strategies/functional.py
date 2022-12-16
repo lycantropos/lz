@@ -22,7 +22,6 @@ from typing import (Any,
                     Container,
                     Dict,
                     List,
-                    Sequence,
                     Tuple)
 
 from hypothesis import strategies
@@ -107,13 +106,9 @@ def extend_suitable_maps(
 
 suitable_maps = strategies.recursive(strategies.tuples(maps),
                                      extend_suitable_maps)
-
-
-def is_various(sequence: Sequence) -> bool:
-    return len(sequence) > 1
-
-
-various_suitable_maps = suitable_maps.filter(is_various)
+two_suitable_maps = extend_suitable_maps(strategies.tuples(maps))
+two_or_more_suitable_maps = extend_suitable_maps(suitable_maps)
+three_or_more_suitable_maps = extend_suitable_maps(two_or_more_suitable_maps)
 # "transparent" is an abbr. of "referential transparent"
 non_variadic_transparent_functions = strategies.sampled_from([bool, bytes,
                                                               complex, float,

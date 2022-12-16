@@ -35,7 +35,7 @@ def test_associativity(maps_triplet_call: CompositionCall) -> None:
     assert left_composition_result == right_composition_result
 
 
-@given(strategies.maps_chain_calls)
+@given(strategies.two_maps_calls)
 def test_currying(maps_chain_call: CompositionCall) -> None:
     (next_suitable_map, *suitable_maps), map_argument = maps_chain_call
     composition = compose(next_suitable_map, *suitable_maps)

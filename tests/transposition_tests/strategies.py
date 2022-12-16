@@ -1,8 +1,8 @@
 from functools import partial
-from typing import Iterable
+from typing import (Collection,
+                    Iterable)
 
-from lz.hints import (Domain,
-                      FiniteIterable)
+from lz.hints import Domain
 from tests.hints import Strategy
 from tests.strategies import (empty,
                               non_negative_indices,
@@ -17,7 +17,7 @@ empty_iterables = empty.iterables
 def to_transposable_iterables_elements(size: int,
                                        *,
                                        elements: Strategy[Domain] = scalars
-                                       ) -> Strategy[FiniteIterable[Domain]]:
+                                       ) -> Strategy[Collection[Domain]]:
     return to_tuples(elements,
                      size=size)
 
@@ -26,7 +26,7 @@ def to_transposable_iterables(size: int,
                               *,
                               elements: Strategy[Domain] = scalars,
                               min_size: int = 0
-                              ) -> Strategy[Iterable[FiniteIterable[Domain]]]:
+                              ) -> Strategy[Iterable[Collection[Domain]]]:
     return to_homogeneous_iterables(
             to_transposable_iterables_elements(size,
                                                elements=elements),

@@ -12,7 +12,7 @@ from tests import strategies
 
 @given(strategies.iterables)
 def test_default_predicate(iterable: Iterable[Any]) -> None:
-    separate = separator()
+    separate = separator(bool)
 
     false_like, true_like = separate(iterable)
 

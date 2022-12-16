@@ -6,7 +6,7 @@ from tests.utils import round_trip_pickle
 from . import strategies
 
 
-@given(strategies.maps_chain_calls)
+@given(strategies.two_or_more_maps_calls)
 def test_round_trip(maps_chain_call: CompositionCall) -> None:
     various_suitable_maps, map_argument = maps_chain_call
     composition = compose(*various_suitable_maps)

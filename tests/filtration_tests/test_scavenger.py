@@ -12,7 +12,7 @@ from tests import strategies
 
 @given(strategies.iterables)
 def test_default_predicate(iterable: Iterable[Any]) -> None:
-    scavenge = scavenger()
+    scavenge = scavenger(bool)
 
     result = scavenge(iterable)
 
