@@ -26,13 +26,17 @@ from typing import (Any,
                     Tuple)
 
 from hypothesis import strategies
-from paradigm import (models,
-                      signatures)
+from paradigm.base import (OverloadedSignature,
+                           ParameterKind,
+                           PlainSignature,
+                           signature_from_callable)
 
+from lz._core.signatures import (Parameter,
+                                 Signature,
+                                 plain_signature_to_parameters_by_kind)
 from lz.functional import (identity,
                            to_constant)
 from lz.hints import (Domain,
-                      Map,
                       Range)
 from lz.logical import negate
 from lz.typology import instance_of
@@ -89,9 +93,12 @@ maps_arguments = (strategies.integers()
                                       allow_infinity=False))
 
 
-def extend_suitable_maps(maps_tuples: Strategy[Tuple[Map, ...]]
-                         ) -> Strategy[Tuple[Map, ...]]:
-    def expand(maps_tuple: Tuple[Map, ...]) -> Strategy[Tuple[Map, ...]]:
+def extend_suitable_maps(
+        maps_tuples: Strategy[Tuple[Callable[[Domain], Range], ...]]
+) -> Strategy[Tuple[Callable[[Domain], Range], ...]]:
+    def expand(
+            maps_tuple: Tuple[Callable[[Domain], Range], ...]
+    ) -> Strategy[Tuple[Callable[[Domain], Range], ...]]:
         return strategies.tuples(to_one_of_suitable_maps(maps_tuple[0]),
                                  *map(strategies.just, maps_tuple))
 
@@ -249,11 +256,12 @@ partitioned_transparent_functions_calls = (transparent_functions_calls
                                            .flatmap(partition_call))
 
 
-def to_invalid_args(function: Callable[..., Any],
-                    *,
-                    values: Strategy[Domain] = strategies.none()
-                    ) -> Strategy[Tuple[Domain, ...]]:
-    signature = signatures.factory(function)
+def to_invalid_args(
+        function: Callable[..., Any],
+        *,
+        values: Strategy[Domain] = strategies.none()
+) -> Strategy[Tuple[Domain, ...]]:
+    signature = signature_from_callable(function)
     count = signature_to_max_positionals_count(signature) + 1
     return to_homogeneous_tuples(values,
                                  min_size=count)
@@ -263,7 +271,7 @@ def to_invalid_kwargs(function: Callable[..., Any],
                       *,
                       values: Strategy[Domain] = strategies.none()
                       ) -> Strategy[Dict[str, Domain]]:
-    signature = signatures.factory(function)
+    signature = signature_from_callable(function)
     keywords = signature_to_keywords_union(signature)
     is_unexpected = negate(keywords.__contains__)
     return (strategies.dictionaries(identifiers.filter(is_unexpected), values)
@@ -271,47 +279,49 @@ def to_invalid_kwargs(function: Callable[..., Any],
 
 
 @singledispatch
-def signature_to_max_positionals_count(signature: models.Base) -> int:
+def signature_to_max_positionals_count(signature: Signature) -> int:
     raise TypeError('Unsupported signature type: {type}.'
                     .format(type=type(signature)))
 
 
-@signature_to_max_positionals_count.register(models.Plain)
-def plain_signature_to_max_positionals_count(signature: models.Plain) -> int:
-    positionals = (signature.parameters_by_kind[
-                       models.Parameter.Kind.POSITIONAL_ONLY]
-                   + signature.parameters_by_kind[
-                       models.Parameter.Kind.POSITIONAL_OR_KEYWORD])
+@signature_to_max_positionals_count.register(PlainSignature)
+def plain_signature_to_max_positionals_count(signature: PlainSignature) -> int:
+    parameters_by_kind = plain_signature_to_parameters_by_kind(signature)
+    positionals = (
+            parameters_by_kind[ParameterKind.POSITIONAL_ONLY]
+            + parameters_by_kind[ParameterKind.POSITIONAL_OR_KEYWORD]
+    )
     return len(positionals)
 
 
-@signature_to_max_positionals_count.register(models.Overloaded)
-def overloaded_signature_to_max_positionals_count(signature: models.Overloaded
-                                                  ) -> int:
+@signature_to_max_positionals_count.register(OverloadedSignature)
+def overloaded_signature_to_max_positionals_count(
+        signature: OverloadedSignature
+) -> int:
     return max(map(signature_to_max_positionals_count, signature.signatures),
                default=0)
 
 
 @singledispatch
-def signature_to_keywords_union(signature: models.Base
-                                ) -> Dict[str, models.Parameter]:
+def signature_to_keywords_union(signature: Signature) -> Dict[str, Parameter]:
     raise TypeError('Unsupported signature type: {type}.'
                     .format(type=type(signature)))
 
 
-@signature_to_keywords_union.register(models.Plain)
-def plain_signature_to_keywords_union(signature: models.Plain
-                                      ) -> Dict[str, models.Parameter]:
-    keywords = (signature.parameters_by_kind[
-                    models.Parameter.Kind.POSITIONAL_OR_KEYWORD]
-                + signature.parameters_by_kind[
-                    models.Parameter.Kind.KEYWORD_ONLY])
-    return models.to_parameters_by_name(keywords)
+@signature_to_keywords_union.register(PlainSignature)
+def plain_signature_to_keywords_union(
+        signature: PlainSignature
+) -> Dict[str, Parameter]:
+    parameters_by_kind = plain_signature_to_parameters_by_kind(signature)
+    keywords = (parameters_by_kind[ParameterKind.POSITIONAL_OR_KEYWORD]
+                + parameters_by_kind[ParameterKind.KEYWORD_ONLY])
+    return {parameter.name: parameter for parameter in keywords}
 
 
-@signature_to_keywords_union.register(models.Overloaded)
-def overloaded_signature_to_keywords_union(signature: models.Overloaded
-                                           ) -> Dict[str, models.Parameter]:
+@signature_to_keywords_union.register(OverloadedSignature)
+def overloaded_signature_to_keywords_union(
+        signature: OverloadedSignature
+) -> Dict[str, Parameter]:
     if not signature.signatures:
         return {}
 

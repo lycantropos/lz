@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Callable, Tuple
 
 from hypothesis import given
 
@@ -6,14 +6,13 @@ from lz.functional import (compose,
                            curry,
                            identity)
 from lz.hints import (Domain,
-                      Map,
                       Range)
 from tests.hints import CompositionCall
 from . import strategies
 
 
 @given(strategies.maps_calls)
-def test_identity(map_call: Tuple[Map[Domain, Range], Domain]) -> None:
+def test_identity(map_call: Tuple[Callable[[Domain], Range], Domain]) -> None:
     map_, map_argument = map_call
     left_composition = compose(identity, map_)
     right_composition = compose(map_, identity)

@@ -1,10 +1,10 @@
 from functools import partial
-from typing import Hashable
+from typing import (Callable,
+                    Hashable)
 
 from hypothesis import strategies
 
 from lz.functional import identity
-from lz.hints import Map
 from tests.strategies import (scalars,
                               to_homogeneous_iterables)
 
@@ -14,7 +14,7 @@ def grouper_key(object_: Hashable,
     return hash(object_) ** odd_order
 
 
-def to_key_function(odd_order: int) -> Map[Hashable, Hashable]:
+def to_key_function(odd_order: int) -> Callable[[Hashable], Hashable]:
     return partial(grouper_key,
                    odd_order=odd_order)
 

@@ -1,8 +1,10 @@
-from typing import Sequence
+from typing import (Callable,
+                    Sequence)
 
 from hypothesis import strategies
 
-from lz.hints import Map
+from lz.hints import (Domain,
+                      Range)
 from tests.hints import (CombinationCall,
                          Strategy)
 from tests.strategies import (maps,
@@ -13,8 +15,9 @@ from tests.strategies import (maps,
 positionals_arguments = positionals_arguments
 
 
-def to_combination_calls(maps_sequence: Sequence[Map]
-                         ) -> Strategy[CombinationCall]:
+def to_combination_calls(
+        maps_sequence: Sequence[Callable[[Domain], Range]]
+) -> Strategy[CombinationCall]:
     return strategies.tuples(strategies.just(maps_sequence),
                              to_homogeneous_sequences(
                                      maps_arguments,

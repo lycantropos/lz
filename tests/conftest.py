@@ -21,10 +21,11 @@ settings.register_profile('default',
                           max_examples=((settings.default.max_examples
                                          // (1 + 4 * is_pypy))
                                         if on_azure_pipelines
-                                        else settings.default.max_examples),
+                                        else 10**4),
                           deadline=None,
                           suppress_health_check=[HealthCheck.filter_too_much,
-                                                 HealthCheck.too_slow])
+                                                 HealthCheck.too_slow],
+                          verbosity=2)
 
 
 @pytest.fixture(scope='session',

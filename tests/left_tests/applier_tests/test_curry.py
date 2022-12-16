@@ -2,8 +2,7 @@ import pytest
 from hypothesis import given
 
 from lz import left
-from lz.functional import (compose,
-                           curry)
+from lz.functional import curry
 from tests import strategies
 from tests.hints import (FunctionCall,
                          PartitionedFunctionCall)
@@ -14,9 +13,7 @@ def test_basic(partitioned_function_call: PartitionedFunctionCall) -> None:
     (function,
      (first_args_part, second_args_part),
      (first_kwargs_part, second_kwargs_part)) = partitioned_function_call
-    applied = left.applier(function,
-                           *first_args_part,
-                           **first_kwargs_part)
+    applied = left.applier(function, *first_args_part, **first_kwargs_part)
 
     result = curry(applied)
 

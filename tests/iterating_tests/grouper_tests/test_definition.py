@@ -1,10 +1,10 @@
 from typing import (Any,
+                    Callable,
                     Hashable,
                     Iterable)
 
 from hypothesis import given
 
-from lz.hints import Map
 from lz.iterating import grouper
 from lz.replication import duplicate
 from . import strategies
@@ -12,7 +12,7 @@ from . import strategies
 
 @given(strategies.hashables_iterables, strategies.keys_functions)
 def test_basic(iterable: Iterable[Hashable],
-               key_function: Map[Any, Hashable]) -> None:
+               key_function: Callable[[Any], Hashable]) -> None:
     original, target = duplicate(iterable)
     group_by = grouper(key_function)
 

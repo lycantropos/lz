@@ -1,8 +1,8 @@
 import pytest
 from hypothesis import given
 
-from lz.functional import (Curry,
-                           curry)
+from lz.functional import (curry)
+from lz._core.functional import Curry
 from tests import strategies
 from tests.hints import (Function,
                          FunctionCall)
@@ -39,8 +39,9 @@ def test_involution(function_call: FunctionCall) -> None:
 
 
 @given(strategies.non_variadic_transparent_functions_calls_with_invalid_args)
-def test_invalid_args_call(function_call_with_invalid_args: FunctionCall
-                           ) -> None:
+def test_invalid_args_call(
+        function_call_with_invalid_args: FunctionCall
+) -> None:
     function, invalid_args, kwargs = function_call_with_invalid_args
     curried = curry(function)
 
@@ -49,8 +50,9 @@ def test_invalid_args_call(function_call_with_invalid_args: FunctionCall
 
 
 @given(strategies.non_variadic_transparent_functions_calls_with_invalid_kwargs)
-def test_invalid_kwargs_call(function_call_with_invalid_kwargs: FunctionCall
-                             ) -> None:
+def test_invalid_kwargs_call(
+        function_call_with_invalid_kwargs: FunctionCall
+) -> None:
     function, args, invalid_kwargs = function_call_with_invalid_kwargs
     curried = curry(function)
 

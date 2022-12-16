@@ -1,11 +1,4 @@
-from .definitions import (built_in_functions,
-                          callables,
-                          classes,
-                          functions,
-                          methods,
-                          methods_descriptors,
-                          partial_callables,
-                          wrappers_descriptors)
+from .definitions import callables
 from .functional import (
     false_predicates,
     maps,

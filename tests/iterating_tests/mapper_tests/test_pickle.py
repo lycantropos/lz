@@ -1,9 +1,10 @@
-from typing import Iterable
+from typing import (Callable,
+                    Iterable)
 
 from hypothesis import given
 
 from lz.hints import (Domain,
-                      Map)
+                      Range)
 from lz.iterating import mapper
 from lz.replication import duplicate
 from tests.utils import (are_iterables_similar,
@@ -12,7 +13,8 @@ from . import strategies
 
 
 @given(strategies.maps, strategies.maps_arguments_iterables)
-def test_round_trip(map_: Map, arguments: Iterable[Domain]) -> None:
+def test_round_trip(map_: Callable[[Domain], Range],
+                    arguments: Iterable[Domain]) -> None:
     original, target = duplicate(arguments)
     map_iterable = mapper(map_)
 

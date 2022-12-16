@@ -12,7 +12,7 @@ from itertools import (chain,
 from operator import methodcaller
 from typing import (Any,
                     AnyStr,
-                    Hashable,
+                    Callable, Hashable,
                     IO,
                     Iterable,
                     Mapping,
@@ -22,7 +22,6 @@ from typing import (Any,
 import pytest
 
 from lz.hints import (Domain,
-                      Map,
                       Range)
 from lz.replication import duplicate
 
@@ -210,7 +209,7 @@ encoding_to_bom = (defaultdict(bytes,
                    .__getitem__)
 
 
-def flatmap(function: Map[Domain, Iterable[Range]],
+def flatmap(function: Callable[[Domain], Iterable[Range]],
             *iterables: Iterable[Domain]) -> Iterable[Range]:
     yield from chain.from_iterable(map(function, *iterables))
 

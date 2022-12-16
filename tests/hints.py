@@ -12,7 +12,6 @@ from typing import (AnyStr,
 from hypothesis.strategies import SearchStrategy
 
 from lz.hints import (Domain,
-                      Map,
                       Range)
 
 ByteStreamWithBatchParameters = Tuple[BinaryIO, bytes, Tuple[int, int]]
@@ -32,7 +31,7 @@ LeftFolderCall = Tuple[LeftProjector, Range, Iterable[Domain]]
 RightProjector = Callable[[Domain, Range], Range]
 RightAccumulatorCall = Tuple[LeftProjector, Range, Sequence[Domain]]
 RightFolderCall = Tuple[RightProjector, Range, Sequence[Domain]]
-CleavageCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
-CombinationCall = Tuple[Sequence[Map], Sequence[Domain]]
-CompositionCall = Tuple[Tuple[Map[Domain, Intermediate], ...], Domain]
+CleavageCall = Tuple[Tuple[Callable[[Domain], Intermediate], ...], Domain]
+CombinationCall = Tuple[Sequence[Callable[[Domain], Range]], Sequence[Domain]]
+CompositionCall = Tuple[Tuple[Callable[[Domain], Intermediate], ...], Domain]
 Strategy = SearchStrategy
