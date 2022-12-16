@@ -1,7 +1,7 @@
 import io
 import os
-import platform
 from collections import abc
+from datetime import timedelta
 from functools import partial
 from typing import (Any,
                     Dict,
@@ -10,22 +10,24 @@ from typing import (Any,
                     TextIO)
 
 import pytest
-from hypothesis import (HealthCheck,
-                        settings)
+from hypothesis import settings
 
 from lz.replication import replicate
 
-on_azure_pipelines = bool(os.getenv('TF_BUILD', False))
-is_pypy = platform.python_implementation() == 'PyPy'
+on_ci = bool(os.getenv('CI', False))
+max_examples = settings.default.max_examples
 settings.register_profile('default',
-                          max_examples=((settings.default.max_examples
-                                         // (1 + 4 * is_pypy))
-                                        if on_azure_pipelines
-                                        else settings.default.max_examples),
-                          deadline=None,
-                          suppress_health_check=[HealthCheck.filter_too_much,
-                                                 HealthCheck.too_slow],
-                          verbosity=2)
+                          deadline=(timedelta(hours=1) / max_examples
+                                    if on_ci
+                                    else None),
+                          max_examples=max_examples)
+
+
+@pytest.hookimpl(trylast=True)
+def pytest_sessionfinish(session: pytest.Session,
+                         exitstatus: pytest.ExitCode) -> None:
+    if exitstatus == pytest.ExitCode.NO_TESTS_COLLECTED:
+        session.exitstatus = pytest.ExitCode.OK
 
 
 @pytest.fixture(scope='session',
