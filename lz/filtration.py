@@ -126,7 +126,7 @@ def kicker(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
 
     If predicate is not specified than true-like objects are skipped.
 
-    >>> kick_while_true_like = kicker()
+    >>> kick_while_true_like = kicker(bool)
     >>> list(kick_while_true_like(range(10)))
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
