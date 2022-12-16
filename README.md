@@ -7,8 +7,8 @@ lz
 [![](https://img.shields.io/github/license/lycantropos/lz.svg)](https://github.com/lycantropos/lz/blob/master/LICENSE "License")
 [![](https://badge.fury.io/py/lz.svg)](https://badge.fury.io/py/lz "PyPI")
 
-In what follows `python` is an alias for `python3.5` or `pypy3.5`
-or any later version (`python3.6`, `pypy3.6` and so on).
+In what follows `python` is an alias for `python3.7` or `pypy3.7`
+or any later version (`python3.8`, `pypy3.8` and so on).
 
 Installation
 ------------
