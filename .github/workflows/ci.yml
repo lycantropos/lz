@@ -35,11 +35,17 @@ jobs:
           },
         ]
         include:
-          - python_version: 'pypy-3.7'
+          - python_version: 'pypy-3.8'
             platform: { os: 'macos-latest', python_architecture: 'x64' }
-          - python_version: 'pypy-3.7'
+          - python_version: 'pypy-3.8'
             platform: { os: 'ubuntu-latest', python_architecture: 'x64' }
-          - python_version: 'pypy-3.7'
+          - python_version: 'pypy-3.8'
+            platform: { os: 'windows-latest', python_architecture: 'x64' }
+          - python_version: 'pypy-3.9'
+            platform: { os: 'macos-latest', python_architecture: 'x64' }
+          - python_version: 'pypy-3.9'
+            platform: { os: 'ubuntu-latest', python_architecture: 'x64' }
+          - python_version: 'pypy-3.9'
             platform: { os: 'windows-latest', python_architecture: 'x64' }
     steps:
       - name: 'Checkout'
@@ -53,10 +59,10 @@ jobs:
           architecture: ${{ matrix.platform.python_architecture }}
       - name: 'Install packaging tools'
         run: python -m pip install -U pip setuptools
-      - name: 'Install coverage dependencies'
-        run: python -m pip install -U coverage
       - name: 'Install in editable mode'
         run: python -m pip -v install -e .
+      - name: 'Install coverage dependencies'
+        run: python -m pip install -U coverage
       - name: 'Install tests dependencies'
         run: python -m pip install -r requirements-tests.txt
       - name: 'Run doctests'
@@ -66,7 +72,7 @@ jobs:
       - name: 'Run tests'
         run: coverage run --append -m pytest
       - name: 'Collect coverage'
-        run: coverage xml
+        run: coverage combine && coverage xml
       - name: 'Upload coverage'
         uses: codecov/codecov-action@v2.1.0
         with:
