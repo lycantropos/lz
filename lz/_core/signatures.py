@@ -23,7 +23,8 @@ def to_signature(value: Any) -> Signature:
 def plain_signature_to_parameters_by_kind(
         signature: PlainSignature
 ) -> Dict[ParameterKind, List[Parameter]]:
-    result = {kind: [] for kind in ParameterKind}
+    result: Dict[ParameterKind, List[Parameter]] = {kind: []
+                                                    for kind in ParameterKind}
     for parameter in signature.parameters:
         result[parameter.kind].append(parameter)
     return result

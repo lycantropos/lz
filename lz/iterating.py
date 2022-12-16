@@ -5,6 +5,7 @@ from collections import (OrderedDict,
                          deque)
 from operator import is_not
 from typing import (Any,
+                    Callable,
                     Hashable,
                     Iterable,
                     MutableMapping,
@@ -15,21 +16,24 @@ from typing import (Any,
 
 from .functional import flatmap
 from .hints import (Domain,
-                    Map,
-                    Operator,
                     Range)
 
 
 @functools.singledispatch
-def capacity(iterable: Iterable[Any]) -> int:
+def capacity(_value: Any) -> int:
     """
-    Returns number of elements in iterable.
+    Returns number of elements in value.
 
     >>> capacity(range(0))
     0
     >>> capacity(range(10))
     10
     """
+    raise TypeError(type(_value))
+
+
+@capacity.register(abc.Iterable)
+def _(iterable: Iterable[Any]) -> int:
     counter = itertools.count()
     # order matters: if `counter` goes first,
     # then it will be incremented even for empty `iterable`
@@ -88,7 +92,7 @@ def cut(iterable: Iterable[Domain],
                                 slice_.start, slice_.stop, slice_.step)
 
 
-def cutter(slice_: slice) -> Operator[Iterable[Domain]]:
+def cutter(slice_: slice) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     """
     Returns function that selects elements from iterable based on given slice.
 
@@ -131,7 +135,9 @@ def _slice_to_description(slice_: slice) -> str:
     return ' '.join(slice_description_parts)
 
 
-def chopper(size: int) -> Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
+def chopper(
+        size: int
+) -> Callable[[Iterable[Domain]], Iterable[Sequence[Domain]]]:
     """
     Returns function that splits iterable into chunks of given size.
 
@@ -139,11 +145,8 @@ def chopper(size: int) -> Map[Iterable[Domain], Iterable[Sequence[Domain]]]:
     >>> list(map(tuple, in_three(range(10))))
     [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
     """
-    result = functools.partial(chop,
-                               size=size)
-    result.__doc__ = ('Splits iterable into chunks of size {size}.\n'
-                      .format(size=size))
-    return result
+    return functools.partial(chop,
+                             size=size)
 
 
 @functools.singledispatch
@@ -195,7 +198,8 @@ def slide(iterable: Iterable[Domain],
                                     shift)
 
 
-def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
+def slider(size: int) -> Callable[[Iterable[Domain]],
+                                  Iterable[Tuple[Domain, ...]]]:
     """
     Returns function that slides over iterable with window of given size.
 
@@ -203,11 +207,8 @@ def slider(size: int) -> Map[Iterable[Domain], Iterable[Tuple[Domain, ...]]]:
     >>> list(pairwise(range(10)))
     [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
     """
-    result = functools.partial(slide,
-                               size=size)
-    result.__doc__ = ('Slides over iterable with window of size {size}.'
-                      .format(size=size))
-    return result
+    return functools.partial(slide,
+                             size=size)
 
 
 pairwise = slider(2)
@@ -215,7 +216,7 @@ triplewise = slider(3)
 quadruplewise = slider(4)
 
 
-def header(size: int) -> Operator[Iterable[Domain]]:
+def header(size: int) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     """
     Returns function that selects elements from the beginning of iterable.
     Resulted iterable will have size not greater than given one.
@@ -224,10 +225,7 @@ def header(size: int) -> Operator[Iterable[Domain]]:
     >>> list(to_first_pair(range(10)))
     [0, 1]
     """
-    result = cutter(slice(size))
-    result.__doc__ = ('Selects {size} elements from the beginning of iterable.'
-                      .format(size=size))
-    return result
+    return cutter(slice(size))
 
 
 @functools.singledispatch
@@ -257,7 +255,7 @@ def _(iterable: Sequence[Domain],
 trail.register(deque, trail.registry[object])
 
 
-def trailer(size: int) -> Operator[Iterable[Domain]]:
+def trailer(size: int) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     """
     Returns function that selects elements from the end of iterable.
     Resulted iterable will have size not greater than given one.
@@ -273,7 +271,8 @@ def trailer(size: int) -> Operator[Iterable[Domain]]:
     return result
 
 
-def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
+def mapper(_map: Callable[[Domain], Range]) -> Callable[[Iterable[Domain]],
+                                                        Iterable[Range]]:
     """
     Returns function that applies given map to the each element of iterable.
 
@@ -281,11 +280,11 @@ def mapper(map_: Map) -> Map[Iterable[Domain], Iterable[Range]]:
     >>> list(to_str(range(10)))
     ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     """
-    return functools.partial(map, map_)
+    return functools.partial(map, _map)
 
 
-def flatmapper(map_: Map[Domain, Iterable[Range]]
-               ) -> Map[Iterable[Domain], Iterable[Range]]:
+def flatmapper(_map: Callable[[Domain], Iterable[Range]]
+               ) -> Callable[[Iterable[Domain]], Iterable[Range]]:
     """
     Returns function that applies map to the each element of iterable
     and flattens results.
@@ -294,7 +293,7 @@ def flatmapper(map_: Map[Domain, Iterable[Range]]
     >>> list(relay(range(5)))
     [0, 0, 1, 0, 1, 2, 0, 1, 2, 3]
     """
-    return functools.partial(flatmap, map_)
+    return functools.partial(flatmap, _map)
 
 
 Group = Tuple[Hashable, Iterable[Domain]]
@@ -302,7 +301,7 @@ Group = Tuple[Hashable, Iterable[Domain]]
 
 def group_by(iterable: Iterable[Domain],
              *,
-             key: Map[Domain, Hashable],
+             key: Callable[[Domain], Hashable],
              mapping_cls: Type[MutableMapping]) -> Iterable[Group]:
     """
     Groups iterable elements based on given key.
@@ -313,10 +312,11 @@ def group_by(iterable: Iterable[Domain],
     yield from groups.items()
 
 
-def grouper(key: Map[Domain, Hashable],
-            *,
-            mapping_cls: Type[MutableMapping] = OrderedDict
-            ) -> Map[Iterable[Domain], Iterable[Group]]:
+def grouper(
+        key: Callable[[Domain], Hashable],
+        *,
+        mapping_cls: Type[MutableMapping] = OrderedDict
+) -> Callable[[Iterable[Domain]], Iterable[Group]]:
     """
     Returns function that groups iterable elements based on given key.
 

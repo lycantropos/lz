@@ -1,19 +1,22 @@
 import functools
 import itertools
+import sys
 from typing import (Callable,
                     Iterable,
+                    Iterator,
                     List,
                     Tuple)
 
+from ._core.left import Applier
 from .hints import (Domain,
-                    Map,
                     Range)
 from .iterating import expand
 
 
-def accumulator(function: Callable[[Range, Domain], Range],
-                initial: Range
-                ) -> Map[Iterable[Domain], Iterable[Range]]:
+def accumulator(
+        function: Callable[[Range, Domain], Range],
+        initial: Range
+) -> Callable[[Iterable[Domain]], Iterable[Range]]:
     """
     Returns function that yields cumulative results of given binary function
     starting from given initial object in direction from left to right.
@@ -23,22 +26,30 @@ def accumulator(function: Callable[[Range, Domain], Range],
     >>> list(to_pi_approximations(range(5, 0, -1)))
     [3.141592653589793, 3.14159, 3.1416, 3.142, 3.14, 3.1]
     """
-    return functools.partial(accumulate,
-                             function=function,
-                             initial=initial)
+    return functools.partial(accumulate, function, initial)
 
 
-def accumulate(iterable: Iterable[Domain],
-               function: Callable[[Range, Domain], Range],
-               initial: Range) -> Iterable[Range]:
-    """
-    Yields cumulative results of given binary function
-    starting from given initial object in direction from left to right.
-    """
-    yield from itertools.accumulate(attach(iterable, initial), function)
+if sys.version_info < (3, 8):
+    def accumulate(function: Callable[[Range, Domain], Range],
+                   initial: Range,
+                   iterable: Iterable[Domain]) -> Iterator[Range]:
+        """
+        Yields cumulative results of given binary function
+        starting from given initial object in direction from left to right.
+        """
+        yield from itertools.accumulate(attach(iterable, initial), function)
+else:
+    def accumulate(function: Callable[[Range, Domain], Range],
+                   initial: Range,
+                   iterable: Iterable[Domain]) -> Iterator[Range]:
+        """
+        Yields cumulative results of given binary function
+        starting from given initial object in direction from left to right.
+        """
+        yield from itertools.accumulate(iterable, function, initial)
 
 
-def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
+def attacher(_value: Domain) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     """
     Returns function that prepends given object to iterable.
 
@@ -46,39 +57,35 @@ def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
     >>> list(attach_hundred(range(10)))
     [100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     """
-    return functools.partial(attach,
-                             object_=object_)
+    return functools.partial(attach, _value)
 
 
 @functools.singledispatch
-def attach(iterable: Iterable[Domain],
-           object_: Domain) -> Iterable[Domain]:
+def attach(_target: Iterable[Domain], _value: Domain) -> Iterable[Domain]:
     """
-    Prepends given object to the iterable.
+    Prepends given value to the target.
     """
-    yield from itertools.chain(expand(object_), iterable)
+    yield from itertools.chain(expand(_value), _target)
 
 
 @attach.register(list)
-def _(iterable: List[Domain],
-      object_: Domain) -> List[Domain]:
+def _(_target: List[Domain], _value: Domain) -> List[Domain]:
     """
     Prepends given object to the list.
     """
-    return [object_] + iterable
+    return [_value] + _target
 
 
 @attach.register(tuple)
-def _(iterable: Tuple[Domain, ...],
-      object_: Domain) -> Tuple[Domain, ...]:
+def _(_target: Tuple[Domain, ...], _value: Domain) -> Tuple[Domain, ...]:
     """
-    Prepends given object to the tuple.
+    Prepends given value to the tuple.
     """
-    return (object_,) + iterable
+    return (_value,) + _target
 
 
 def folder(function: Callable[[Range, Domain], Range],
-           initial: Range) -> Map[Iterable[Domain], Range]:
+           initial: Range) -> Callable[[Iterable[Domain]], Range]:
     """
     Returns function that cumulatively applies given binary function
     starting from given initial object in direction from left to right.
@@ -87,22 +94,17 @@ def folder(function: Callable[[Range, Domain], Range],
     >>> to_sum_evaluation_order(range(1, 10))
     '(((((((((0 + 1) + 2) + 3) + 4) + 5) + 6) + 7) + 8) + 9)'
     """
-    return functools.partial(fold,
-                             function=function,
-                             initial=initial)
+    return functools.partial(fold, function, initial)
 
 
-def fold(iterable: Iterable[Domain],
-         function: Callable[[Range, Domain], Range],
-         initial: Range) -> Range:
+def fold(function: Callable[[Range, Domain], Range],
+         initial: Range,
+         iterable: Iterable[Domain]) -> Range:
     """
     Cumulatively applies given binary function
     starting from given initial object in direction from left to right.
     """
     return functools.reduce(function, iterable, initial)
-
-
-Applier = functools.partial
 
 
 def applier(function: Callable[..., Range],

@@ -17,15 +17,8 @@ def instance_of(*types: type) -> Predicate:
     >>> is_any_string(1)
     False
     """
-    result = partial(is_instance_of,
-                     types=types)
-    result.__name__ = result.__qualname__ = (
-            'is_instance_of_' + '_or_'.join(type_.__name__ for type_ in types))
-    result.__doc__ = ('Checks if given object is instance '
-                      'of one of types: "{types}".'
-                      .format(types='", "'.join(type_.__qualname__
-                                                for type_ in types)))
-    return result
+    return partial(is_instance_of,
+                   types=types)
 
 
 def subclass_of(*types: type) -> Predicate:
@@ -38,20 +31,13 @@ def subclass_of(*types: type) -> Predicate:
     >>> is_metaclass(object)
     False
     """
-    result = partial(is_subclass_of,
-                     types=types)
-    result.__name__ = result.__qualname__ = (
-            'is_subclass_of_' + '_or_'.join(type_.__name__ for type_ in types))
-    result.__doc__ = ('Checks if given type is subclass '
-                      'of one of types: "{types}".'
-                      .format(types='", "'.join(type_.__qualname__
-                                                for type_ in types)))
-    return result
+    return partial(is_subclass_of,
+                   types=types)
 
 
-def is_instance_of(object_: Any, types: Tuple[type, ...]) -> bool:
-    return isinstance(object_, types)
+def is_instance_of(value: Any, types: Tuple[type, ...]) -> bool:
+    return isinstance(value, types)
 
 
-def is_subclass_of(type_: type, types: Tuple[type, ...]) -> bool:
-    return issubclass(type_, types)
+def is_subclass_of(value: type, types: Tuple[type, ...]) -> bool:
+    return issubclass(value, types)

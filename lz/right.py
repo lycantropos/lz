@@ -11,27 +11,25 @@ from paradigm.base import (OptionalParameter,
                            ParameterKind,
                            PlainSignature,
                            RequiredParameter)
-from reprit import seekers
-from reprit.base import generate_repr
 
 from . import left
+from ._core.right import Applier
 from ._core.signatures import (Parameter,
                                Signature,
                                plain_signature_to_parameters_by_kind,
                                to_signature)
-from .functional import (ApplierBase,
-                         compose,
+from .functional import (compose,
                          flip)
 from .hints import (Domain,
-                    Map,
                     Range)
 from .iterating import expand
 from .reversal import reverse
 
 
-def accumulator(function: Callable[[Domain, Range], Range],
-                initial: Range
-                ) -> Map[Iterable[Domain], Iterable[Iterable[Range]]]:
+def accumulator(
+        function: Callable[[Domain, Range], Range],
+        initial: Range
+) -> Callable[[Iterable[Domain]], Iterable[Iterable[Range]]]:
     """
     Returns function that yields cumulative results of given binary function
     starting from given initial object in direction from right to left.
@@ -49,7 +47,7 @@ def accumulator(function: Callable[[Domain, Range], Range],
     return compose(left_accumulator, reverse)
 
 
-def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
+def attacher(_value: Domain) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     """
     Returns function that appends given object to iterable.
 
@@ -57,24 +55,23 @@ def attacher(object_: Domain) -> Map[Iterable[Domain], Iterable[Domain]]:
     >>> list(attach_hundred(range(10)))
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 100]
     """
-    return functools.partial(attach,
-                             object_=object_)
+    return Applier(attach, _value)
 
 
 @functools.singledispatch
-def attach(iterable: Iterable[Domain], object_: Domain) -> Iterable[Domain]:
+def attach(iterable: Iterable[Domain], _value: Domain) -> Iterable[Domain]:
     """
     Appends given object to the iterable.
     """
-    yield from itertools.chain(iterable, expand(object_))
+    yield from itertools.chain(iterable, expand(_value))
 
 
 @attach.register(list)
-def _(iterable: List[Domain], object_: Domain) -> List[Domain]:
+def _(iterable: List[Domain], _value: Domain) -> List[Domain]:
     """
     Appends given object to the list.
     """
-    return iterable + [object_]
+    return iterable + [_value]
 
 
 @attach.register(tuple)
@@ -86,7 +83,7 @@ def _(iterable: Tuple[Domain, ...], object_: Domain) -> Tuple[Domain, ...]:
 
 
 def folder(function: Callable[[Domain, Range], Range],
-           initial: Range) -> Map[Iterable[Domain], Range]:
+           initial: Range) -> Callable[[Iterable[Domain]], Range]:
     """
     Returns function that cumulatively applies given binary function
     starting from given initial object in direction from right to left.
@@ -99,24 +96,10 @@ def folder(function: Callable[[Domain, Range], Range],
     return compose(left_folder, reverse)
 
 
-class Applier(ApplierBase):
-    def __init__(self,
-                 function: Callable[..., Range],
-                 *args: Domain,
-                 **kwargs: Domain) -> None:
-        super().__init__(function, *args, **kwargs)
-
-    def __call__(self, *args: Domain, **kwargs: Domain) -> Range:
-        return self.func(*args, *self.args, **self.keywords, **kwargs)
-
-    __repr__ = generate_repr(__init__,
-                             field_seeker=seekers.complex_)
-
-
 @to_signature.register(Applier)
-def _(value: Applier) -> PlainSignature:
+def _(value: Applier) -> Signature:
     return _bind_positionals_to_applier(
-            to_signature(value.func).bind(**value.keywords), value.args
+            to_signature(value.function).bind(**value.kwargs), value.args
     )
 
 

@@ -2,22 +2,33 @@ import functools
 import itertools
 from collections import (abc,
                          deque)
-from typing import (Iterable,
-                    Tuple)
+from typing import (Any,
+                    Callable,
+                    Deque,
+                    Dict,
+                    Iterable,
+                    List,
+                    Sequence,
+                    Tuple,
+                    TypeVar)
 
-from .hints import (Domain,
-                    Map)
+from .hints import Domain
+
+_T = TypeVar('_T')
 
 
 @functools.singledispatch
-def replicate(object_: Domain,
+def replicate(_value: Any,
               *,
-              count: int) -> Iterable[Domain]:
+              count: int) -> Iterable[Any]:
     """
     Returns given number of object replicas.
     """
     raise TypeError('Unsupported object type: {type}.'
-                    .format(type=type(object_)))
+                    .format(type=type(_value)))
+
+
+_Immutable = TypeVar('_Immutable', bytes, object, str)
 
 
 @replicate.register(object)
@@ -25,27 +36,23 @@ def replicate(object_: Domain,
 # that can be replicated by simply repeating
 @replicate.register(bytes)
 @replicate.register(str)
-# mappings cannot be replicated as other iterables
-# since they are iterable only by key
-@replicate.register(abc.Mapping)
-def _(object_: Domain,
-      *,
-      count: int) -> Iterable[Domain]:
+def _(_value: _Immutable, *, count: int) -> Iterable[_Immutable]:
     """
     Returns object repeated given number of times.
     """
-    return itertools.repeat(object_, count)
+    yield from itertools.repeat(_value, count)
 
 
 @replicate.register(abc.Iterable)
-def _replicate_iterable(object_: Iterable[Domain],
+def _replicate_iterable(_value: Iterable[_T],
                         *,
-                        count: int) -> Iterable[Iterable[Domain]]:
+                        count: int) -> Iterable[Iterable[_T]]:
     """
     Returns given number of iterable replicas.
     """
-    iterator = iter(object_)
-    queues = [deque() for _ in itertools.repeat(None, count)]
+    iterator = iter(_value)
+    queues: Sequence[Deque[_T]] = [deque()
+                                   for _ in itertools.repeat(None, count)]
 
     def replica(queue: deque) -> Iterable[Domain]:
         while True:
@@ -64,14 +71,46 @@ def _replicate_iterable(object_: Iterable[Domain],
 
 
 @replicate.register(tuple)
-def _(object_: Tuple[Domain, ...],
+def _(_value: Tuple[_T, ...],
       *,
-      count: int) -> Iterable[Tuple[Domain, ...]]:
-    yield from map(tuple, _replicate_iterable(object_,
-                                              count=count))
+      count: int) -> Iterable[Tuple[_T, ...]]:
+    for replica in _replicate_iterable(_value,
+                                       count=count):
+        yield tuple(replica)
 
 
-def replicator(count: int) -> Map[Domain, Iterable[Domain]]:
+@replicate.register(list)
+def _(_value: List[_T],
+      *,
+      count: int) -> Iterable[List[_T]]:
+    for replica in _replicate_iterable(_value,
+                                       count=count):
+        yield list(replica)
+
+
+_Key = TypeVar('_Key')
+_Value = TypeVar('_Value')
+
+
+@replicate.register(dict)
+def _(_value: Dict[_Key, _Value],
+      *,
+      count: int) -> Iterable[Dict[_Key, _Value]]:
+    result: Sequence[Dict[_Key, _Value]] = [
+        {} for _ in itertools.repeat(None, count)
+    ]
+    for key, value in _value.items():
+        for index, (key_replica, value_replica) in enumerate(
+                zip(replicate(key,
+                              count=count),
+                    replicate(value,
+                              count=count))
+        ):
+            result[index][key_replica] = value_replica
+    yield from result
+
+
+def replicator(count: int) -> Callable[[Domain], Iterable[Domain]]:
     """
     Returns function that replicates passed object.
 
