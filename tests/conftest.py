@@ -70,11 +70,3 @@ def patch_replication() -> None:
     replicate.register(frozenset, replicate_sized)
     replicate.register(list, replicate_sized)
     replicate.register(set, replicate_sized)
-
-    def replicate_dictionary(object_: Dict[Hashable, Any],
-                             *,
-                             count: int) -> Iterable[Dict[Hashable, Any]]:
-        yield from map(dict, replicate_iterable(object_.items(),
-                                                count=count))
-
-    replicate.register(dict, replicate_dictionary)

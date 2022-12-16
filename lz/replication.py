@@ -6,9 +6,11 @@ from typing import (Any,
                     Callable,
                     Deque,
                     Dict,
+                    FrozenSet,
                     Iterable,
                     List,
                     Sequence,
+                    Set,
                     Tuple,
                     TypeVar)
 
@@ -70,13 +72,21 @@ def _replicate_iterable(_value: Iterable[_T],
     yield from map(replica, queues)
 
 
-@replicate.register(tuple)
-def _(_value: Tuple[_T, ...],
+@replicate.register(bytearray)
+def _(_value: bytearray,
       *,
-      count: int) -> Iterable[Tuple[_T, ...]]:
+      count: int) -> Iterable[bytearray]:
+    for _ in itertools.repeat(None, count):
+        yield _value[:]
+
+
+@replicate.register(frozenset)
+def _(_value: FrozenSet[_T],
+      *,
+      count: int) -> Iterable[FrozenSet[_T]]:
     for replica in _replicate_iterable(_value,
                                        count=count):
-        yield tuple(replica)
+        yield frozenset(replica)
 
 
 @replicate.register(list)
@@ -88,6 +98,24 @@ def _(_value: List[_T],
         yield list(replica)
 
 
+@replicate.register(set)
+def _(_value: Set[_T],
+      *,
+      count: int) -> Iterable[Set[_T]]:
+    for replica in _replicate_iterable(_value,
+                                       count=count):
+        yield set(replica)
+
+
+@replicate.register(tuple)
+def _(_value: Tuple[_T, ...],
+      *,
+      count: int) -> Iterable[Tuple[_T, ...]]:
+    for replica in _replicate_iterable(_value,
+                                       count=count):
+        yield tuple(replica)
+
+
 _Key = TypeVar('_Key')
 _Value = TypeVar('_Value')
 
@@ -96,18 +124,9 @@ _Value = TypeVar('_Value')
 def _(_value: Dict[_Key, _Value],
       *,
       count: int) -> Iterable[Dict[_Key, _Value]]:
-    result: Sequence[Dict[_Key, _Value]] = [
-        {} for _ in itertools.repeat(None, count)
-    ]
-    for key, value in _value.items():
-        for index, (key_replica, value_replica) in enumerate(
-                zip(replicate(key,
-                              count=count),
-                    replicate(value,
-                              count=count))
-        ):
-            result[index][key_replica] = value_replica
-    yield from result
+    for replica in _replicate_iterable(_value.items(),
+                                       count=count):
+        yield dict(replica)
 
 
 def replicator(count: int) -> Callable[[Domain], Iterable[Domain]]:
