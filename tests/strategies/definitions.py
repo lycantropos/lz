@@ -24,11 +24,15 @@ stdlib_modules_names_list = [path_to_string(module_path)
 def is_supported(value: Any) -> bool:
     try:
         signature = signature_from_callable(value)
-        pickle.dumps(signature)
-    except (ValueError, pickle.PicklingError):
+    except (TypeError, ValueError):
         return False
     else:
-        return True
+        try:
+            pickle.dumps(signature)
+        except pickle.PicklingError:
+            return False
+        else:
+            return True
 
 
 def to_contents(module_or_type: Union[ModuleType, type]) -> Iterable[Any]:
