@@ -63,6 +63,6 @@ def _(_value: Iterable[Collection[Domain]]) -> Collection[Iterable[Domain]]:
     return tuple(map(coordinate, queues))
 
 
-@_transpose.register(Collection)
+@_transpose.register(abc.Collection)
 def _(_value: Collection[Iterable[Domain]]) -> Iterable[Collection[Domain]]:
     yield from zip(*_value)

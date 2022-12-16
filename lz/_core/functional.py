@@ -81,6 +81,12 @@ class Composition:
                 owner: t.Type[Domain]) -> t.Callable[..., Range]:
         return MethodType(self.function, instance)
 
+    def __getnewargs_ex__(self) -> t.Tuple[t.Tuple[_Arg, ...],
+                                           t.Dict[str, _KwArg]]:
+        return (self.functions, {'file_path': self._file_path,
+                                 'line_number': self._line_number,
+                                 'line_offset': self._line_offset})
+
     __repr__ = generate_repr(__new__,
                              field_seeker=seekers.complex_)
 

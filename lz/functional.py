@@ -104,7 +104,7 @@ def curry(function: Callable[..., Range]) -> Curry:
 
 def pack(
         function: Callable[_Params, Range]
-) -> Callable[[_Params.args, _Params.kwargs], Range]:
+) -> Callable[[_T1, _T2], Range]:
     """
     Returns function that works with single iterable parameter
     by unpacking elements to given function.

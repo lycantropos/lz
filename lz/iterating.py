@@ -42,7 +42,7 @@ def _(iterable: Iterable[Any]) -> int:
     return next(counter)
 
 
-@capacity.register(abc.Sized)
+@capacity.register(abc.Collection)
 def _(iterable: Sized) -> int:
     """
     Returns number of elements in sized iterable.

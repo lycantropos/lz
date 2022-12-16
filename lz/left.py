@@ -57,7 +57,8 @@ def attacher(_value: Domain) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     >>> list(attach_hundred(range(10)))
     [100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     """
-    return functools.partial(attach, _value)
+    return functools.partial(attach,
+                             _value=_value)
 
 
 @functools.singledispatch
