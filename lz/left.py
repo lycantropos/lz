@@ -46,7 +46,8 @@ else:
         Yields cumulative results of given binary function
         starting from given initial object in direction from left to right.
         """
-        yield from itertools.accumulate(iterable, function, initial)
+        yield from itertools.accumulate(iterable, function,
+                                        initial=initial)
 
 
 def attacher(_value: Domain) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
