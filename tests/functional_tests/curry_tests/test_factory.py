@@ -3,8 +3,8 @@ from typing import (Any,
 
 from hypothesis import given
 
-from lz.functional import (curry)
 from lz._core.functional import Curry
+from lz.functional import curry
 from tests import strategies
 
 

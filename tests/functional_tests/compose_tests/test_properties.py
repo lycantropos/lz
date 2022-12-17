@@ -1,4 +1,5 @@
-from typing import Callable, Tuple
+from typing import (Callable,
+                    Tuple)
 
 from hypothesis import given
 

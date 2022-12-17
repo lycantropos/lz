@@ -1,6 +1,6 @@
+import math
 from numbers import Real
 
-import math
 from hypothesis import given
 
 from lz.arithmetical import ceil_division
