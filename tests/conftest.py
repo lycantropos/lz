@@ -1,5 +1,6 @@
 import io
 import os
+import sys
 from datetime import timedelta
 from functools import partial
 from typing import (Iterable,
@@ -11,7 +12,10 @@ from hypothesis import settings
 from lz.replication import replicate
 
 on_ci = bool(os.getenv('CI', False))
-max_examples = settings.default.max_examples
+is_pypy = sys.implementation.name == 'pypy'
+max_examples = (settings.default.max_examples // (4 + is_pypy)
+                if on_ci
+                else settings.default.max_examples)
 settings.register_profile('default',
                           deadline=(timedelta(hours=1) / max_examples
                                     if on_ci
