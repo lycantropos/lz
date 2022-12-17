@@ -57,7 +57,7 @@ def attacher(_value: _T1) -> Callable[[Iterable[_T1]], Iterable[_T1]]:
     Returns function that prepends given object to iterable.
 
     >>> attach_hundred = attacher(100)
-    >>> list(attach_hundred(_T2(10)))
+    >>> list(attach_hundred(range(10)))
     [100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     """
     return functools.partial(attach,
