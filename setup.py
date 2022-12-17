@@ -9,6 +9,7 @@ project_base_url = 'https://github.com/lycantropos/lz/'
 
 setup(name=lz.__name__,
       packages=find_packages(exclude=('tests', 'tests.*')),
+      package_data={lz.__name__: ['py.typed']},
       version=lz.__version__,
       description=lz.__doc__,
       long_description=Path('README.md').read_text(encoding='utf-8'),
