@@ -4,7 +4,8 @@ from collections import deque
 from typing import (Callable,
                     Deque,
                     Iterable,
-                    Tuple)
+                    Tuple,
+                    cast)
 
 from .hints import (Domain,
                     Predicate)
@@ -29,7 +30,8 @@ def sifter(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
     >>> list(to_even(range(10)))
     [0, 2, 4, 6, 8]
     """
-    return functools.partial(filter, predicate)
+    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
+                functools.partial(filter, predicate))
 
 
 def scavenger(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
@@ -50,7 +52,8 @@ def scavenger(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
     >>> list(to_odd(range(10)))
     [1, 3, 5, 7, 9]
     """
-    return functools.partial(itertools.filterfalse, predicate)
+    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
+                functools.partial(itertools.filterfalse, predicate))
 
 
 def separator(
@@ -115,7 +118,8 @@ def grabber(predicate: Predicate) -> Callable[[Iterable[Domain]],
     >>> list(grab_while_less_than_five(range(10)))
     [0, 1, 2, 3, 4]
     """
-    return functools.partial(itertools.takewhile, predicate)
+    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
+                functools.partial(itertools.takewhile, predicate))
 
 
 def kicker(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
@@ -136,4 +140,5 @@ def kicker(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
     >>> list(kick_while_less_than_five(range(10)))
     [5, 6, 7, 8, 9]
     """
-    return functools.partial(itertools.dropwhile, predicate)
+    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
+                functools.partial(itertools.dropwhile, predicate))

@@ -202,14 +202,18 @@ class Cleavage(t.Generic[Range]):
 def _compose(*functions: t.Callable[..., t.Any],
              function_name: str,
              arguments_factory: t.Callable[..., ast.arguments] =
-             ast.arguments if sys.version_info < (3, 8)
+             ast.arguments
+             if sys.version_info < (3, 8)
              # Python3.8 adds positional-only arguments
-             else functools.partial(ast.arguments, []),
+             else t.cast(t.Callable[..., ast.arguments],
+                         functools.partial(ast.arguments, [])),
              module_factory: t.Callable[..., ast.Module] =
-             ast.Module if sys.version_info < (3, 8)
+             ast.Module
+             if sys.version_info < (3, 8)
              # Python3.8 adds `type_ignores` parameter
-             else functools.partial(ast.Module,
-                                    type_ignores=[]),
+             else t.cast(t.Callable[..., ast.Module],
+                         functools.partial(ast.Module,
+                                           type_ignores=[])),
              file_path: str,
              line_number: int,
              line_offset: int) -> t.Callable[..., Range]:

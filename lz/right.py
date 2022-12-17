@@ -3,7 +3,8 @@ import itertools
 from typing import (Callable,
                     Iterable,
                     List,
-                    Tuple)
+                    Tuple,
+                    cast)
 
 from . import left
 from ._core.right import Applier
@@ -32,8 +33,8 @@ def accumulator(
     ...  for fraction in to_simple_continued_fractions(list(repeat(1, 10)))]
     [1, 2.0, 1.5, 1.6667, 1.6, 1.625, 1.6154, 1.619, 1.6176, 1.6182, 1.618]
     """
-    left_accumulator = left.accumulator(flip(function), initial)
-    return compose(left_accumulator, reverse)
+    return cast(Callable[[Iterable[Domain]], Iterable[Iterable[Range]]],
+                compose(left.accumulator(flip(function), initial), reverse))
 
 
 def attacher(_value: Domain) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
@@ -44,7 +45,8 @@ def attacher(_value: Domain) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     >>> list(attach_hundred(range(10)))
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 100]
     """
-    return Applier(attach, _value)
+    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
+                Applier(attach, _value))
 
 
 @functools.singledispatch

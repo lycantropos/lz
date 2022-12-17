@@ -8,11 +8,13 @@ from typing import (Any,
                     Callable,
                     Hashable,
                     Iterable,
+                    Iterator,
                     MutableMapping,
                     Sequence,
                     Sized,
                     Tuple,
-                    Type)
+                    Type,
+                    cast)
 
 from .functional import flatmap
 from .hints import (Domain,
@@ -194,7 +196,8 @@ def slide(iterable: Iterable[Domain],
               element: Domain) -> Tuple[Domain, ...]:
         return previous[1:] + (element,)
 
-    yield from itertools.accumulate(itertools.chain([initial], iterator),
+    yield from itertools.accumulate(cast(Iterable[Domain],
+                                         itertools.chain([initial], iterator)),
                                     shift)
 
 
@@ -264,11 +267,8 @@ def trailer(size: int) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     >>> list(to_last_pair(range(10)))
     [8, 9]
     """
-    result = functools.partial(trail,
-                               size=size)
-    result.__doc__ = ('Selects {size} elements from the end of iterable.'
-                      .format(size=size))
-    return result
+    return functools.partial(trail,
+                             size=size)
 
 
 def mapper(_map: Callable[[Domain], Range]) -> Callable[[Iterable[Domain]],
@@ -280,7 +280,8 @@ def mapper(_map: Callable[[Domain], Range]) -> Callable[[Iterable[Domain]],
     >>> list(to_str(range(10)))
     ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     """
-    return functools.partial(map, _map)
+    return cast(Callable[[Iterable[Domain]], Iterable[Range]],
+                functools.partial(map, _map))
 
 
 def flatmapper(_map: Callable[[Domain], Iterable[Range]]
@@ -362,7 +363,8 @@ def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
     >>> list(interleave([range(5), range(10, 20)]))
     [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 15, 16, 17, 18, 19]
     """
-    iterators = itertools.cycle(map(iter, iterable))
+    iterators = itertools.cycle(cast(Iterable[Iterator[Domain]],
+                                     map(iter, iterable)))
     while True:
         try:
             for iterator in iterators:
