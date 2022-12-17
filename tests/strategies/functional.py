@@ -78,11 +78,13 @@ is_instance_predicates = classes.map(instance_of)
 predicates = false_predicates | true_predicates | is_instance_predicates
 predicates_arguments = scalars
 starting_maps = [identity, float, str, json.dumps]
-suitable_maps = {identity: [identity, float, str],
-                 float: starting_maps,
-                 str: [identity, float, str, json.loads],
-                 json.dumps: [identity, float, str, json.loads],
-                 json.loads: starting_maps}
+suitable_maps = {
+    identity: [identity, float, str],
+    float: starting_maps,
+    str: [identity, float, str, json.loads],
+    json.dumps: [identity, float, str, json.loads],
+    json.loads: starting_maps
+}
 suitable_maps = dict(zip(suitable_maps.keys(),
                          map(strategies.sampled_from, suitable_maps.values())))
 to_one_of_suitable_maps = suitable_maps.__getitem__
@@ -110,18 +112,17 @@ two_suitable_maps = extend_suitable_maps(strategies.tuples(maps))
 two_or_more_suitable_maps = extend_suitable_maps(suitable_maps)
 three_or_more_suitable_maps = extend_suitable_maps(two_or_more_suitable_maps)
 # "transparent" is an abbr. of "referential transparent"
-non_variadic_transparent_functions = strategies.sampled_from([bool, bytes,
-                                                              complex, float,
-                                                              identity,
-                                                              int, str,
-                                                              textwrap.indent])
-variadic_transparent_functions = strategies.sampled_from([json.dumps,
-                                                          json.loads,
-                                                          os.path.join])
+non_variadic_transparent_functions = strategies.sampled_from([
+    bool, bytes, complex, float, identity, int, str, textwrap.indent
+])
+variadic_transparent_functions = strategies.sampled_from([
+    json.dumps, json.loads, os.path.join
+])
 transparent_functions = (non_variadic_transparent_functions
                          | variadic_transparent_functions)
 paths_names_parts = strategies.text(
-        strategies.sampled_from(string.digits + string.ascii_letters + '_'))
+        strategies.sampled_from(string.digits + string.ascii_letters + '_')
+)
 to_transparent_function_args = {
     bool: strategies.tuples(scalars),
     bytes: strings_with_encodings,
@@ -157,16 +158,18 @@ to_transparent_function_kwargs = {
     str: empty.dictionaries,
     textwrap.indent: empty.dictionaries,
 }.__getitem__
-projectors = strategies.sampled_from([add, and_, max, min, or_,
-                                      os.path.join, sub, xor])
-projectors_domains = {add: [lists, numbers, strings, tuples],
-                      and_: [sets],
-                      max: sortable_domains,
-                      min: sortable_domains,
-                      or_: [sets],
-                      os.path.join: [paths_names_parts],
-                      sub: [numbers, sets],
-                      xor: [sets]}
+projectors = strategies.sampled_from([add, and_, max, min, or_, os.path.join,
+                                      sub, xor])
+projectors_domains = {
+    add: [lists, numbers, strings, tuples],
+    and_: [sets],
+    max: sortable_domains,
+    min: sortable_domains,
+    or_: [sets],
+    os.path.join: [paths_names_parts],
+    sub: [numbers, sets],
+    xor: [sets]
+}
 projectors_domains = dict(zip(projectors_domains.keys(),
                               map(strategies.sampled_from,
                                   projectors_domains.values())))
