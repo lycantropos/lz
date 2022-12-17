@@ -1,13 +1,13 @@
-import functools
-import itertools
+import functools as _functools
+import itertools as _itertools
 import typing as _t
 
-from . import left
-from ._core.right import Applier
-from .functional import (compose,
-                         flip)
-from .iterating import expand
-from .reversal import reverse
+from . import left as _left
+from ._core.right import Applier as _Applier
+from .functional import (compose as _compose,
+                         flip as _flip)
+from .iterating import expand as _expand
+from .reversal import reverse as _reverse
 
 _T1 = _t.TypeVar('_T1')
 _T2 = _t.TypeVar('_T2')
@@ -31,7 +31,8 @@ def accumulator(
     """
     return _t.cast(_t.Callable[[_t.Iterable[_T1]],
                                _t.Iterable[_t.Iterable[_T2]]],
-                   compose(left.accumulator(flip(function), initial), reverse))
+                   _compose(_left.accumulator(_flip(function), initial),
+                            _reverse))
 
 
 def attacher(_value: _T1) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
@@ -43,15 +44,15 @@ def attacher(_value: _T1) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 100]
     """
     return _t.cast(_t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]],
-                   Applier(attach, _value))
+                   _Applier(attach, _value))
 
 
-@functools.singledispatch
+@_functools.singledispatch
 def attach(_iterable: _t.Iterable[_T1], _value: _T1) -> _t.Iterable[_T1]:
     """
     Appends given object to the iterable.
     """
-    yield from itertools.chain(_iterable, expand(_value))
+    yield from _itertools.chain(_iterable, _expand(_value))
 
 
 @attach.register(list)
@@ -80,8 +81,8 @@ def folder(_function: _t.Callable[[_T1, _T2], _T2],
     >>> to_sum_evaluation_order(range(1, 10))
     '(1 + (2 + (3 + (4 + (5 + (6 + (7 + (8 + (9 + 0)))))))))'
     """
-    left_folder = left.folder(flip(_function), _initial)
-    return compose(left_folder, reverse)
+    left_folder = _left.folder(_flip(_function), _initial)
+    return _compose(left_folder, _reverse)
 
 
 def applier(_function: _t.Callable[..., _T2],
@@ -96,4 +97,4 @@ def applier(_function: _t.Callable[..., _T2],
     >>> square(10)
     100
     """
-    return Applier(_function, *args, **kwargs)
+    return _Applier(_function, *args, **kwargs)

@@ -6,11 +6,7 @@ import typing as _t
 
 import typing_extensions as _te
 
-from ._core.functional import (Cleavage,
-                               Combination,
-                               Composition,
-                               Constant,
-                               Curry)
+from ._core import functional as _functional
 from ._core.signatures import to_signature as _to_signature
 
 _Params = _te.ParamSpec('_Params')
@@ -19,14 +15,14 @@ _T1 = _t.TypeVar('_T1')
 _T2 = _t.TypeVar('_T2')
 
 
-def identity(argument: _T1) -> _T1:
+def identity(_value: _T1) -> _T1:
     """
     Returns object itself.
 
     >>> identity(0)
     0
     """
-    return argument
+    return _value
 
 
 def compose(
@@ -42,10 +38,11 @@ def compose(
     45
     """
     caller_frame_info = _inspect.stack()[1]
-    return Composition(_last_function, _penult_function, *_rest_functions,
-                       file_path=caller_frame_info.filename,
-                       line_number=caller_frame_info.lineno,
-                       line_offset=0)
+    return _functional.Composition(_last_function, _penult_function,
+                                   *_rest_functions,
+                                   file_path=caller_frame_info.filename,
+                                   line_number=caller_frame_info.lineno,
+                                   line_offset=0)
 
 
 def combine(
@@ -58,10 +55,10 @@ def combine(
     >>> list(encoder_decoder(['hello', b'world']))
     [b'hello', 'world']
     """
-    return Combination(*maps)
+    return _functional.Combination(*maps)
 
 
-def curry(function: _t.Callable[..., _T2]) -> Curry:
+def curry(_function: _t.Callable[..., _T2]) -> _functional.Curry:
     """
     Returns curried version of given function.
 
@@ -70,10 +67,10 @@ def curry(function: _t.Callable[..., _T2]) -> Curry:
     >>> two_to_power(10)
     1024
     """
-    return Curry(function, _to_signature(function))
+    return _functional.Curry(_function, _to_signature(_function))
 
 
-def pack(function: _t.Callable[_Params, _T2]) -> _t.Callable[[_T1, _T2], _T2]:
+def pack(_function: _t.Callable[_Params, _T2]) -> _t.Callable[[_T1, _T2], _T2]:
     """
     Returns function that works with single iterable parameter
     by unpacking elements to given function.
@@ -84,21 +81,21 @@ def pack(function: _t.Callable[_Params, _T2]) -> _t.Callable[[_T1, _T2], _T2]:
     >>> packed_int(['10'], {'base': 2})
     2
     """
-    return _functools.partial(apply, function)
+    return _functools.partial(call, _function)
 
 
-def apply(function: _t.Callable[_Params, _T2],
-          args: _Params.args,
-          kwargs: _Params.kwargs = _types.MappingProxyType({})) -> _T2:
+def call(_function: _t.Callable[_Params, _T2],
+         _args: _Params.args,
+         _kwargs: _Params.kwargs = _types.MappingProxyType({})) -> _T2:
     """
     Calls given function with given positional and keyword arguments.
     """
-    return function(*args, **kwargs)
+    return _function(*_args, **_kwargs)
 
 
-def to_constant(object_: _T1) -> _t.Callable[..., _T1]:
+def to_constant(_value: _T1) -> _t.Callable[..., _T1]:
     """
-    Returns function that always returns given object.
+    Returns function that always returns given value.
 
     >>> always_zero = to_constant(0)
     >>> always_zero()
@@ -108,10 +105,10 @@ def to_constant(object_: _T1) -> _t.Callable[..., _T1]:
     >>> always_zero(how_about=2)
     0
     """
-    return Constant(object_)
+    return _functional.Constant(_value)
 
 
-def flip(function: _t.Callable[..., _T2]) -> _t.Callable[..., _T2]:
+def flip(_function: _t.Callable[..., _T2]) -> _t.Callable[..., _T2]:
     """
     Returns function with positional arguments flipped.
 
@@ -119,16 +116,16 @@ def flip(function: _t.Callable[..., _T2]) -> _t.Callable[..., _T2]:
     >>> flipped_power(2, 4)
     16
     """
-    return _functools.partial(call_flipped, function)
+    return _functools.partial(call_flipped, _function)
 
 
-def call_flipped(function: _t.Callable[..., _T2],
+def call_flipped(_function: _t.Callable[..., _T2],
                  *args: _T1,
                  **kwargs: _T1) -> _T2:
     """
     Calls given function with positional arguments flipped.
     """
-    return function(*args[::-1], **kwargs)
+    return _function(*args[::-1], **kwargs)
 
 
 def cleave(
@@ -144,10 +141,10 @@ def cleave(
     >>> list(to_min_and_max(range(0), default=None))
     [None, None]
     """
-    return Cleavage(*functions)
+    return _functional.Cleavage(*functions)
 
 
-def flatmap(function: _t.Callable[[_T1], _t.Iterable[_T2]],
+def flatmap(_function: _t.Callable[[_T1], _t.Iterable[_T2]],
             *iterables: _t.Iterable[_T1]) -> _t.Iterable[_T2]:
     """
     Applies given function to the arguments aggregated from given iterables
@@ -156,4 +153,4 @@ def flatmap(function: _t.Callable[[_T1], _t.Iterable[_T2]],
     >>> list(flatmap(range, range(5)))
     [0, 0, 1, 0, 1, 2, 0, 1, 2, 3]
     """
-    yield from _itertools.chain.from_iterable(map(function, *iterables))
+    yield from _itertools.chain.from_iterable(map(_function, *iterables))

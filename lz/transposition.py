@@ -1,7 +1,7 @@
-import functools
-from collections import (abc,
-                         deque)
+import functools as _functools
 import typing as _t
+from collections import (abc as _abc,
+                         deque as _deque)
 
 _T = _t.TypeVar('_T')
 
@@ -30,12 +30,12 @@ def transpose(_value: _T) -> _t.Any:
     return _transpose(_value)
 
 
-@functools.singledispatch
+@_functools.singledispatch
 def _transpose(_value: _t.Any) -> _t.Any:
     raise TypeError(type(_value))
 
 
-@_transpose.register(abc.Iterable)
+@_transpose.register(_abc.Iterable)
 def _(
         _value: _t.Iterable[_t.Collection[_T]]
 ) -> _t.Collection[_t.Iterable[_T]]:
@@ -44,9 +44,9 @@ def _(
         first_elements = next(iterator)
     except StopIteration:
         return ()
-    queues = [deque([element]) for element in first_elements]
+    queues = [_deque([element]) for element in first_elements]
 
-    def coordinate(queue: deque) -> _t.Iterable[_T]:
+    def coordinate(queue: _t.Deque[_T]) -> _t.Iterable[_T]:
         while True:
             if not queue:
                 try:
@@ -60,7 +60,7 @@ def _(
     return tuple(map(coordinate, queues))
 
 
-@_transpose.register(abc.Collection)
+@_transpose.register(_abc.Collection)
 def _(
         _value: _t.Collection[_t.Iterable[_T]]
 ) -> _t.Iterable[_t.Collection[_T]]:

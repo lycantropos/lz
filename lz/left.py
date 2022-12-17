@@ -1,24 +1,18 @@
-import functools
-import itertools
-import sys
-from typing import (Callable,
-                    Iterable,
-                    Iterator,
-                    List,
-                    Tuple, 
-                    TypeVar)
+import functools as _functools
+import itertools as _itertools
+import typing as _t
 
-from ._core.left import Applier
-from .iterating import expand
+from ._core.left import Applier as _Applier
+from .iterating import expand as _expand
 
-_T1 = TypeVar('_T1')
-_T2 = TypeVar('_T2')
+_T1 = _t.TypeVar('_T1')
+_T2 = _t.TypeVar('_T2')
 
 
 def accumulator(
-        function: Callable[[_T2, _T1], _T2],
+        function: _t.Callable[[_T2, _T1], _T2],
         initial: _T2
-) -> Callable[[Iterable[_T1]], Iterable[_T2]]:
+) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]]:
     """
     Returns function that yields cumulative results of given binary function
     starting from given initial object in direction from left to right.
@@ -28,31 +22,23 @@ def accumulator(
     >>> list(to_pi_approximations(_T2(5, 0, -1)))
     [3.141592653589793, 3.14159, 3.1416, 3.142, 3.14, 3.1]
     """
-    return functools.partial(accumulate, function, initial)
+    return _functools.partial(accumulate, function, initial)
 
 
-if sys.version_info < (3, 8):
-    def accumulate(function: Callable[[_T2, _T1], _T2],
-                   initial: _T2,
-                   iterable: Iterable[_T1]) -> Iterator[_T2]:
-        """
-        Yields cumulative results of given binary function
-        starting from given initial object in direction from left to right.
-        """
-        yield from itertools.accumulate(attach(iterable, initial), function)
-else:
-    def accumulate(function: Callable[[_T2, _T1], _T2],
-                   initial: _T2,
-                   iterable: Iterable[_T1]) -> Iterator[_T2]:
-        """
-        Yields cumulative results of given binary function
-        starting from given initial object in direction from left to right.
-        """
-        yield from itertools.accumulate(iterable, function,
-                                        initial=initial)
+def accumulate(function: _t.Callable[[_T2, _T1], _T2],
+               initial: _T2,
+               iterable: _t.Iterable[_T1]) -> _t.Iterable[_T2]:
+    """
+    Yields cumulative results of given binary function
+    starting from given initial object in direction from left to right.
+    """
+    yield from _itertools.accumulate(
+            attach(iterable, initial),
+            _t.cast(_t.Callable[[_t.Any, _t.Any], _T2], function)
+    )
 
 
-def attacher(_value: _T1) -> Callable[[Iterable[_T1]], Iterable[_T1]]:
+def attacher(_value: _T1) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
     """
     Returns function that prepends given object to iterable.
 
@@ -60,20 +46,20 @@ def attacher(_value: _T1) -> Callable[[Iterable[_T1]], Iterable[_T1]]:
     >>> list(attach_hundred(range(10)))
     [100, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     """
-    return functools.partial(attach,
-                             _value=_value)
+    return _functools.partial(attach,
+                              _value=_value)
 
 
-@functools.singledispatch
-def attach(_target: Iterable[_T1], _value: _T1) -> Iterable[_T1]:
+@_functools.singledispatch
+def attach(_target: _t.Iterable[_T1], _value: _T1) -> _t.Iterable[_T1]:
     """
     Prepends given value to the target.
     """
-    yield from itertools.chain(expand(_value), _target)
+    yield from _itertools.chain(_expand(_value), _target)
 
 
 @attach.register(list)
-def _(_target: List[_T1], _value: _T1) -> List[_T1]:
+def _(_target: _t.List[_T1], _value: _T1) -> _t.List[_T1]:
     """
     Prepends given object to the list.
     """
@@ -81,15 +67,15 @@ def _(_target: List[_T1], _value: _T1) -> List[_T1]:
 
 
 @attach.register(tuple)
-def _(_target: Tuple[_T1, ...], _value: _T1) -> Tuple[_T1, ...]:
+def _(_target: _t.Tuple[_T1, ...], _value: _T1) -> _t.Tuple[_T1, ...]:
     """
     Prepends given value to the tuple.
     """
     return (_value,) + _target
 
 
-def folder(function: Callable[[_T2, _T1], _T2],
-           initial: _T2) -> Callable[[Iterable[_T1]], _T2]:
+def folder(function: _t.Callable[[_T2, _T1], _T2],
+           initial: _T2) -> _t.Callable[[_t.Iterable[_T1]], _T2]:
     """
     Returns function that cumulatively applies given binary function
     starting from given initial object in direction from left to right.
@@ -98,22 +84,22 @@ def folder(function: Callable[[_T2, _T1], _T2],
     >>> to_sum_evaluation_order(_T2(1, 10))
     '(((((((((0 + 1) + 2) + 3) + 4) + 5) + 6) + 7) + 8) + 9)'
     """
-    return functools.partial(fold, function, initial)
+    return _functools.partial(fold, function, initial)
 
 
-def fold(function: Callable[[_T2, _T1], _T2],
+def fold(function: _t.Callable[[_T2, _T1], _T2],
          initial: _T2,
-         iterable: Iterable[_T1]) -> _T2:
+         iterable: _t.Iterable[_T1]) -> _T2:
     """
     Cumulatively applies given binary function
     starting from given initial object in direction from left to right.
     """
-    return functools.reduce(function, iterable, initial)
+    return _functools.reduce(function, iterable, initial)
 
 
-def applier(function: Callable[..., _T2],
+def applier(function: _t.Callable[..., _T2],
             *args: _T1,
-            **kwargs: _T1) -> Callable[..., _T2]:
+            **kwargs: _T1) -> _t.Callable[..., _T2]:
     """
     Returns function that behaves like given function
     with given arguments partially applied.
@@ -123,4 +109,4 @@ def applier(function: Callable[..., _T2],
     >>> list(count_from_zero_to(10))
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     """
-    return Applier(function, *args, **kwargs)
+    return _Applier(function, *args, **kwargs)

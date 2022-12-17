@@ -5,8 +5,8 @@ from operator import (not_,
 import typing_extensions as _te
 
 from . import left as _left
-from .functional import (cleave,
-                         compose)
+from .functional import (cleave as _cleave,
+                         compose as _compose)
 
 _Params = _te.ParamSpec('_Params')
 _T = _t.TypeVar('_T')
@@ -24,7 +24,7 @@ def conjoin(
     >>> is_valid_constant_identifier('2ND_SECTION')
     False
     """
-    return compose(all, cleave(*predicates))
+    return _compose(all, _cleave(*predicates))
 
 
 def disjoin(
@@ -41,7 +41,7 @@ def disjoin(
     >>> alphabetic_or_numeric('Hello42')
     False
     """
-    return compose(any, cleave(*predicates))
+    return _compose(any, _cleave(*predicates))
 
 
 def exclusive_disjoin(
@@ -61,7 +61,7 @@ def exclusive_disjoin(
     >>> valid_object_name('lambda')
     False
     """
-    return compose(_left.folder(xor, False), cleave(*predicates))
+    return _compose(_left.folder(xor, False), _cleave(*predicates))
 
 
 def negate(
@@ -77,4 +77,4 @@ def negate(
     >>> false_like([0])
     False
     """
-    return compose(not_, predicate)
+    return _compose(not_, predicate)

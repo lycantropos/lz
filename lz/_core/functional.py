@@ -180,11 +180,11 @@ class Curry(ApplierBase[_Arg, _KwArg, _Result]):
 
 @final
 class Constant(_t.Generic[_T]):
-    def __init__(self, object_: _T) -> None:
-        self.object_ = object_
+    def __init__(self, _value: _T) -> None:
+        self._value = _value
 
     def __call__(self, *args: _t.Any, **kwargs: _t.Any) -> _T:
-        return self.object_
+        return self._value
 
     __repr__ = generate_repr(__init__)
 
@@ -288,25 +288,25 @@ def _compose(*functions: _t.Callable[..., _t.Any],
 
 
 @to_signature.register(Cleavage)
-def _(object_: Cleavage) -> Signature:
-    return to_signature(object_.functions[0])
+def _(_value: Cleavage) -> Signature:
+    return to_signature(_value.functions[0])
 
 
 @to_signature.register(Combination)
-def _(object_: Combination) -> Signature:
-    return to_signature(object_.__call__)
+def _(_value: Combination) -> Signature:
+    return to_signature(_value.__call__)
 
 
 @to_signature.register(Composition)
-def _(object_: Composition) -> Signature:
-    return to_signature(object_.functions[-1])
+def _(_value: Composition) -> Signature:
+    return to_signature(_value.functions[-1])
 
 
 @to_signature.register(Constant)
-def _(object_: Constant) -> Signature:
-    return to_signature(object_.__call__)
+def _(_value: Constant) -> Signature:
+    return to_signature(_value.__call__)
 
 
 @to_signature.register(Curry)
-def _(object_: Curry) -> Signature:
-    return object_._signature
+def _(_value: Curry) -> Signature:
+    return _value._signature
