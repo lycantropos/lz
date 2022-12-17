@@ -1,8 +1,9 @@
 import pytest
 from hypothesis import given
 
-from lz.functional import (curry)
 from lz._core.functional import Curry
+from lz._core.signatures import to_signature
+from lz.functional import curry
 from tests import strategies
 from tests.hints import (Function,
                          FunctionCall)
@@ -14,7 +15,7 @@ def test_empty_call(function: Function) -> None:
 
     result = curried()
 
-    assert curried.signature.all_set() or isinstance(result, Curry)
+    assert to_signature(curried).all_set() or isinstance(result, Curry)
 
 
 @given(strategies.transparent_functions_calls)
