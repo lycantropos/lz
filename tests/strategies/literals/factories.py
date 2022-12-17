@@ -18,7 +18,7 @@ from typing import (AnyStr,
 
 from hypothesis import strategies
 
-from lz.textual import code_units_sizes
+from lz._core.textual import code_units_sizes
 from tests.configs import MAX_ITERABLES_SIZE
 from tests.hints import (ByteSequence,
                          Domain,
