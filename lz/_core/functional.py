@@ -12,7 +12,8 @@ from reprit.base import generate_repr
 from typing_extensions import (ParamSpec,
                                final)
 
-from lz._core.signatures import Signature
+from lz._core.signatures import (Signature,
+                                 to_signature)
 from lz.hints import (Domain,
                       Range)
 
@@ -139,24 +140,37 @@ class ApplierBase(ABC, t.Generic[_Arg, _KwArg, Range]):
 class Curry(ApplierBase):
     def __init__(self,
                  function: t.Callable[..., Range],
-                 signature: Signature,
-                 *args: Domain,
-                 **kwargs: Domain) -> None:
+                 _signature: Signature,
+                 *args: _Arg,
+                 **kwargs: _KwArg) -> None:
         super().__init__(function, *args, **kwargs)
-        self.signature = signature
+        self._signature = _signature
 
     def __call__(self,
-                 *args: Domain,
-                 **kwargs: Domain) -> t.Union['Curry', Range]:
-        args = self.args + args
-        kwargs = {**self.kwargs, **kwargs}
+                 *args: _Arg,
+                 **kwargs: _KwArg) -> t.Union['Curry', Range]:
+        total_args = self.args + args
+        total_kwargs = {**self.kwargs, **kwargs}
         try:
-            return self.function(*args, **kwargs)
+            return self.function(*total_args, **total_kwargs)
         except TypeError:
-            if (not self.signature.expects(*args, **kwargs)
-                    or self.signature.all_set(*args, **kwargs)):
+            if (not self._signature.expects(*total_args, **total_kwargs)
+                    or self._signature.all_set(*total_args, **total_kwargs)):
                 raise
-            return type(self)(self.function, self.signature, *args, **kwargs)
+            return type(self)(self.function, self._signature, *total_args,
+                              **total_kwargs)
+
+    def __getstate__(self) -> t.Tuple[t.Callable[..., Range],
+                                      t.Tuple[_Arg, ...],
+                                      t.Dict[str, _KwArg]]:
+        return self.function, self.args, self.kwargs
+
+    def __setstate__(self,
+                     state: t.Tuple[t.Callable[..., Range],
+                                    t.Tuple[_Arg, ...],
+                                    t.Dict[str, _KwArg]]) -> None:
+        self._function, self._args, self._kwargs = state
+        self._signature = to_signature(self._function)
 
     __repr__ = generate_repr(__init__,
                              field_seeker=seekers.complex_)
