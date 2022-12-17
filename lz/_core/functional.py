@@ -2,16 +2,19 @@ import ast
 import functools
 import itertools
 import sys
-from abc import ABC, abstractmethod
-from types import MethodType
 import typing as t
+from abc import (ABC,
+                 abstractmethod)
+from types import MethodType
 
 from reprit import seekers
 from reprit.base import generate_repr
-from typing_extensions import ParamSpec, final
+from typing_extensions import (ParamSpec,
+                               final)
 
 from lz._core.signatures import Signature
-from lz.hints import Domain, Range
+from lz.hints import (Domain,
+                      Range)
 
 _Arg = t.TypeVar('_Arg')
 _KwArg = t.TypeVar('_KwArg')
@@ -19,9 +22,9 @@ _KwArg = t.TypeVar('_KwArg')
 MIN_COMPOSABLE_FUNCTIONS_COUNT = 2
 
 
-class Composition:
+class Composition(t.Generic[_Arg, _KwArg, Range]):
     _file_path: str
-    _function: t.Callable[..., t.Any]
+    _function: t.Optional[t.Callable[..., t.Any]]
     _functions: t.Tuple[t.Callable[..., t.Any], ...]
     _line_number: int
     _line_offset: int
@@ -81,11 +84,11 @@ class Composition:
                 owner: t.Type[Domain]) -> t.Callable[..., Range]:
         return MethodType(self.function, instance)
 
-    def __getnewargs_ex__(self) -> t.Tuple[t.Tuple[_Arg, ...],
-                                           t.Dict[str, _KwArg]]:
-        return (self.functions, {'file_path': self._file_path,
-                                 'line_number': self._line_number,
-                                 'line_offset': self._line_offset})
+    def __getnewargs_ex__(self) -> t.Tuple[t.Tuple[t.Any, ...],
+                                           t.Dict[str, t.Any]]:
+        return self.functions, {'file_path': self._file_path,
+                                'line_number': self._line_number,
+                                'line_offset': self._line_offset}
 
     __repr__ = generate_repr(__new__,
                              field_seeker=seekers.complex_)

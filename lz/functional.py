@@ -5,13 +5,15 @@ from types import MappingProxyType
 from typing import (Any,
                     Callable,
                     Iterable,
-                    TypeVar,
-                    overload)
+                    TypeVar)
 
 from typing_extensions import ParamSpec
 
-from ._core.functional import Cleavage, Combination, Composition, Constant, \
-    Curry
+from ._core.functional import (Cleavage,
+                               Combination,
+                               Composition,
+                               Constant,
+                               Curry)
 from ._core.signatures import (Signature,
                                to_signature)
 from .hints import (Domain,
@@ -32,19 +34,6 @@ _Params = ParamSpec('_Params')
 _T1 = TypeVar('_T1')
 _T2 = TypeVar('_T2')
 _T3 = TypeVar('_T3')
-
-
-@overload
-def compose(_last_function: Callable[[_T2], _T3],
-            _penult_function: Callable[_Params, _T2]) -> Callable[_Params, _T3]:
-    ...
-
-
-@overload
-def compose(_last_function: Callable[[_T2], _T3],
-            _penult_function: Callable[[_T1], _T2],
-            _front_function: Callable[_Params, _T1]) -> Callable[_Params, _T3]:
-    ...
 
 
 def compose(_last_function: Callable[[_T2], _T3],
