@@ -1,5 +1,6 @@
 from numbers import Real
-from typing import TypeVar, overload
+from typing import (TypeVar,
+                    overload)
 
 
 @overload

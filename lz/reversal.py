@@ -8,12 +8,15 @@ from operator import (methodcaller,
                       sub)
 from typing import (Any,
                     BinaryIO,
-                    Callable, Iterable,
+                    Callable,
+                    Iterable,
                     List,
                     Optional,
                     Reversible,
                     Sequence,
-                    TextIO, Tuple, Union)
+                    TextIO,
+                    Tuple,
+                    Union)
 
 from .arithmetical import ceil_division
 from .hints import Domain
