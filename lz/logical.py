@@ -1,13 +1,20 @@
+import typing as _t
 from operator import (not_,
                       xor)
 
-from . import left
+import typing_extensions as _te
+
+from . import left as _left
 from .functional import (cleave,
                          compose)
-from .hints import Predicate
+
+_Params = _te.ParamSpec('_Params')
+_T = _t.TypeVar('_T')
 
 
-def conjoin(*predicates: Predicate) -> Predicate:
+def conjoin(
+        *predicates: _t.Callable[_Params, bool]
+) -> _t.Callable[_Params, bool]:
     """
     Returns conjunction of given predicates.
 
@@ -20,7 +27,9 @@ def conjoin(*predicates: Predicate) -> Predicate:
     return compose(all, cleave(*predicates))
 
 
-def disjoin(*predicates: Predicate) -> Predicate:
+def disjoin(
+        *predicates: _t.Callable[_Params, bool]
+) -> _t.Callable[_Params, bool]:
     """
     Returns disjunction of given predicates.
 
@@ -35,7 +44,9 @@ def disjoin(*predicates: Predicate) -> Predicate:
     return compose(any, cleave(*predicates))
 
 
-def exclusive_disjoin(*predicates: Predicate) -> Predicate:
+def exclusive_disjoin(
+        *predicates: _t.Callable[_Params, bool]
+) -> _t.Callable[_Params, bool]:
     """
     Returns exclusive disjunction of given predicates.
 
@@ -50,10 +61,12 @@ def exclusive_disjoin(*predicates: Predicate) -> Predicate:
     >>> valid_object_name('lambda')
     False
     """
-    return compose(left.folder(xor, False), cleave(*predicates))
+    return compose(_left.folder(xor, False), cleave(*predicates))
 
 
-def negate(predicate: Predicate) -> Predicate:
+def negate(
+        predicate: _t.Callable[_Params, bool]
+) -> _t.Callable[_Params, bool]:
     """
     Returns negated version of given predicate.
 

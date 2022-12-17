@@ -1,19 +1,16 @@
-import functools
-import itertools
-from collections import deque
-from typing import (Callable,
-                    Deque,
-                    Iterable,
-                    Tuple,
-                    cast)
+import functools as _functools
+import itertools as _itertools
+import typing as _t
+from collections import deque as _deque
 
-from .hints import (Domain,
-                    Predicate)
 from .replication import duplicate as _duplicate
 
+_T = _t.TypeVar('_T')
 
-def sifter(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
-                                                     Iterable[Domain]]:
+
+def sifter(
+        predicate: _t.Callable[[_T], bool]
+) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from iterable
     which satisfy given predicate.
@@ -30,12 +27,13 @@ def sifter(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
     >>> list(to_even(range(10)))
     [0, 2, 4, 6, 8]
     """
-    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
-                functools.partial(filter, predicate))
+    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]],
+                   _functools.partial(filter, predicate))
 
 
-def scavenger(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
-                                                        Iterable[Domain]]:
+def scavenger(
+        predicate: _t.Callable[[_T], bool]
+) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from iterable
     which dissatisfy given predicate.
@@ -52,13 +50,14 @@ def scavenger(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
     >>> list(to_odd(range(10)))
     [1, 3, 5, 7, 9]
     """
-    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
-                functools.partial(itertools.filterfalse, predicate))
+    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]],
+                   _functools.partial(_itertools.filterfalse, predicate))
 
 
 def separator(
-        predicate: Predicate[Domain]
-) -> Callable[[Iterable[Domain]], Tuple[Iterable[Domain], Iterable[Domain]]]:
+        predicate: _t.Callable[[_T], bool]
+) -> _t.Callable[[_t.Iterable[_T]],
+                 _t.Tuple[_t.Iterable[_T], _t.Iterable[_T]]]:
     """
     Returns function that returns pair of iterables
     first of which consists of elements that dissatisfy given predicate
@@ -74,17 +73,17 @@ def separator(
     >>> tuple(map(list, split_by_evenness(range(10))))
     ([1, 3, 5, 7, 9], [0, 2, 4, 6, 8])
     """
-    return functools.partial(separate, predicate)
+    return _functools.partial(separate, predicate)
 
 
-def separate(predicate: Callable[[Domain], bool],
-             _value: Iterable[Domain]) -> Tuple[Iterable[Domain],
-                                                Iterable[Domain]]:
+def separate(
+        _predicate: _t.Callable[[_T], bool], _value: _t.Iterable[_T]
+) -> _t.Tuple[_t.Iterable[_T], _t.Iterable[_T]]:
     iterator = iter(_value)
-    unsatisfying: Deque[Domain] = deque()
-    satisfying: Deque[Domain] = deque()
+    unsatisfying: _t.Deque[_T] = _deque()
+    satisfying: _t.Deque[_T] = _deque()
 
-    def fill(queue: Deque[Domain]) -> Iterable[Domain]:
+    def fill(queue: _t.Deque[_T]) -> _t.Iterable[_T]:
         while True:
             while not queue:
                 try:
@@ -93,15 +92,16 @@ def separate(predicate: Callable[[Domain], bool],
                     return
                 subject, element = _duplicate(element)
                 (satisfying
-                 if predicate(subject)
+                 if _predicate(subject)
                  else unsatisfying).append(element)
             yield queue.popleft()
 
     return fill(unsatisfying), fill(satisfying)
 
 
-def grabber(predicate: Predicate) -> Callable[[Iterable[Domain]],
-                                              Iterable[Domain]]:
+def grabber(
+        predicate: _t.Callable[[_T], bool]
+) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from the beginning of iterable
     while given predicate is satisfied.
@@ -113,17 +113,18 @@ def grabber(predicate: Predicate) -> Callable[[Iterable[Domain]],
     []
 
     >>> from operator import gt
-    >>> from functools import partial
+    >>> from _functools import partial
     >>> grab_while_less_than_five = grabber(partial(gt, 5))
     >>> list(grab_while_less_than_five(range(10)))
     [0, 1, 2, 3, 4]
     """
-    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
-                functools.partial(itertools.takewhile, predicate))
+    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]],
+                   _functools.partial(_itertools.takewhile, predicate))
 
 
-def kicker(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
-                                                     Iterable[Domain]]:
+def kicker(
+        predicate: _t.Callable[[_T], bool]
+) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that skips elements from the beginning of iterable
     while given predicate is satisfied.
@@ -135,10 +136,10 @@ def kicker(predicate: Predicate[Domain]) -> Callable[[Iterable[Domain]],
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     >>> from operator import gt
-    >>> from functools import partial
+    >>> from _functools import partial
     >>> kick_while_less_than_five = kicker(partial(gt, 5))
     >>> list(kick_while_less_than_five(range(10)))
     [5, 6, 7, 8, 9]
     """
-    return cast(Callable[[Iterable[Domain]], Iterable[Domain]],
-                functools.partial(itertools.dropwhile, predicate))
+    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]],
+                   _functools.partial(_itertools.dropwhile, predicate))

@@ -2,7 +2,7 @@ import ast
 import functools
 import itertools
 import sys
-import typing as t
+import typing as _t
 from abc import (ABC,
                  abstractmethod)
 from types import MethodType
@@ -14,20 +14,20 @@ from typing_extensions import (ParamSpec,
 
 from lz._core.signatures import (Signature,
                                  to_signature)
-from lz.hints import (Domain,
-                      Range)
 
-_Arg = t.TypeVar('_Arg')
-_KwArg = t.TypeVar('_KwArg')
+_Arg = _t.TypeVar('_Arg')
+_KwArg = _t.TypeVar('_KwArg')
+_Result = _t.TypeVar('_Result')
+_T = _t.TypeVar('_T')
 
 MIN_COMPOSABLE_FUNCTIONS_COUNT = 2
 
 
 @final
-class Composition(t.Generic[_Arg, _KwArg, Range]):
+class Composition(_t.Generic[_Arg, _KwArg, _Result]):
     _file_path: str
-    _function: t.Optional[t.Callable[..., t.Any]]
-    _functions: t.Tuple[t.Callable[..., t.Any], ...]
+    _function: _t.Optional[_t.Callable[..., _t.Any]]
+    _functions: _t.Tuple[_t.Callable[..., _t.Any], ...]
     _line_number: int
     _line_offset: int
 
@@ -35,8 +35,8 @@ class Composition(t.Generic[_Arg, _KwArg, Range]):
                  '_line_offset')
 
     def __new__(cls,
-                *functions: t.Callable[..., t.Any],
-                file_path: t.Optional[str] = None,
+                *functions: _t.Callable[..., _t.Any],
+                file_path: _t.Optional[str] = None,
                 line_number: int = 0,
                 line_offset: int = 0) -> 'Composition':
         if len(functions) < MIN_COMPOSABLE_FUNCTIONS_COUNT:
@@ -47,8 +47,8 @@ class Composition(t.Generic[_Arg, _KwArg, Range]):
         self = super().__new__(cls)
 
         def flatten(
-                function: t.Callable[..., t.Any]
-        ) -> t.Iterable[t.Callable[..., t.Any]]:
+                function: _t.Callable[..., _t.Any]
+        ) -> _t.Iterable[_t.Callable[..., _t.Any]]:
             if isinstance(function, cls):
                 yield from function.functions
             else:
@@ -65,11 +65,11 @@ class Composition(t.Generic[_Arg, _KwArg, Range]):
         return self
 
     @property
-    def functions(self) -> t.Tuple[t.Callable[..., t.Any], ...]:
+    def functions(self) -> _t.Tuple[_t.Callable[..., _t.Any], ...]:
         return self._functions
 
     @property
-    def function(self) -> t.Callable[..., Range]:
+    def function(self) -> _t.Callable[..., _Result]:
         if self._function is None:
             self._function = _compose(*self.functions,
                                       function_name='composition',
@@ -78,16 +78,16 @@ class Composition(t.Generic[_Arg, _KwArg, Range]):
                                       line_offset=self._line_offset)
         return self._function
 
-    def __call__(self, *args: _Arg, **kwargs: _KwArg) -> Range:
+    def __call__(self, *args: _Arg, **kwargs: _KwArg) -> _Result:
         return self.function(*args, **kwargs)
 
     def __get__(self,
-                instance: Domain,
-                owner: t.Type[Domain]) -> t.Callable[..., Range]:
+                instance: _T,
+                owner: _t.Type[_T]) -> _t.Callable[..., _Result]:
         return MethodType(self.function, instance)
 
-    def __getnewargs_ex__(self) -> t.Tuple[t.Tuple[t.Any, ...],
-                                           t.Dict[str, t.Any]]:
+    def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
+                                            _t.Dict[str, _t.Any]]:
         return self.functions, {'file_path': self._file_path,
                                 'line_number': self._line_number,
                                 'line_offset': self._line_offset}
@@ -97,20 +97,20 @@ class Composition(t.Generic[_Arg, _KwArg, Range]):
 
 
 @final
-class Combination(t.Generic[_Arg]):
-    def __init__(self, *maps: t.Callable[[_Arg], Range]) -> None:
+class Combination(_t.Generic[_Arg, _Result]):
+    def __init__(self, *maps: _t.Callable[[_Arg], _Result]) -> None:
         self.maps = maps
 
-    def __call__(self, arguments: t.Iterable[_Arg]) -> t.Tuple[Range, ...]:
+    def __call__(self, arguments: _t.Iterable[_Arg]) -> _t.Tuple[_Result, ...]:
         return tuple(map_(argument)
                      for map_, argument in zip(self.maps, arguments))
 
     __repr__ = generate_repr(__init__)
 
 
-class ApplierBase(ABC, t.Generic[_Arg, _KwArg, Range]):
+class ApplierBase(ABC, _t.Generic[_Arg, _KwArg, _Result]):
     def __init__(self,
-                 function: t.Callable[..., Range],
+                 function: _t.Callable[..., _Result],
                  *args: _Arg,
                  **kwargs: _KwArg) -> None:
         if isinstance(function, type(self)):
@@ -122,15 +122,15 @@ class ApplierBase(ABC, t.Generic[_Arg, _KwArg, Range]):
         self._kwargs = kwargs
 
     @property
-    def function(self) -> t.Callable[..., Range]:
+    def function(self) -> _t.Callable[..., _Result]:
         return self._function
 
     @property
-    def args(self) -> t.Tuple[_Arg, ...]:
+    def args(self) -> _t.Tuple[_Arg, ...]:
         return self._args
 
     @property
-    def kwargs(self) -> t.Dict[str, _KwArg]:
+    def kwargs(self) -> _t.Dict[str, _KwArg]:
         return self._kwargs
 
     @abstractmethod
@@ -139,9 +139,9 @@ class ApplierBase(ABC, t.Generic[_Arg, _KwArg, Range]):
 
 
 @final
-class Curry(ApplierBase):
+class Curry(ApplierBase[_Arg, _KwArg, _Result]):
     def __init__(self,
-                 function: t.Callable[..., Range],
+                 function: _t.Callable[..., _Result],
                  _signature: Signature,
                  *args: _Arg,
                  **kwargs: _KwArg) -> None:
@@ -150,7 +150,7 @@ class Curry(ApplierBase):
 
     def __call__(self,
                  *args: _Arg,
-                 **kwargs: _KwArg) -> t.Union['Curry', Range]:
+                 **kwargs: _KwArg) -> _t.Union['Curry', _Result]:
         total_args = self.args + args
         total_kwargs = {**self.kwargs, **kwargs}
         try:
@@ -162,15 +162,15 @@ class Curry(ApplierBase):
             return type(self)(self.function, self._signature, *total_args,
                               **total_kwargs)
 
-    def __getstate__(self) -> t.Tuple[t.Callable[..., Range],
-                                      t.Tuple[_Arg, ...],
-                                      t.Dict[str, _KwArg]]:
+    def __getstate__(self) -> _t.Tuple[_t.Callable[..., _Result],
+                                       _t.Tuple[_Arg, ...],
+                                       _t.Dict[str, _KwArg]]:
         return self.function, self.args, self.kwargs
 
     def __setstate__(self,
-                     state: t.Tuple[t.Callable[..., Range],
-                                    t.Tuple[_Arg, ...],
-                                    t.Dict[str, _KwArg]]) -> None:
+                     state: _t.Tuple[_t.Callable[..., _Result],
+                                     _t.Tuple[_Arg, ...],
+                                     _t.Dict[str, _KwArg]]) -> None:
         self._function, self._args, self._kwargs = state
         self._signature = to_signature(self._function)
 
@@ -179,11 +179,11 @@ class Curry(ApplierBase):
 
 
 @final
-class Constant(t.Generic[Domain]):
-    def __init__(self, object_: Domain) -> None:
+class Constant(_t.Generic[_T]):
+    def __init__(self, object_: _T) -> None:
         self.object_ = object_
 
-    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Domain:
+    def __call__(self, *args: _t.Any, **kwargs: _t.Any) -> _T:
         return self.object_
 
     __repr__ = generate_repr(__init__)
@@ -193,35 +193,35 @@ _Params = ParamSpec('_Params')
 
 
 @final
-class Cleavage(t.Generic[Range]):
-    def __init__(self, *functions: t.Callable[_Params, Range]) -> None:
+class Cleavage(_t.Generic[_Result]):
+    def __init__(self, *functions: _t.Callable[_Params, _Result]) -> None:
         self.functions = functions
 
     def __call__(self,
                  *args: _Params.args,
-                 **kwargs: _Params.kwargs) -> t.Tuple[Range, ...]:
+                 **kwargs: _Params.kwargs) -> _t.Tuple[_Result, ...]:
         return tuple(function(*args, **kwargs) for function in self.functions)
 
 
-def _compose(*functions: t.Callable[..., t.Any],
+def _compose(*functions: _t.Callable[..., _t.Any],
              function_name: str,
-             arguments_factory: t.Callable[..., ast.arguments] =
+             arguments_factory: _t.Callable[..., ast.arguments] =
              ast.arguments
              if sys.version_info < (3, 8)
              # Python3.8 adds positional-only arguments
-             else t.cast(t.Callable[..., ast.arguments],
-                         functools.partial(ast.arguments, [])),
-             module_factory: t.Callable[..., ast.Module] =
+             else _t.cast(_t.Callable[..., ast.arguments],
+                          functools.partial(ast.arguments, [])),
+             module_factory: _t.Callable[..., ast.Module] =
              ast.Module
              if sys.version_info < (3, 8)
              # Python3.8 adds `type_ignores` parameter
-             else t.cast(t.Callable[..., ast.Module],
-                         functools.partial(ast.Module,
-                                           type_ignores=[])),
+             else _t.cast(_t.Callable[..., ast.Module],
+                          functools.partial(ast.Module,
+                                            type_ignores=[])),
              file_path: str,
              line_number: int,
-             line_offset: int) -> t.Callable[..., Range]:
-    def function_to_unique_name(function: t.Callable) -> str:
+             line_offset: int) -> _t.Callable[..., _Result]:
+    def function_to_unique_name(function: _t.Callable) -> str:
         # we are not using `__name__`/`__qualname__` attributes
         # due to their potential non-uniqueness
         return '_' + str(id(function)).replace('-', '_')
@@ -237,7 +237,7 @@ def _compose(*functions: t.Callable[..., t.Any],
 
     def to_name_node(name: str,
                      *,
-                     context_factory: t.Type[ast.expr_context] = ast.Load
+                     context_factory: _t.Type[ast.expr_context] = ast.Load
                      ) -> ast.Name:
         return ast.Name(name, context_factory(),
                         lineno=line_number,

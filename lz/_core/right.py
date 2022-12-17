@@ -1,9 +1,5 @@
 import functools
-from typing import (Callable,
-                    List,
-                    Sequence,
-                    Tuple,
-                    TypeVar)
+import typing as _t
 
 from paradigm.base import (OptionalParameter,
                            OverloadedSignature,
@@ -19,22 +15,22 @@ from lz._core.signatures import (Parameter,
                                  Signature,
                                  plain_signature_to_parameters_by_kind,
                                  to_signature)
-from lz.hints import (Domain,
-                      Range)
 
-_Arg = TypeVar('_Arg')
-_KwArg = TypeVar('_KwArg')
+_Arg = _t.TypeVar('_Arg')
+_KwArg = _t.TypeVar('_KwArg')
+_Result = _t.TypeVar('_Result')
+_T = _t.TypeVar('_T')
 
 
 @final
-class Applier(ApplierBase[_Arg, _KwArg, Range]):
+class Applier(ApplierBase[_Arg, _KwArg, _Result]):
     def __init__(self,
-                 function: Callable[..., Range],
+                 function: _t.Callable[..., _Result],
                  *args: _Arg,
                  **kwargs: _KwArg) -> None:
         super().__init__(function, *args, **kwargs)
 
-    def __call__(self, *args: _Arg, **kwargs: _KwArg) -> Range:
+    def __call__(self, *args: _Arg, **kwargs: _KwArg) -> _Result:
         return self.function(*args, *self.args, **self.kwargs, **kwargs)
 
     __repr__ = generate_repr(__init__,
@@ -50,13 +46,13 @@ def _(value: Applier) -> Signature:
 
 @functools.singledispatch
 def _bind_positionals_to_applier(signature: Signature,
-                                 args: Tuple[Domain, ...]) -> Signature:
+                                 args: _t.Tuple[_T, ...]) -> Signature:
     raise TypeError('Unsupported signature type: {type}.'
                     .format(type=type(signature)))
 
 
 @_bind_positionals_to_applier.register(PlainSignature)
-def _(signature: PlainSignature, args: Tuple[Domain, ...]) -> Signature:
+def _(signature: PlainSignature, args: _t.Tuple[_T, ...]) -> Signature:
     if not args:
         return signature
     parameters_by_kind = plain_signature_to_parameters_by_kind(signature)
@@ -72,7 +68,7 @@ def _(signature: PlainSignature, args: Tuple[Domain, ...]) -> Signature:
                         f'{"was" if len(args) == 1 else "were"} given.')
     non_positionals = (parameters_by_kind[ParameterKind.KEYWORD_ONLY]
                        + parameters_by_kind[ParameterKind.VARIADIC_KEYWORD])
-    signatures_parameters: List[Sequence[Parameter]] = []
+    signatures_parameters: _t.List[_t.Sequence[Parameter]] = []
     if len(args) <= len(positionals):
         signatures_parameters.append(positionals[:-len(args)]
                                      + non_positionals)
@@ -113,7 +109,7 @@ def _(signature: PlainSignature, args: Tuple[Domain, ...]) -> Signature:
 
 
 @_bind_positionals_to_applier.register(OverloadedSignature)
-def _(signature: OverloadedSignature, args: Tuple[Domain, ...]) -> Signature:
+def _(signature: OverloadedSignature, args: _t.Tuple[_T, ...]) -> Signature:
     sub_signatures = [_bind_positionals_to_applier(sub_signature, args)
                       for sub_signature in signature.signatures
                       if sub_signature.expects(*args)]

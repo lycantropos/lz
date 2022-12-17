@@ -1,28 +1,17 @@
-import functools
-import itertools
-from collections import (OrderedDict,
-                         abc,
-                         deque)
-from operator import is_not
-from typing import (Any,
-                    Callable,
-                    Hashable,
-                    Iterable,
-                    Iterator,
-                    MutableMapping,
-                    Sequence,
-                    Sized,
-                    Tuple,
-                    Type,
-                    cast)
+import collections as _collections
+import functools as _functools
+import itertools as _itertools
+import typing as _t
+from operator import is_not as _is_not
 
-from .functional import flatmap
-from .hints import (Domain,
-                    Range)
+from .functional import flatmap as _flatmap
+
+_T1 = _t.TypeVar('_T1')
+_T2 = _t.TypeVar('_T2')
 
 
-@functools.singledispatch
-def capacity(_value: Any) -> int:
+@_functools.singledispatch
+def capacity(_value: _t.Any) -> int:
     """
     Returns number of elements in value.
 
@@ -34,25 +23,25 @@ def capacity(_value: Any) -> int:
     raise TypeError(type(_value))
 
 
-@capacity.register(abc.Iterable)
-def _(iterable: Iterable[Any]) -> int:
-    counter = itertools.count()
+@capacity.register(_collections.abc.Iterable)
+def _(iterable: _t.Iterable[_t.Any]) -> int:
+    counter = _itertools.count()
     # order matters: if `counter` goes first,
     # then it will be incremented even for empty `iterable`
-    deque(zip(iterable, counter),
-          maxlen=0)
+    _collections.deque(zip(iterable, counter),
+                       maxlen=0)
     return next(counter)
 
 
-@capacity.register(abc.Collection)
-def _(iterable: Sized) -> int:
+@capacity.register(_collections.abc.Collection)
+def _(iterable: _t.Sized) -> int:
     """
     Returns number of elements in sized iterable.
     """
     return len(iterable)
 
 
-def first(iterable: Iterable[Domain]) -> Domain:
+def first(iterable: _t.Iterable[_T1]) -> _T1:
     """
     Returns first element of iterable.
 
@@ -65,7 +54,7 @@ def first(iterable: Iterable[Domain]) -> Domain:
         raise ValueError('Argument supposed to be non-empty.') from error
 
 
-def last(iterable: Iterable[Domain]) -> Domain:
+def last(iterable: _t.Iterable[_T1]) -> _T1:
     """
     Returns last element of iterable.
 
@@ -73,15 +62,15 @@ def last(iterable: Iterable[Domain]) -> Domain:
     9
     """
     try:
-        return deque(iterable,
-                     maxlen=1)[0]
+        return _collections.deque(iterable,
+                                  maxlen=1)[0]
     except IndexError as error:
         raise ValueError('Argument supposed to be non-empty.') from error
 
 
-def cut(iterable: Iterable[Domain],
+def cut(iterable: _t.Iterable[_T1],
         *,
-        slice_: slice) -> Iterable[Domain]:
+        slice_: slice) -> _t.Iterable[_T1]:
     """
     Selects elements from iterable based on given slice.
 
@@ -90,11 +79,11 @@ def cut(iterable: Iterable[Domain],
     which may be potentially infinite
     or change previous elements if iterating made backwards.
     """
-    yield from itertools.islice(iterable,
-                                slice_.start, slice_.stop, slice_.step)
+    yield from _itertools.islice(iterable,
+                                 slice_.start, slice_.stop, slice_.step)
 
 
-def cutter(slice_: slice) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
+def cutter(slice_: slice) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
     """
     Returns function that selects elements from iterable based on given slice.
 
@@ -110,8 +99,8 @@ def cutter(slice_: slice) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     >>> list(cut_out_every_third(range(10)))
     [0, 3, 6, 9]
     """
-    result = functools.partial(cut,
-                               slice_=slice_)
+    result = _functools.partial(cut,
+                                slice_=slice_)
     result.__doc__ = ('Selects elements from iterable {slice}.'
                       .format(slice=_slice_to_description(slice_)))
     return result
@@ -139,7 +128,7 @@ def _slice_to_description(slice_: slice) -> str:
 
 def chopper(
         size: int
-) -> Callable[[Iterable[Domain]], Iterable[Sequence[Domain]]]:
+) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_t.Sequence[_T1]]]:
     """
     Returns function that splits iterable into chunks of given size.
 
@@ -147,25 +136,25 @@ def chopper(
     >>> list(map(tuple, in_three(range(10))))
     [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9,)]
     """
-    return functools.partial(chop,
-                             size=size)
+    return _functools.partial(chop,
+                              size=size)
 
 
-@functools.singledispatch
-def chop(iterable: Iterable[Domain],
+@_functools.singledispatch
+def chop(iterable: _t.Iterable[_T1],
          *,
-         size: int) -> Iterable[Sequence[Domain]]:
+         size: int) -> _t.Iterable[_t.Sequence[_T1]]:
     """
     Splits iterable into chunks of given size.
     """
     iterator = iter(iterable)
-    yield from iter(lambda: tuple(itertools.islice(iterator, size)), ())
+    yield from iter(lambda: tuple(_itertools.islice(iterator, size)), ())
 
 
-@chop.register(abc.Sequence)
-def _(iterable: Sequence[Domain],
+@chop.register(_collections.abc.Sequence)
+def _(iterable: _t.Sequence[_T1],
       *,
-      size: int) -> Iterable[Sequence[Domain]]:
+      size: int) -> _t.Iterable[_t.Sequence[_T1]]:
     """
     Splits sequence into chunks of given size.
     """
@@ -176,33 +165,34 @@ def _(iterable: Sequence[Domain],
 
 
 # deque do not support slice notation
-chop.register(deque, chop.registry[object])
+chop.register(_collections.deque, chop.registry[object])
 
 in_two = chopper(2)
 in_three = chopper(3)
 in_four = chopper(4)
 
 
-def slide(iterable: Iterable[Domain],
+def slide(iterable: _t.Iterable[_T1],
           *,
-          size: int) -> Iterable[Tuple[Domain, ...]]:
+          size: int) -> _t.Iterable[_t.Tuple[_T1, ...]]:
     """
     Slides over iterable with window of given size.
     """
     iterator = iter(iterable)
-    initial = tuple(itertools.islice(iterator, size))
+    initial = tuple(_itertools.islice(iterator, size))
 
-    def shift(previous: Tuple[Domain, ...],
-              element: Domain) -> Tuple[Domain, ...]:
+    def shift(previous: _t.Tuple[_T1, ...],
+              element: _T1) -> _t.Tuple[_T1, ...]:
         return previous[1:] + (element,)
 
-    yield from itertools.accumulate(cast(Iterable[Domain],
-                                         itertools.chain([initial], iterator)),
-                                    shift)
+    yield from _itertools.accumulate(
+            _t.cast(_t.Iterable[_T1], _itertools.chain([initial], iterator)),
+            shift
+    )
 
 
-def slider(size: int) -> Callable[[Iterable[Domain]],
-                                  Iterable[Tuple[Domain, ...]]]:
+def slider(size: int) -> _t.Callable[[_t.Iterable[_T1]],
+                                     _t.Iterable[_t.Tuple[_T1, ...]]]:
     """
     Returns function that slides over iterable with window of given size.
 
@@ -210,8 +200,8 @@ def slider(size: int) -> Callable[[Iterable[Domain]],
     >>> list(pairwise(range(10)))
     [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9)]
     """
-    return functools.partial(slide,
-                             size=size)
+    return _functools.partial(slide,
+                              size=size)
 
 
 pairwise = slider(2)
@@ -219,7 +209,7 @@ triplewise = slider(3)
 quadruplewise = slider(4)
 
 
-def header(size: int) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
+def header(size: int) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
     """
     Returns function that selects elements from the beginning of iterable.
     Resulted iterable will have size not greater than given one.
@@ -231,22 +221,22 @@ def header(size: int) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     return cutter(slice(size))
 
 
-@functools.singledispatch
-def trail(iterable: Iterable[Domain],
+@_functools.singledispatch
+def trail(iterable: _t.Iterable[_T1],
           *,
-          size: int) -> Iterable[Domain]:
+          size: int) -> _t.Iterable[_T1]:
     """
     Selects elements from the end of iterable.
     Resulted iterable will have size not greater than given one.
     """
-    return deque(iterable,
-                 maxlen=size)
+    return _collections.deque(iterable,
+                              maxlen=size)
 
 
-@trail.register(abc.Sequence)
-def _(iterable: Sequence[Domain],
+@trail.register(_collections.abc.Sequence)
+def _(iterable: _t.Sequence[_T1],
       *,
-      size: int) -> Sequence[Domain]:
+      size: int) -> _t.Sequence[_T1]:
     """
     Selects elements from the end of sequence.
     Resulted sequence will have size not greater than given one.
@@ -255,10 +245,10 @@ def _(iterable: Sequence[Domain],
 
 
 # deque do not support slice notation
-trail.register(deque, trail.registry[object])
+trail.register(_collections.deque, trail.registry[object])
 
 
-def trailer(size: int) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
+def trailer(size: int) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
     """
     Returns function that selects elements from the end of iterable.
     Resulted iterable will have size not greater than given one.
@@ -267,12 +257,13 @@ def trailer(size: int) -> Callable[[Iterable[Domain]], Iterable[Domain]]:
     >>> list(to_last_pair(range(10)))
     [8, 9]
     """
-    return functools.partial(trail,
-                             size=size)
+    return _functools.partial(trail,
+                              size=size)
 
 
-def mapper(_map: Callable[[Domain], Range]) -> Callable[[Iterable[Domain]],
-                                                        Iterable[Range]]:
+def mapper(
+        _map: _t.Callable[[_T1], _T2]
+) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]]:
     """
     Returns function that applies given map to the each element of iterable.
 
@@ -280,12 +271,13 @@ def mapper(_map: Callable[[Domain], Range]) -> Callable[[Iterable[Domain]],
     >>> list(to_str(range(10)))
     ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     """
-    return cast(Callable[[Iterable[Domain]], Iterable[Range]],
-                functools.partial(map, _map))
+    return _t.cast(_t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]],
+                   _functools.partial(map, _map))
 
 
-def flatmapper(_map: Callable[[Domain], Iterable[Range]]
-               ) -> Callable[[Iterable[Domain]], Iterable[Range]]:
+def flatmapper(
+        _map: _t.Callable[[_T1], _t.Iterable[_T2]]
+) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]]:
     """
     Returns function that applies map to the each element of iterable
     and flattens results.
@@ -294,16 +286,16 @@ def flatmapper(_map: Callable[[Domain], Iterable[Range]]
     >>> list(relay(range(5)))
     [0, 0, 1, 0, 1, 2, 0, 1, 2, 3]
     """
-    return functools.partial(flatmap, _map)
+    return _functools.partial(_flatmap, _map)
 
 
-Group = Tuple[Hashable, Iterable[Domain]]
+Group = _t.Tuple[_t.Hashable, _t.Iterable[_T1]]
 
 
-def group_by(iterable: Iterable[Domain],
+def group_by(iterable: _t.Iterable[_T1],
              *,
-             key: Callable[[Domain], Hashable],
-             mapping_cls: Type[MutableMapping]) -> Iterable[Group]:
+             key: _t.Callable[[_T1], _t.Hashable],
+             mapping_cls: _t.Type[_t.MutableMapping]) -> _t.Iterable[Group]:
     """
     Groups iterable elements based on given key.
     """
@@ -314,10 +306,10 @@ def group_by(iterable: Iterable[Domain],
 
 
 def grouper(
-        key: Callable[[Domain], Hashable],
+        key: _t.Callable[[_T1], _t.Hashable],
         *,
-        mapping_cls: Type[MutableMapping] = OrderedDict
-) -> Callable[[Iterable[Domain]], Iterable[Group]]:
+        mapping_cls: _t.Type[_t.MutableMapping] = _collections.OrderedDict
+) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[Group]]:
     """
     Returns function that groups iterable elements based on given key.
 
@@ -331,12 +323,12 @@ def grouper(
     >>> list(group_by_evenness(range(10)))
     [(0, [0, 2, 4, 6, 8]), (1, [1, 3, 5, 7, 9])]
     """
-    return functools.partial(group_by,
-                             key=key,
-                             mapping_cls=mapping_cls)
+    return _functools.partial(group_by,
+                              key=key,
+                              mapping_cls=mapping_cls)
 
 
-def expand(object_: Domain) -> Iterable[Domain]:
+def expand(object_: _T1) -> _t.Iterable[_T1]:
     """
     Wraps object into iterable.
 
@@ -346,32 +338,32 @@ def expand(object_: Domain) -> Iterable[Domain]:
     yield object_
 
 
-def flatten(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
+def flatten(iterable: _t.Iterable[_t.Iterable[_T1]]) -> _t.Iterable[_T1]:
     """
     Returns plain iterable from iterable of iterables.
 
     >>> list(flatten([range(5), range(10, 20)]))
     [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     """
-    yield from itertools.chain.from_iterable(iterable)
+    yield from _itertools.chain.from_iterable(iterable)
 
 
-def interleave(iterable: Iterable[Iterable[Domain]]) -> Iterable[Domain]:
+def interleave(iterable: _t.Iterable[_t.Iterable[_T1]]) -> _t.Iterable[_T1]:
     """
     Interleaves elements from given iterable of iterables.
 
     >>> list(interleave([range(5), range(10, 20)]))
     [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 15, 16, 17, 18, 19]
     """
-    iterators = itertools.cycle(cast(Iterable[Iterator[Domain]],
-                                     map(iter, iterable)))
+    iterators = _itertools.cycle(_t.cast(_t.Iterable[_t.Iterator[_T1]],
+                                         map(iter, iterable)))
     while True:
         try:
             for iterator in iterators:
                 yield next(iterator)
         except StopIteration:
-            is_not_exhausted = functools.partial(is_not, iterator)
-            iterators = itertools.cycle(itertools.takewhile(is_not_exhausted,
-                                                            iterators))
+            is_not_exhausted = _functools.partial(_is_not, iterator)
+            iterators = _itertools.cycle(_itertools.takewhile(is_not_exhausted,
+                                                              iterators))
         else:
             return

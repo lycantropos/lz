@@ -1,30 +1,26 @@
 import functools
 from collections import (abc,
                          deque)
-from typing import (Any,
-                    Collection,
-                    Iterable,
-                    Iterator,
-                    overload)
+import typing as _t
 
-from .hints import Domain
+_T = _t.TypeVar('_T')
 
 
-@overload
+@_t.overload
 def transpose(
-        _value: Collection[Iterable[Domain]]
-) -> Iterable[Collection[Domain]]:
+        _value: _t.Collection[_t.Iterable[_T]]
+) -> _t.Iterable[_t.Collection[_T]]:
     pass
 
 
-@overload
+@_t.overload
 def transpose(
-        _value: Iterator[Collection[Domain]]
-) -> Collection[Iterable[Domain]]:
+        _value: _t.Iterator[_t.Collection[_T]]
+) -> _t.Collection[_t.Iterable[_T]]:
     pass
 
 
-def transpose(_value: Domain) -> Any:
+def transpose(_value: _T) -> _t.Any:
     """
     Transposes given object.
 
@@ -35,21 +31,22 @@ def transpose(_value: Domain) -> Any:
 
 
 @functools.singledispatch
-def _transpose(_value: Any) -> Any:
+def _transpose(_value: _t.Any) -> _t.Any:
     raise TypeError(type(_value))
 
 
 @_transpose.register(abc.Iterable)
-def _(_value: Iterable[Collection[Domain]]) -> Collection[Iterable[Domain]]:
+def _(
+        _value: _t.Iterable[_t.Collection[_T]]
+) -> _t.Collection[_t.Iterable[_T]]:
     iterator = iter(_value)
     try:
         first_elements = next(iterator)
     except StopIteration:
         return ()
-    queues = [deque([element])
-              for element in first_elements]
+    queues = [deque([element]) for element in first_elements]
 
-    def coordinate(queue: deque) -> Iterable[Domain]:
+    def coordinate(queue: deque) -> _t.Iterable[_T]:
         while True:
             if not queue:
                 try:
@@ -64,5 +61,7 @@ def _(_value: Iterable[Collection[Domain]]) -> Collection[Iterable[Domain]]:
 
 
 @_transpose.register(abc.Collection)
-def _(_value: Collection[Iterable[Domain]]) -> Iterable[Collection[Domain]]:
+def _(
+        _value: _t.Collection[_t.Iterable[_T]]
+) -> _t.Iterable[_t.Collection[_T]]:
     yield from zip(*_value)

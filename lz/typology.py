@@ -1,11 +1,8 @@
-from functools import partial
-from typing import (Any,
-                    Tuple)
-
-from .hints import Predicate
+from functools import partial as _partial
+import typing as _t
 
 
-def instance_of(*types: type) -> Predicate:
+def instance_of(*types: type) -> _t.Callable[[_t.Any], bool]:
     """
     Creates predicate that checks if object is instance of given types.
 
@@ -17,11 +14,16 @@ def instance_of(*types: type) -> Predicate:
     >>> is_any_string(1)
     False
     """
-    return partial(is_instance_of,
-                   types=types)
+    non_types = [candidate
+                 for candidate in types
+                 if not isinstance(candidate, type)]
+    if non_types:
+        raise TypeError(non_types)
+    return _partial(is_instance_of,
+                    types=types)
 
 
-def subclass_of(*types: type) -> Predicate:
+def subclass_of(*types: type) -> _t.Callable[[type], bool]:
     """
     Creates predicate that checks if type is subclass of given types.
 
@@ -31,13 +33,18 @@ def subclass_of(*types: type) -> Predicate:
     >>> is_metaclass(object)
     False
     """
-    return partial(is_subclass_of,
-                   types=types)
+    non_types = [candidate
+                 for candidate in types
+                 if not isinstance(candidate, type)]
+    if non_types:
+        raise TypeError(non_types)
+    return _partial(is_subclass_of,
+                    types=types)
 
 
-def is_instance_of(value: Any, types: Tuple[type, ...]) -> bool:
+def is_instance_of(value: _t.Any, types: _t.Tuple[type, ...]) -> bool:
     return isinstance(value, types)
 
 
-def is_subclass_of(value: type, types: Tuple[type, ...]) -> bool:
+def is_subclass_of(value: type, types: _t.Tuple[type, ...]) -> bool:
     return issubclass(value, types)

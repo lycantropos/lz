@@ -1,25 +1,25 @@
-import functools
-import inspect
-import itertools
-from types import MappingProxyType
-from typing import (Any,
-                    Callable,
-                    Iterable,
-                    TypeVar)
+import functools as _functools
+import inspect as _inspect
+import itertools as _itertools
+import types as _types
+import typing as _t
 
-from typing_extensions import ParamSpec
+import typing_extensions as _te
 
 from ._core.functional import (Cleavage,
                                Combination,
                                Composition,
                                Constant,
                                Curry)
-from ._core.signatures import to_signature
-from .hints import (Domain,
-                    Range)
+from ._core.signatures import to_signature as _to_signature
+
+_Params = _te.ParamSpec('_Params')
+_T3 = _t.TypeVar('_T3')
+_T1 = _t.TypeVar('_T1')
+_T2 = _t.TypeVar('_T2')
 
 
-def identity(argument: Domain) -> Domain:
+def identity(argument: _T1) -> _T1:
     """
     Returns object itself.
 
@@ -29,15 +29,11 @@ def identity(argument: Domain) -> Domain:
     return argument
 
 
-_Params = ParamSpec('_Params')
-_T1 = TypeVar('_T1')
-_T2 = TypeVar('_T2')
-_T3 = TypeVar('_T3')
-
-
-def compose(_last_function: Callable[[_T2], _T3],
-            _penult_function: Callable[..., _T2],
-            *_rest_functions: Callable[..., Any]) -> Callable[_Params, _T3]:
+def compose(
+        _last_function: _t.Callable[[_T2], _T3],
+        _penult_function: _t.Callable[..., _T2],
+        *_rest_functions: _t.Callable[..., _t.Any]
+) -> _t.Callable[_Params, _T3]:
     """
     Returns functions composition.
 
@@ -45,14 +41,16 @@ def compose(_last_function: Callable[[_T2], _T3],
     >>> sum_of_first_n_natural_numbers(10)
     45
     """
-    caller_frame_info = inspect.stack()[1]
+    caller_frame_info = _inspect.stack()[1]
     return Composition(_last_function, _penult_function, *_rest_functions,
                        file_path=caller_frame_info.filename,
                        line_number=caller_frame_info.lineno,
                        line_offset=0)
 
 
-def combine(*maps: Callable) -> Callable[[Iterable[Domain]], Iterable[Range]]:
+def combine(
+        *maps: _t.Callable[[_T1], _T2]
+) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]]:
     """
     Returns function that applies each map to corresponding argument.
 
@@ -63,7 +61,7 @@ def combine(*maps: Callable) -> Callable[[Iterable[Domain]], Iterable[Range]]:
     return Combination(*maps)
 
 
-def curry(function: Callable[..., Range]) -> Curry:
+def curry(function: _t.Callable[..., _T2]) -> Curry:
     """
     Returns curried version of given function.
 
@@ -72,12 +70,10 @@ def curry(function: Callable[..., Range]) -> Curry:
     >>> two_to_power(10)
     1024
     """
-    return Curry(function, to_signature(function))
+    return Curry(function, _to_signature(function))
 
 
-def pack(
-        function: Callable[_Params, Range]
-) -> Callable[[_T1, _T2], Range]:
+def pack(function: _t.Callable[_Params, _T2]) -> _t.Callable[[_T1, _T2], _T2]:
     """
     Returns function that works with single iterable parameter
     by unpacking elements to given function.
@@ -88,19 +84,19 @@ def pack(
     >>> packed_int(['10'], {'base': 2})
     2
     """
-    return functools.partial(apply, function)
+    return _functools.partial(apply, function)
 
 
-def apply(function: Callable[_Params, Range],
+def apply(function: _t.Callable[_Params, _T2],
           args: _Params.args,
-          kwargs: _Params.kwargs = MappingProxyType({})) -> Range:
+          kwargs: _Params.kwargs = _types.MappingProxyType({})) -> _T2:
     """
     Calls given function with given positional and keyword arguments.
     """
     return function(*args, **kwargs)
 
 
-def to_constant(object_: Domain) -> Callable[..., Domain]:
+def to_constant(object_: _T1) -> _t.Callable[..., _T1]:
     """
     Returns function that always returns given object.
 
@@ -115,7 +111,7 @@ def to_constant(object_: Domain) -> Callable[..., Domain]:
     return Constant(object_)
 
 
-def flip(function: Callable[..., Range]) -> Callable[..., Range]:
+def flip(function: _t.Callable[..., _T2]) -> _t.Callable[..., _T2]:
     """
     Returns function with positional arguments flipped.
 
@@ -123,19 +119,21 @@ def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     >>> flipped_power(2, 4)
     16
     """
-    return functools.partial(call_flipped, function)
+    return _functools.partial(call_flipped, function)
 
 
-def call_flipped(function: Callable[..., Range],
-                 *args: Domain,
-                 **kwargs: Domain) -> Range:
+def call_flipped(function: _t.Callable[..., _T2],
+                 *args: _T1,
+                 **kwargs: _T1) -> _T2:
     """
     Calls given function with positional arguments flipped.
     """
     return function(*args[::-1], **kwargs)
 
 
-def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
+def cleave(
+        *functions: _t.Callable[..., _T1]
+) -> _t.Callable[..., _t.Iterable[_T1]]:
     """
     Returns function that separately applies
     given functions to the same arguments.
@@ -149,8 +147,8 @@ def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
     return Cleavage(*functions)
 
 
-def flatmap(function: Callable[[Domain], Iterable[Range]],
-            *iterables: Iterable[Domain]) -> Iterable[Range]:
+def flatmap(function: _t.Callable[[_T1], _t.Iterable[_T2]],
+            *iterables: _t.Iterable[_T1]) -> _t.Iterable[_T2]:
     """
     Applies given function to the arguments aggregated from given iterables
     and concatenates results into plain iterable.
@@ -158,4 +156,4 @@ def flatmap(function: Callable[[Domain], Iterable[Range]],
     >>> list(flatmap(range, range(5)))
     [0, 0, 1, 0, 1, 2, 0, 1, 2, 3]
     """
-    yield from itertools.chain.from_iterable(map(function, *iterables))
+    yield from _itertools.chain.from_iterable(map(function, *iterables))

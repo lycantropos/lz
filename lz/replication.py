@@ -14,7 +14,6 @@ from typing import (Any,
                     Tuple,
                     TypeVar)
 
-from .hints import Domain
 
 _T = TypeVar('_T')
 
@@ -56,7 +55,7 @@ def _replicate_iterable(_value: Iterable[_T],
     queues: Sequence[Deque[_T]] = [deque()
                                    for _ in itertools.repeat(None, count)]
 
-    def replica(queue: deque) -> Iterable[Domain]:
+    def replica(queue: Deque[_T]) -> Iterable[_T]:
         while True:
             if not queue:
                 try:
@@ -129,7 +128,7 @@ def _(_value: Dict[_Key, _Value],
         yield dict(replica)
 
 
-def replicator(count: int) -> Callable[[Domain], Iterable[Domain]]:
+def replicator(count: int) -> Callable[[_T], Iterable[_T]]:
     """
     Returns function that replicates passed object.
 
