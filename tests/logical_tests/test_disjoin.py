@@ -1,13 +1,14 @@
+from typing import Callable
+
 from hypothesis import given
 
-from lz.hints import (Domain,
-                      Predicate)
+from lz.hints import Domain
 from lz.logical import disjoin
 from tests import strategies
 
 
 @given(strategies.predicates, strategies.predicates_arguments)
-def test_idempotency(predicate: Predicate,
+def test_idempotency(predicate: Callable[[Domain], bool],
                      predicate_argument: Domain) -> None:
     self_disjunction = disjoin(predicate)
 
@@ -16,11 +17,10 @@ def test_idempotency(predicate: Predicate,
     assert result is predicate(predicate_argument)
 
 
-@given(strategies.predicates,
-       strategies.true_predicates,
+@given(strategies.predicates, strategies.true_predicates,
        strategies.predicates_arguments)
-def test_absorbing_element(predicate: Predicate,
-                           true_predicate: Predicate,
+def test_absorbing_element(predicate: Callable[[Domain], bool],
+                           true_predicate: Callable[[Domain], bool],
                            predicate_argument: Domain) -> None:
     left_disjunction = disjoin(predicate, true_predicate)
     right_disjunction = disjoin(true_predicate, predicate)
@@ -31,11 +31,10 @@ def test_absorbing_element(predicate: Predicate,
     assert left_result is right_result is true_predicate(predicate_argument)
 
 
-@given(strategies.predicates,
-       strategies.false_predicates,
+@given(strategies.predicates, strategies.false_predicates,
        strategies.predicates_arguments)
-def test_neutral_element(predicate: Predicate,
-                         false_predicate: Predicate,
+def test_neutral_element(predicate: Callable[[Domain], bool],
+                         false_predicate: Callable[[Domain], bool],
                          predicate_argument: Domain) -> None:
     left_disjunction = disjoin(predicate, false_predicate)
     right_disjunction = disjoin(false_predicate, predicate)
@@ -46,11 +45,10 @@ def test_neutral_element(predicate: Predicate,
     assert left_result is right_result is predicate(predicate_argument)
 
 
-@given(strategies.predicates,
-       strategies.predicates,
+@given(strategies.predicates, strategies.predicates,
        strategies.predicates_arguments)
-def test_commutativity(left_predicate: Predicate,
-                       right_predicate: Predicate,
+def test_commutativity(left_predicate: Callable[[Domain], bool],
+                       right_predicate: Callable[[Domain], bool],
                        predicate_argument: Domain) -> None:
     left_disjunction = disjoin(left_predicate, right_predicate)
     right_disjunction = disjoin(right_predicate, left_predicate)
@@ -61,18 +59,16 @@ def test_commutativity(left_predicate: Predicate,
     assert left_result is right_result
 
 
-@given(strategies.predicates,
-       strategies.predicates,
-       strategies.predicates,
+@given(strategies.predicates, strategies.predicates, strategies.predicates,
        strategies.predicates_arguments)
-def test_associativity(left_predicate: Predicate,
-                       mid_predicate: Predicate,
-                       right_predicate: Predicate,
+def test_associativity(left_predicate: Callable[[Domain], bool],
+                       mid_predicate: Callable[[Domain], bool],
+                       right_predicate: Callable[[Domain], bool],
                        predicate_argument: Domain) -> None:
-    left_disjunction = disjoin(left_predicate, right_predicate)
-    right_disjunction = disjoin(right_predicate, left_predicate)
+    first_disjunction = disjoin(disjoin(left_predicate, mid_predicate),
+                                right_predicate)
+    second_disjunction = disjoin(left_predicate, disjoin(mid_predicate,
+                                                         right_predicate))
 
-    left_result = left_disjunction(predicate_argument)
-    right_result = right_disjunction(predicate_argument)
-
-    assert left_result is right_result
+    assert (first_disjunction(predicate_argument)
+            is second_disjunction(predicate_argument))
