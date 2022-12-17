@@ -23,6 +23,7 @@ _KwArg = t.TypeVar('_KwArg')
 MIN_COMPOSABLE_FUNCTIONS_COUNT = 2
 
 
+@final
 class Composition(t.Generic[_Arg, _KwArg, Range]):
     _file_path: str
     _function: t.Optional[t.Callable[..., t.Any]]
@@ -95,6 +96,7 @@ class Composition(t.Generic[_Arg, _KwArg, Range]):
                              field_seeker=seekers.complex_)
 
 
+@final
 class Combination(t.Generic[_Arg]):
     def __init__(self, *maps: t.Callable[[_Arg], Range]) -> None:
         self.maps = maps
@@ -176,6 +178,7 @@ class Curry(ApplierBase):
                              field_seeker=seekers.complex_)
 
 
+@final
 class Constant(t.Generic[Domain]):
     def __init__(self, object_: Domain) -> None:
         self.object_ = object_
@@ -189,6 +192,7 @@ class Constant(t.Generic[Domain]):
 _Params = ParamSpec('_Params')
 
 
+@final
 class Cleavage(t.Generic[Range]):
     def __init__(self, *functions: t.Callable[_Params, Range]) -> None:
         self.functions = functions

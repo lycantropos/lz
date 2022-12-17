@@ -1,6 +1,8 @@
 from typing import (Callable,
                     TypeVar)
 
+from typing_extensions import final
+
 from lz._core.functional import ApplierBase
 from lz._core.signatures import (Signature,
                                  to_signature)
@@ -10,6 +12,7 @@ _Arg = TypeVar('_Arg')
 _KwArg = TypeVar('_KwArg')
 
 
+@final
 class Applier(ApplierBase[_Arg, _KwArg, Range]):
     def __init__(self,
                  function: Callable[..., Range],
