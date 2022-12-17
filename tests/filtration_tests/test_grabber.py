@@ -1,13 +1,13 @@
-from typing import Iterable
+from typing import (Callable,
+                    Iterable)
 
 import pytest
 from hypothesis import given
 
 from lz.filtration import grabber
-from lz.hints import (Domain,
-                      Predicate)
 from lz.replication import duplicate
 from tests import strategies
+from tests.hints import Domain
 from tests.utils import (are_iterables_similar,
                          are_objects_similar,
                          is_empty)
@@ -32,7 +32,7 @@ def test_basic(iterable: Iterable[Domain]) -> None:
 
 @given(strategies.iterables, strategies.false_predicates)
 def test_false_predicate(iterable: Iterable[Domain],
-                         false_predicate: Predicate) -> None:
+                         false_predicate: Callable[[Domain], bool]) -> None:
     skip_all = grabber(false_predicate)
 
     result = skip_all(iterable)
@@ -42,7 +42,7 @@ def test_false_predicate(iterable: Iterable[Domain],
 
 @given(strategies.iterables, strategies.true_predicates)
 def test_true_predicate(iterable: Iterable[Domain],
-                        true_predicate: Predicate) -> None:
+                        true_predicate: Callable[[Domain], bool]) -> None:
     original, target = duplicate(iterable)
     grab_all = grabber(true_predicate)
 

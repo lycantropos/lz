@@ -1,11 +1,12 @@
 from typing import (Any,
+                    Callable,
                     Iterable)
 
 from hypothesis import given
 
 from lz.filtration import sifter
-from lz.hints import Predicate
 from tests import strategies
+from tests.hints import Domain
 
 
 @given(strategies.iterables)
@@ -18,8 +19,8 @@ def test_default_predicate(iterable: Iterable[Any]) -> None:
 
 
 @given(strategies.iterables, strategies.predicates)
-def test_custom_predicate(iterable: Iterable[Any],
-                          predicate: Predicate) -> None:
+def test_custom_predicate(iterable: Iterable[Domain],
+                          predicate: Callable[[Domain], bool]) -> None:
     sift = sifter(predicate)
 
     result = sift(iterable)

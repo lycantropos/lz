@@ -6,9 +6,9 @@ from hypothesis import given
 from lz.functional import (compose,
                            curry,
                            identity)
-from lz.hints import (Domain,
-                      Range)
-from tests.hints import CompositionCall
+from tests.hints import (CompositionCall,
+                         Domain,
+                         Range)
 from . import strategies
 
 

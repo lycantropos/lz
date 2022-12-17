@@ -22,9 +22,9 @@ from typing import (Any,
 
 import pytest
 
-from lz.hints import (Domain,
-                      Range)
 from lz.replication import duplicate
+from tests.hints import (Domain,
+                         Range)
 
 try:
     from typing import ContextManager

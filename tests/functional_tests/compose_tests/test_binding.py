@@ -5,8 +5,8 @@ from typing import (Tuple,
 from hypothesis import given
 
 from lz.functional import compose
-from lz.hints import Domain
-from tests.hints import CompositionCall
+from tests.hints import (CompositionCall,
+                         Domain)
 from . import strategies
 
 

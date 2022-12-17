@@ -2,8 +2,8 @@ from functools import partial
 from typing import (Collection,
                     Iterable)
 
-from lz.hints import Domain
-from tests.hints import Strategy
+from tests.hints import (Domain,
+                         Strategy)
 from tests.strategies import (empty,
                               non_negative_indices,
                               positive_indices,

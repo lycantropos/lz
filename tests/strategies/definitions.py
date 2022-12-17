@@ -14,7 +14,7 @@ from paradigm._core.catalog import path_to_string
 from paradigm._core.discovery import supported_stdlib_modules_paths
 from paradigm.base import signature_from_callable
 
-from lz.hints import Domain
+from tests.hints import Domain
 from tests.utils import flatmap
 
 stdlib_modules_names_list = [path_to_string(module_path)

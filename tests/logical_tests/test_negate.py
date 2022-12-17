@@ -5,9 +5,9 @@ from typing import (Any,
 
 from hypothesis import given
 
-from lz.hints import Domain
 from lz.logical import negate
 from tests import strategies
+from tests.hints import Domain
 
 
 @given(strategies.false_predicates, strategies.true_predicates,

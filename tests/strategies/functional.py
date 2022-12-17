@@ -35,15 +35,15 @@ from lz._core.signatures import (Parameter,
                                  plain_signature_to_parameters_by_kind)
 from lz.functional import (identity,
                            to_constant)
-from lz.hints import (Domain,
-                      Range)
 from lz.logical import negate
 from lz.typology import instance_of
 from tests.hints import (Args,
+                         Domain,
                          Function,
                          FunctionCall,
                          Kwargs,
                          PartitionedFunctionCall,
+                         Range,
                          Strategy)
 from .literals import empty
 from .literals.base import (byte_sequences,

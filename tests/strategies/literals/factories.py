@@ -18,10 +18,10 @@ from typing import (AnyStr,
 
 from hypothesis import strategies
 
-from lz.hints import Domain
 from lz.textual import code_units_sizes
 from tests.configs import MAX_ITERABLES_SIZE
 from tests.hints import (ByteSequence,
+                         Domain,
                          Strategy)
 from tests.utils import encoding_to_bom
 

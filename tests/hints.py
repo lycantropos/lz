@@ -11,9 +11,8 @@ from typing import (AnyStr,
 
 from hypothesis.strategies import SearchStrategy
 
-from lz.hints import (Domain,
-                      Range)
-
+Domain = TypeVar('Domain')
+Range = TypeVar('Range')
 ByteStreamWithBatchParameters = Tuple[BinaryIO, bytes, Tuple[int, int]]
 StreamWithReverseParameters = Tuple[IO, AnyStr, Tuple[int, AnyStr, bool]]
 Intermediate = TypeVar('Intermediate')

@@ -3,12 +3,12 @@ from typing import (Callable,
 
 from hypothesis import given
 
-from lz.hints import (Domain,
-                      Range)
 from lz.iterating import (first,
                           last,
                           mapper)
 from lz.replication import duplicate
+from tests.hints import (Domain,
+                         Range)
 from tests.utils import is_empty
 from . import strategies
 

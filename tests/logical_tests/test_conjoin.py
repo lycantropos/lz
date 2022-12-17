@@ -2,9 +2,9 @@ from typing import Callable
 
 from hypothesis import given
 
-from lz.hints import Domain
 from lz.logical import conjoin
 from tests import strategies
+from tests.hints import Domain
 
 
 @given(strategies.predicates, strategies.predicates_arguments)

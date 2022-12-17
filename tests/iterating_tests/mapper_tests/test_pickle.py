@@ -3,10 +3,10 @@ from typing import (Callable,
 
 from hypothesis import given
 
-from lz.hints import (Domain,
-                      Range)
 from lz.iterating import mapper
 from lz.replication import duplicate
+from tests.hints import (Domain,
+                         Range)
 from tests.utils import (are_iterables_similar,
                          round_trip_pickle)
 from . import strategies

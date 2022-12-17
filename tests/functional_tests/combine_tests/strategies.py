@@ -3,9 +3,9 @@ from typing import (Callable,
 
 from hypothesis import strategies
 
-from lz.hints import (Domain,
-                      Range)
 from tests.hints import (CombinationCall,
+                         Domain,
+                         Range,
                          Strategy)
 from tests.strategies import (maps,
                               maps_arguments,
