@@ -14,8 +14,7 @@ from ._core.functional import (Cleavage,
                                Composition,
                                Constant,
                                Curry)
-from ._core.signatures import (Signature,
-                               to_signature)
+from ._core.signatures import to_signature
 from .hints import (Domain,
                     Range)
 
@@ -53,11 +52,6 @@ def compose(_last_function: Callable[[_T2], _T3],
                        line_offset=0)
 
 
-@to_signature.register(Composition)
-def _(object_: Composition) -> Signature:
-    return to_signature(object_.functions[-1])
-
-
 def combine(*maps: Callable) -> Callable[[Iterable[Domain]], Iterable[Range]]:
     """
     Returns function that applies each map to corresponding argument.
@@ -67,16 +61,6 @@ def combine(*maps: Callable) -> Callable[[Iterable[Domain]], Iterable[Range]]:
     [b'hello', 'world']
     """
     return Combination(*maps)
-
-
-@to_signature.register(Combination)
-def _(object_: Combination) -> Signature:
-    return to_signature(object_.__call__)
-
-
-@to_signature.register(Curry)
-def _(object_: Curry) -> Signature:
-    return object_.signature
 
 
 def curry(function: Callable[..., Range]) -> Curry:
@@ -131,11 +115,6 @@ def to_constant(object_: Domain) -> Callable[..., Domain]:
     return Constant(object_)
 
 
-@to_signature.register(Constant)
-def _(object_: Constant) -> Signature:
-    return to_signature(object_.__call__)
-
-
 def flip(function: Callable[..., Range]) -> Callable[..., Range]:
     """
     Returns function with positional arguments flipped.
@@ -168,11 +147,6 @@ def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
     [None, None]
     """
     return Cleavage(*functions)
-
-
-@to_signature.register(Cleavage)
-def _(object_: Cleavage) -> Signature:
-    return to_signature(object_.functions[0])
 
 
 def flatmap(function: Callable[[Domain], Iterable[Range]],

@@ -277,3 +277,28 @@ def _compose(*functions: t.Callable[..., t.Any],
     namespace = dict(zip(functions_names, functions))
     exec(code, namespace)
     return namespace[function_name]
+
+
+@to_signature.register(Cleavage)
+def _(object_: Cleavage) -> Signature:
+    return to_signature(object_.functions[0])
+
+
+@to_signature.register(Combination)
+def _(object_: Combination) -> Signature:
+    return to_signature(object_.__call__)
+
+
+@to_signature.register(Composition)
+def _(object_: Composition) -> Signature:
+    return to_signature(object_.functions[-1])
+
+
+@to_signature.register(Constant)
+def _(object_: Constant) -> Signature:
+    return to_signature(object_.__call__)
+
+
+@to_signature.register(Curry)
+def _(object_: Curry) -> Signature:
+    return object_._signature
