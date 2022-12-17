@@ -51,12 +51,6 @@ right module
 .. automodule:: lz.right
     :members:
 
-sorting module
-~~~~~~~~~~~~~~
-
-.. automodule:: lz.sorting
-    :members:
-
 transposition module
 ~~~~~~~~~~~~~~~~~~~~
 
