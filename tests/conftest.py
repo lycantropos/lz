@@ -1,12 +1,8 @@
 import io
 import os
-from collections import abc
 from datetime import timedelta
 from functools import partial
-from typing import (Any,
-                    Dict,
-                    Hashable,
-                    Iterable,
+from typing import (Iterable,
                     TextIO)
 
 import pytest
@@ -58,15 +54,3 @@ def patch_replication() -> None:
                                  count=count))
 
     replicate.register(io.TextIOWrapper, replicate_text_stream)
-    replicate_iterable = replicate.dispatch(abc.Iterable)
-
-    def replicate_sized(object_: Any,
-                        *,
-                        count: int) -> Iterable[Any]:
-        yield from map(type(object_), replicate_iterable(object_,
-                                                         count=count))
-
-    replicate.register(bytearray, replicate_sized)
-    replicate.register(frozenset, replicate_sized)
-    replicate.register(list, replicate_sized)
-    replicate.register(set, replicate_sized)
