@@ -61,6 +61,10 @@ jobs:
         run: python -m pip install -U pip setuptools
       - name: 'Install in editable mode'
         run: python -m pip -v install -e .
+      - name: 'Install type checker'
+        run: python -m pip install -U mypy
+      - name: 'Run type checker'
+        run: python -m mypy ${{ github.event.repository.name }}
       - name: 'Install coverage dependencies'
         run: python -m pip install -U coverage
       - name: 'Install tests dependencies'
