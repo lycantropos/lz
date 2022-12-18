@@ -25,7 +25,6 @@ left module
 
 .. automodule:: lz.left
     :members:
-    :exclude-members: accumulate, fold
 
 logical module
 ~~~~~~~~~~~~~~
