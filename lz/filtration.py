@@ -113,7 +113,7 @@ def grabber(
     []
 
     >>> from operator import gt
-    >>> from _functools import partial
+    >>> from functools import partial
     >>> grab_while_less_than_five = grabber(partial(gt, 5))
     >>> list(grab_while_less_than_five(range(10)))
     [0, 1, 2, 3, 4]
@@ -136,7 +136,7 @@ def kicker(
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     >>> from operator import gt
-    >>> from _functools import partial
+    >>> from functools import partial
     >>> kick_while_less_than_five = kicker(partial(gt, 5))
     >>> list(kick_while_less_than_five(range(10)))
     [5, 6, 7, 8, 9]
