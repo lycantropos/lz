@@ -19,7 +19,7 @@ def instance_of(*types: type) -> _t.Callable[[_t.Any], bool]:
                  if not isinstance(candidate, type)]
     if non_types:
         raise TypeError(non_types)
-    return _partial(is_instance_of,
+    return _partial(_is_instance_of,
                     types=types)
 
 
@@ -38,13 +38,13 @@ def subclass_of(*types: type) -> _t.Callable[[type], bool]:
                  if not isinstance(candidate, type)]
     if non_types:
         raise TypeError(non_types)
-    return _partial(is_subclass_of,
+    return _partial(_is_subclass_of,
                     types=types)
 
 
-def is_instance_of(value: _t.Any, types: _t.Tuple[type, ...]) -> bool:
+def _is_instance_of(value: _t.Any, types: _t.Tuple[type, ...]) -> bool:
     return isinstance(value, types)
 
 
-def is_subclass_of(value: type, types: _t.Tuple[type, ...]) -> bool:
+def _is_subclass_of(value: type, types: _t.Tuple[type, ...]) -> bool:
     return issubclass(value, types)

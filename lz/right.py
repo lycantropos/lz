@@ -14,7 +14,7 @@ _T2 = _t.TypeVar('_T2')
 
 
 def accumulator(
-        function: _t.Callable[[_T1, _T2], _T2], initial: _T2
+        _function: _t.Callable[[_T1, _T2], _T2], _initial: _T2
 ) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_t.Iterable[_T2]]]:
     """
     Returns function that yields cumulative results of given binary function
@@ -31,8 +31,26 @@ def accumulator(
     """
     return _t.cast(_t.Callable[[_t.Iterable[_T1]],
                                _t.Iterable[_t.Iterable[_T2]]],
-                   _compose(_left.accumulator(_flip(function), initial),
+                   _compose(_left.accumulator(_flip(_function), _initial),
                             _reverse))
+
+
+def accumulate(_function: _t.Callable[[_T1, _T2], _T2],
+               _initial: _T2,
+               _iterable: _t.Iterable[_T1]) -> _t.Iterable[_T2]:
+    """
+    Yields cumulative results of given binary function
+    starting from given initial object in direction from right to left.
+
+    >>> def to_next_fraction(partial_denominator: int,
+    ...                      reciprocal: float) -> float:
+    ...     return partial_denominator + 1 / reciprocal
+    >>> from itertools import repeat
+    >>> [round(fraction, 4)
+    ...  for fraction in accumulate(to_next_fraction, 1, list(repeat(1, 10)))]
+    [1, 2.0, 1.5, 1.6667, 1.6, 1.625, 1.6154, 1.619, 1.6176, 1.6182, 1.618]
+    """
+    return _left.accumulate(_flip(_function), _initial, _reverse(_iterable))
 
 
 def attacher(_value: _T1) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
@@ -83,6 +101,19 @@ def folder(_function: _t.Callable[[_T1, _T2], _T2],
     """
     left_folder = _left.folder(_flip(_function), _initial)
     return _compose(left_folder, _reverse)
+
+
+def fold(_function: _t.Callable[[_T2, _T1], _T2],
+         _initial: _T2,
+         _iterable: _t.Iterable[_T1]) -> _T2:
+    """
+    Cumulatively applies given binary function
+    starting from given initial object in direction from left to right.
+
+    >>> fold('({} + {})'.format, 0, range(1, 10))
+    '(1 + (2 + (3 + (4 + (5 + (6 + (7 + (8 + (9 + 0)))))))))'
+    """
+    return _functools.reduce(_flip(_function), _reverse(_iterable), _initial)
 
 
 def applier(_function: _t.Callable[..., _T2],
