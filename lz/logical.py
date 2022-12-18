@@ -70,7 +70,6 @@ def negate(
     """
     Returns negated version of given predicate.
 
-    >>> from lz.logical import negate
     >>> false_like = negate(bool)
     >>> false_like([])
     True
