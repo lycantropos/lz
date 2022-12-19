@@ -94,14 +94,49 @@ class Composition(_t.Generic[_Arg, _KwArg, _Result]):
 
 @final
 class Combination(_t.Generic[_Arg, _Result]):
-    def __init__(self, *maps: _t.Callable[[_Arg], _Result]) -> None:
-        self.maps = maps
+    _file_path: str
+    _function: _t.Callable[..., _t.Tuple[_Result, ...]]
+    _line_number: int
+    _line_offset: int
+    _maps: _t.Tuple[_t.Callable[[_Arg], _Result], ...]
 
-    def __call__(self, arguments: _t.Iterable[_Arg]) -> _t.Tuple[_Result, ...]:
-        return tuple(map_(argument)
-                     for map_, argument in zip(self.maps, arguments))
+    __slots__ = ('_file_path', '_function', '_line_number', '_line_offset',
+                 '_maps')
 
-    __repr__ = generate_repr(__init__)
+    def __new__(cls,
+                *_maps: _t.Callable[[_Arg], _Result],
+                file_path: str = __file__,
+                line_number: int = 0,
+                line_offset: int = 0) -> 'Combination[_Arg, _Result]':
+        self = super().__new__(cls)
+        self._maps = _maps
+        self._file_path = file_path
+        self._line_number = line_number
+        self._line_offset = line_offset
+        self._function = _combine(*_maps,
+                                  function_name='combination',
+                                  file_path=file_path,
+                                  line_number=line_number,
+                                  line_offset=line_offset)
+        return self
+
+    def __call__(self, *args: _Arg) -> _t.Tuple[_Result, ...]:
+        return self._function(*args)
+
+    def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
+                                            _t.Dict[str, _t.Any]]:
+        return self._maps, {'file_path': self._file_path,
+                            'line_number': self._line_number,
+                            'line_offset': self._line_offset}
+
+    def __getstate__(self) -> None:
+        return None
+
+    def __setstate__(self, _state: None) -> None:
+        pass
+
+    __repr__ = generate_repr(__new__,
+                             field_seeker=seekers.complex_)
 
 
 class ApplierBase(ABC, _t.Generic[_Arg, _KwArg, _Result]):
@@ -199,7 +234,7 @@ class Cleavage(_t.Generic[_Result]):
         return tuple(function(*args, **kwargs) for function in self.functions)
 
 
-def _compose(*functions: _t.Callable[..., _t.Any],
+def _combine(*maps: _t.Callable[[_T], _Result],
              function_name: str,
              arguments_factory: _t.Callable[..., ast.arguments] =
              ast.arguments
@@ -207,24 +242,60 @@ def _compose(*functions: _t.Callable[..., _t.Any],
              # Python3.8 adds positional-only arguments
              else _t.cast(_t.Callable[..., ast.arguments],
                           functools.partial(ast.arguments, [])),
-             module_factory: _t.Callable[..., ast.Module] =
-             ast.Module
-             if sys.version_info < (3, 8)
-             # Python3.8 adds `type_ignores` parameter
-             else _t.cast(_t.Callable[..., ast.Module],
-                          functools.partial(ast.Module,
-                                            type_ignores=[])),
              file_path: str,
              line_number: int,
-             line_offset: int) -> _t.Callable[..., _Result]:
-    def function_to_unique_name(function: _t.Callable[..., _t.Any]) -> str:
-        # we are not using `__name__`/`__qualname__` attributes
-        # due to their potential non-uniqueness
-        return '_' + str(id(function)).replace('-', '_')
+             line_offset: int) -> _t.Callable[..., _t.Tuple[_Result, ...]]:
+    maps_names = [_function_to_unique_name(map_) for map_ in maps]
+    args_names = [f'_arg{index}' for index in range(len(maps))]
+    function_definition_node = ast.FunctionDef(
+            function_name,
+            arguments_factory([ast.arg(arg_name, None,
+                                       lineno=line_number,
+                                       col_offset=line_offset)
+                               for arg_name in args_names],
+                              None, [], [], None, []),
+            [ast.Return(ast.Tuple([ast.Call(ast.Name(map_name, ast.Load(),
+                                                     lineno=line_number,
+                                                     col_offset=line_offset),
+                                            [ast.Name(arg_name, ast.Load(),
+                                                      lineno=line_number,
+                                                      col_offset=line_offset)],
+                                            [],
+                                            lineno=line_number,
+                                            col_offset=line_offset)
+                                   for map_name, arg_name in zip(maps_names,
+                                                                 args_names)],
+                                  ast.Load(),
+                                  lineno=line_number,
+                                  col_offset=line_offset),
+                        lineno=line_number,
+                        col_offset=line_offset)],
+            [], None,
+            lineno=line_number,
+            col_offset=line_offset
+    )
+    return _compile_function(function_definition_node,
+                             file_path=file_path,
+                             namespace=dict(zip(maps_names, maps)))
 
-    functions_names = list(map(function_to_unique_name, functions))
-    variadic_positionals_name = 'args'
-    variadic_keywords_name = 'kwargs'
+
+def _compose(
+        *functions: _t.Callable[..., _t.Any],
+        function_name: str,
+        file_path: str,
+        line_number: int,
+        line_offset: int,
+        arguments_factory: _t.Callable[..., ast.arguments] =
+        ast.arguments
+        if sys.version_info < (3, 8)
+        # Python3.8 adds positional-only arguments
+        else _t.cast(_t.Callable[..., ast.arguments],
+                     functools.partial(ast.arguments, [])),
+        variadic_positionals_name: str = 'args',
+        variadic_keywords_name: str = 'kwargs'
+) -> _t.Callable[..., _Result]:
+    functions_names = [_function_to_unique_name(function)
+                       for function in functions]
 
     def to_next_call_node(node: ast.Call, name: str) -> ast.Call:
         return ast.Call(to_name_node(name), [node], [],
@@ -276,11 +347,34 @@ def _compose(*functions: _t.Callable[..., _t.Any],
             lineno=line_number,
             col_offset=line_offset
     )
+    return _compile_function(function_definition_node,
+                             file_path=file_path,
+                             namespace=dict(zip(functions_names, functions)))
+
+
+def _compile_function(
+        function_definition_node: ast.FunctionDef,
+        *,
+        file_path: str,
+        namespace: _t.Dict[str, _t.Any],
+        module_factory: _t.Callable[..., ast.Module] =
+        ast.Module
+        if sys.version_info < (3, 8)
+        # Python3.8 adds `type_ignores` parameter
+        else _t.cast(_t.Callable[..., ast.Module],
+                     functools.partial(ast.Module,
+                                       type_ignores=[]))
+) -> _t.Callable[..., _t.Any]:
     tree = module_factory([function_definition_node])
     code = compile(tree, file_path, 'exec')
-    namespace = dict(zip(functions_names, functions))
     exec(code, namespace)
-    return namespace[function_name]
+    return namespace[function_definition_node.name]
+
+
+def _function_to_unique_name(function: _t.Callable[..., _t.Any]) -> str:
+    # we are not using `__name__`/`__qualname__` attributes
+    # due to their potential non-uniqueness
+    return '_' + str(id(function)).replace('-', '_')
 
 
 @to_signature.register(Cleavage)
@@ -290,7 +384,7 @@ def _(_value: Cleavage) -> Signature:
 
 @to_signature.register(Combination)
 def _(_value: Combination) -> Signature:
-    return to_signature(_value.__call__)
+    return to_signature(_value._function)
 
 
 @to_signature.register(Composition)

@@ -25,6 +25,23 @@ def identity(_value: _T1) -> _T1:
     return _value
 
 
+def combine(
+        *maps: _t.Callable[[_T1], _T2]
+) -> _t.Callable[..., _t.Tuple[_T2, ...]]:
+    """
+    Returns function that applies each map to corresponding argument.
+
+    >>> encoder_decoder = combine(str.encode, bytes.decode)
+    >>> encoder_decoder('hello', b'world')
+    (b'hello', 'world')
+    """
+    caller_frame_info = _inspect.stack()[1]
+    return _functional.Combination(*maps,
+                                   file_path=caller_frame_info.filename,
+                                   line_number=caller_frame_info.lineno,
+                                   line_offset=0)
+
+
 def compose(
         _last_function: _t.Callable[[_T2], _T3],
         _penult_function: _t.Callable[..., _T2],
@@ -43,19 +60,6 @@ def compose(
                                    file_path=caller_frame_info.filename,
                                    line_number=caller_frame_info.lineno,
                                    line_offset=0)
-
-
-def combine(
-        *maps: _t.Callable[[_T1], _T2]
-) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]]:
-    """
-    Returns function that applies each map to corresponding argument.
-
-    >>> encoder_decoder = combine(str.encode, bytes.decode)
-    >>> list(encoder_decoder(['hello', b'world']))
-    [b'hello', 'world']
-    """
-    return _functional.Combination(*maps)
 
 
 def curry(_function: _t.Callable[..., _T2]) -> _functional.Curry:
