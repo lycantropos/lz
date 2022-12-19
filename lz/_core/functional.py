@@ -7,6 +7,8 @@ from abc import (ABC,
                  abstractmethod)
 from types import MethodType
 
+from paradigm.base import (OverloadedSignature,
+                           PlainSignature)
 from reprit import seekers
 from reprit.base import generate_repr
 from typing_extensions import (ParamSpec,
@@ -293,7 +295,32 @@ def _(_value: Combination) -> Signature:
 
 @to_signature.register(Composition)
 def _(_value: Composition) -> Signature:
-    return to_signature(_value._functions[-1])
+    last_signature = to_signature(_value._functions[0])
+    if isinstance(last_signature, OverloadedSignature):
+        returns = _t.Union[tuple(signature.returns
+                                 for signature in last_signature.signatures
+                                 if signature.expects(None))]
+    else:
+        assert isinstance(last_signature, PlainSignature)
+        returns = last_signature.returns
+    return _replace_returns(to_signature(_value._functions[-1]), returns)
+
+
+@functools.singledispatch
+def _replace_returns(signature: Signature, returns: _t.Any) -> Signature:
+    raise TypeError(type(signature))
+
+
+@_replace_returns.register(OverloadedSignature)
+def _(signature: OverloadedSignature, returns: _t.Any) -> Signature:
+    return OverloadedSignature(*[_replace_returns(sub_signature, returns)
+                                 for sub_signature in signature.signatures])
+
+
+@_replace_returns.register(PlainSignature)
+def _(signature: PlainSignature, returns: _t.Any) -> Signature:
+    return PlainSignature(*signature.parameters,
+                          returns=returns)
 
 
 @to_signature.register(Constant)
