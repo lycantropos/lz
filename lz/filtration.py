@@ -8,8 +8,24 @@ from .replication import duplicate as _duplicate
 _T = _t.TypeVar('_T')
 
 
+def sift(_predicate: _t.Callable[[_T], bool],
+         _value: _t.Iterable[_T]) -> _t.Iterable[_T]:
+    """
+    Selects elements from iterable which satisfy given predicate.
+
+    >>> list(sift(bool, range(10)))
+    [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    >>> def is_even(number: int) -> bool:
+    ...     return number % 2 == 0
+    >>> list(sift(is_even, range(10)))
+    [0, 2, 4, 6, 8]
+    """
+    return filter(_predicate, _value)
+
+
 def sifter(
-        predicate: _t.Callable[[_T], bool]
+        _predicate: _t.Callable[[_T], bool]
 ) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from iterable
@@ -25,12 +41,27 @@ def sifter(
     >>> list(to_even(range(10)))
     [0, 2, 4, 6, 8]
     """
-    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]],
-                   _functools.partial(filter, predicate))
+    return _functools.partial(sift, _predicate)
+
+
+def scavenge(_predicate: _t.Callable[[_T], bool],
+             _value: _t.Iterable[_T]) -> _t.Iterable[_T]:
+    """
+    Selects elements from iterable which dissatisfy given predicate.
+
+    >>> list(scavenge(bool, range(10)))
+    [0]
+
+    >>> def is_even(number: int) -> bool:
+    ...     return number % 2 == 0
+    >>> list(scavenge(is_even, range(10)))
+    [1, 3, 5, 7, 9]
+    """
+    return _itertools.filterfalse(_predicate, _value)
 
 
 def scavenger(
-        predicate: _t.Callable[[_T], bool]
+        _predicate: _t.Callable[[_T], bool]
 ) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from iterable
@@ -46,30 +77,7 @@ def scavenger(
     >>> list(to_odd(range(10)))
     [1, 3, 5, 7, 9]
     """
-    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]],
-                   _functools.partial(_itertools.filterfalse, predicate))
-
-
-def separator(
-        predicate: _t.Callable[[_T], bool]
-) -> _t.Callable[[_t.Iterable[_T]],
-                 _t.Tuple[_t.Iterable[_T], _t.Iterable[_T]]]:
-    """
-    Returns function that returns pair of iterables
-    first of which consists of elements that dissatisfy given predicate
-    and second one consists of elements that satisfy given predicate.
-
-    >>> split_by_truth = separator(bool)
-    >>> tuple(map(list, split_by_truth(range(10))))
-    ([0], [1, 2, 3, 4, 5, 6, 7, 8, 9])
-
-    >>> def is_even(number: int) -> bool:
-    ...     return number % 2 == 0
-    >>> split_by_evenness = separator(is_even)
-    >>> tuple(map(list, split_by_evenness(range(10))))
-    ([1, 3, 5, 7, 9], [0, 2, 4, 6, 8])
-    """
-    return _functools.partial(separate, predicate)
+    return _functools.partial(scavenge, _predicate)
 
 
 def separate(
@@ -108,8 +116,49 @@ def separate(
     return fill(unsatisfying), fill(satisfying)
 
 
+def separator(
+        _predicate: _t.Callable[[_T], bool]
+) -> _t.Callable[[_t.Iterable[_T]],
+                 _t.Tuple[_t.Iterable[_T], _t.Iterable[_T]]]:
+    """
+    Returns function that returns pair of iterables
+    first of which consists of elements that dissatisfy given predicate
+    and second one consists of elements that satisfy given predicate.
+
+    >>> split_by_truth = separator(bool)
+    >>> tuple(map(list, split_by_truth(range(10))))
+    ([0], [1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+    >>> def is_even(number: int) -> bool:
+    ...     return number % 2 == 0
+    >>> split_by_evenness = separator(is_even)
+    >>> tuple(map(list, split_by_evenness(range(10))))
+    ([1, 3, 5, 7, 9], [0, 2, 4, 6, 8])
+    """
+    return _functools.partial(separate, _predicate)
+
+
+def grab(_predicate: _t.Callable[[_T], bool],
+         _value: _t.Iterable[_T]) -> _t.Iterable[_T]:
+    """
+    Selects elements from the beginning of iterable
+    while given predicate is satisfied.
+
+    >>> grab_while_true_like = grabber(bool)
+    >>> list(grab_while_true_like(range(10)))
+    []
+
+    >>> from operator import gt
+    >>> from functools import partial
+    >>> grab_while_less_than_five = grabber(partial(gt, 5))
+    >>> list(grab_while_less_than_five(range(10)))
+    [0, 1, 2, 3, 4]
+    """
+    return _itertools.takewhile(_predicate, _value)
+
+
 def grabber(
-        predicate: _t.Callable[[_T], bool]
+        _predicate: _t.Callable[[_T], bool]
 ) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from the beginning of iterable
@@ -125,12 +174,28 @@ def grabber(
     >>> list(grab_while_less_than_five(range(10)))
     [0, 1, 2, 3, 4]
     """
-    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]],
-                   _functools.partial(_itertools.takewhile, predicate))
+    return _functools.partial(grab, _predicate)
+
+
+def kick(_predicate: _t.Callable[[_T], bool],
+         _value: _t.Iterable[_T]) -> _t.Iterable[_T]:
+    """
+    Skips elements from the beginning of iterable
+    while given predicate is satisfied.
+
+    >>> list(kick(bool, range(10)))
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    >>> from operator import gt
+    >>> from functools import partial
+    >>> list(kick(partial(gt, 5), range(10)))
+    [5, 6, 7, 8, 9]
+    """
+    return _itertools.dropwhile(_predicate, _value)
 
 
 def kicker(
-        predicate: _t.Callable[[_T], bool]
+        _predicate: _t.Callable[[_T], bool]
 ) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that skips elements from the beginning of iterable
@@ -146,5 +211,4 @@ def kicker(
     >>> list(kick_while_less_than_five(range(10)))
     [5, 6, 7, 8, 9]
     """
-    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]],
-                   _functools.partial(_itertools.dropwhile, predicate))
+    return _functools.partial(kick, _predicate)
