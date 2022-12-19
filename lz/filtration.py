@@ -15,8 +15,6 @@ def sifter(
     Returns function that selects elements from iterable
     which satisfy given predicate.
 
-    If predicate is not specified than true-like objects are selected.
-
     >>> to_true_like = sifter(bool)
     >>> list(to_true_like(range(10)))
     [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -37,8 +35,6 @@ def scavenger(
     """
     Returns function that selects elements from iterable
     which dissatisfy given predicate.
-
-    If predicate is not specified than false-like objects are selected.
 
     >>> to_false_like = scavenger(bool)
     >>> list(to_false_like(range(10)))
@@ -79,6 +75,19 @@ def separator(
 def separate(
         _predicate: _t.Callable[[_T], bool], _value: _t.Iterable[_T]
 ) -> _t.Tuple[_t.Iterable[_T], _t.Iterable[_T]]:
+    """
+    Returns pair of iterables
+    first of which consists of elements that dissatisfy given predicate
+    and second one consists of elements that satisfy given predicate.
+
+    >>> tuple(map(list, separate(bool, range(10))))
+    ([0], [1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+    >>> def is_even(number: int) -> bool:
+    ...     return number % 2 == 0
+    >>> tuple(map(list, separate(is_even, range(10))))
+    ([1, 3, 5, 7, 9], [0, 2, 4, 6, 8])
+    """
     iterator = iter(_value)
     unsatisfying: _t.Deque[_T] = _deque()
     satisfying: _t.Deque[_T] = _deque()
@@ -106,8 +115,6 @@ def grabber(
     Returns function that selects elements from the beginning of iterable
     while given predicate is satisfied.
 
-    If predicate is not specified than true-like objects are selected.
-
     >>> grab_while_true_like = grabber(bool)
     >>> list(grab_while_true_like(range(10)))
     []
@@ -128,8 +135,6 @@ def kicker(
     """
     Returns function that skips elements from the beginning of iterable
     while given predicate is satisfied.
-
-    If predicate is not specified than true-like objects are skipped.
 
     >>> kick_while_true_like = kicker(bool)
     >>> list(kick_while_true_like(range(10)))
