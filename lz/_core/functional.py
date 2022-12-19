@@ -26,7 +26,7 @@ MIN_COMPOSABLE_FUNCTIONS_COUNT = 2
 @final
 class Composition(_t.Generic[_Arg, _KwArg, _Result]):
     _file_path: str
-    _function: _t.Optional[_t.Callable[..., _t.Any]]
+    _function: _t.Callable[..., _t.Any]
     _functions: _t.Tuple[_t.Callable[..., _t.Any], ...]
     _line_number: int
     _line_offset: int
@@ -36,7 +36,7 @@ class Composition(_t.Generic[_Arg, _KwArg, _Result]):
 
     def __new__(cls,
                 *functions: _t.Callable[..., _t.Any],
-                file_path: _t.Optional[str] = None,
+                file_path: str = __file__,
                 line_number: int = 0,
                 line_offset: int = 0) -> 'Composition':
         if len(functions) < MIN_COMPOSABLE_FUNCTIONS_COUNT:
@@ -50,47 +50,41 @@ class Composition(_t.Generic[_Arg, _KwArg, _Result]):
                 function: _t.Callable[..., _t.Any]
         ) -> _t.Iterable[_t.Callable[..., _t.Any]]:
             if isinstance(function, cls):
-                yield from function.functions
+                yield from function._functions
             else:
                 yield function
 
         self._functions = tuple(itertools.chain.from_iterable(map(flatten,
                                                                   functions)))
-        self._function = None
-        if file_path is None:
-            file_path = __file__
         self._file_path = file_path
         self._line_number = line_number
         self._line_offset = line_offset
+        self._function = _compose(*functions,
+                                  function_name='composition',
+                                  file_path=file_path,
+                                  line_number=line_number,
+                                  line_offset=line_offset)
         return self
 
-    @property
-    def functions(self) -> _t.Tuple[_t.Callable[..., _t.Any], ...]:
-        return self._functions
-
-    @property
-    def function(self) -> _t.Callable[..., _Result]:
-        if self._function is None:
-            self._function = _compose(*self.functions,
-                                      function_name='composition',
-                                      file_path=self._file_path,
-                                      line_number=self._line_number,
-                                      line_offset=self._line_offset)
-        return self._function
-
     def __call__(self, *args: _Arg, **kwargs: _KwArg) -> _Result:
-        return self.function(*args, **kwargs)
+        return self._function(*args, **kwargs)
 
     def __get__(self,
                 instance: _T,
                 owner: _t.Type[_T]) -> _t.Callable[..., _Result]:
-        return MethodType(self.function, instance)
+        return MethodType(self, instance)
 
     def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
                                             _t.Dict[str, _t.Any]]:
-        return self.functions, {'file_path': self._file_path,
-                                'line_number': self._line_number,
-                                'line_offset': self._line_offset}
+        return self._functions, {'file_path': self._file_path,
+                                 'line_number': self._line_number,
+                                 'line_offset': self._line_offset}
+
+    def __getstate__(self) -> None:
+        return None
+
+    def __setstate__(self, _state: None) -> None:
+        pass
 
     __repr__ = generate_repr(__new__,
                              field_seeker=seekers.complex_)
@@ -221,7 +215,7 @@ def _compose(*functions: _t.Callable[..., _t.Any],
              file_path: str,
              line_number: int,
              line_offset: int) -> _t.Callable[..., _Result]:
-    def function_to_unique_name(function: _t.Callable) -> str:
+    def function_to_unique_name(function: _t.Callable[..., _t.Any]) -> str:
         # we are not using `__name__`/`__qualname__` attributes
         # due to their potential non-uniqueness
         return '_' + str(id(function)).replace('-', '_')
@@ -299,7 +293,7 @@ def _(_value: Combination) -> Signature:
 
 @to_signature.register(Composition)
 def _(_value: Composition) -> Signature:
-    return to_signature(_value.functions[-1])
+    return to_signature(_value._functions[-1])
 
 
 @to_signature.register(Constant)
