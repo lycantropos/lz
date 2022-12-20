@@ -390,13 +390,11 @@ def _(_value: Combination) -> Signature:
 @to_signature.register(Composition)
 def _(_value: Composition) -> Signature:
     last_signature = to_signature(_value._functions[0])
-    if isinstance(last_signature, OverloadedSignature):
-        returns = _t.Union[tuple(signature.returns
-                                 for signature in last_signature.signatures
-                                 if signature.expects(None))]
-    else:
-        assert isinstance(last_signature, PlainSignature)
-        returns = last_signature.returns
+    returns = (_t.Union[tuple(signature.returns
+                              for signature in last_signature.signatures
+                              if signature.expects(None))]
+               if isinstance(last_signature, OverloadedSignature)
+               else last_signature.returns)
     return _replace_returns(to_signature(_value._functions[-1]), returns)
 
 
