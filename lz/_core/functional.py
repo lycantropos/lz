@@ -222,54 +222,102 @@ class Constant(_t.Generic[_T]):
 
 _Params = ParamSpec('_Params')
 
+if sys.version_info < (3, 10):
+    @final
+    class Cleavage(_t.Generic[_Result]):
+        _file_path: str
+        _function: _t.Callable[..., _t.Tuple[_Result, ...]]
+        _functions: _t.Tuple[_t.Callable[..., _Result], ...]
+        _line_number: int
+        _line_offset: int
 
-@final
-class Cleavage(_t.Generic[_Result]):
-    _file_path: str
-    _function: _t.Callable[..., _t.Tuple[_Result, ...]]
-    _functions: _t.Tuple[_t.Callable[..., _Result], ...]
-    _line_number: int
-    _line_offset: int
+        __slots__ = ('_file_path', '_function', '_functions', '_line_number',
+                     '_line_offset')
 
-    __slots__ = ('_file_path', '_function', '_functions', '_line_number',
-                 '_line_offset')
+        def __new__(cls,
+                    *functions: _t.Callable[_Params, _Result],
+                    file_path: str = __file__,
+                    line_number: int = 0,
+                    line_offset: int = 0) -> 'Cleavage[_Result]':
+            self = super().__new__(cls)
+            self._functions = functions
+            self._file_path = file_path
+            self._line_number = line_number
+            self._line_offset = line_offset
+            self._function = _cleave(*functions,
+                                     function_name='cleavage',
+                                     file_path=file_path,
+                                     line_number=line_number,
+                                     line_offset=line_offset)
+            return self
 
-    def __new__(cls,
-                *functions: _t.Callable[_Params, _Result],
-                file_path: str = __file__,
-                line_number: int = 0,
-                line_offset: int = 0) -> 'Cleavage[_Result]':
-        self = super().__new__(cls)
-        self._functions = functions
-        self._file_path = file_path
-        self._line_number = line_number
-        self._line_offset = line_offset
-        self._function = _cleave(*functions,
-                                 function_name='cleavage',
-                                 file_path=file_path,
-                                 line_number=line_number,
-                                 line_offset=line_offset)
-        return self
+        def __call__(self,
+                     *args: _Params.args,
+                     **kwargs: _Params.kwargs) -> _t.Tuple[_Result, ...]:
+            return self._function(*args, **kwargs)
 
-    def __call__(self,
-                 *args: _Params.args,
-                 **kwargs: _Params.kwargs) -> _t.Tuple[_Result, ...]:
-        return self._function(*args, **kwargs)
+        def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
+                                                _t.Dict[str, _t.Any]]:
+            return self._functions, {'file_path': self._file_path,
+                                     'line_number': self._line_number,
+                                     'line_offset': self._line_offset}
 
-    def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
-                                            _t.Dict[str, _t.Any]]:
-        return self._functions, {'file_path': self._file_path,
-                                 'line_number': self._line_number,
-                                 'line_offset': self._line_offset}
+        def __getstate__(self) -> None:
+            return None
 
-    def __getstate__(self) -> None:
-        return None
+        def __setstate__(self, _state: None) -> None:
+            pass
 
-    def __setstate__(self, _state: None) -> None:
-        pass
+        __repr__ = generate_repr(__new__,
+                                 field_seeker=seekers.complex_)
+else:
+    @final
+    class Cleavage(_t.Generic[_Params, _Result]):
+        _file_path: str
+        _function: _t.Callable[_Params, _t.Tuple[_Result, ...]]
+        _functions: _t.Tuple[_t.Callable[_Params, _Result], ...]
+        _line_number: int
+        _line_offset: int
 
-    __repr__ = generate_repr(__new__,
-                             field_seeker=seekers.complex_)
+        __slots__ = ('_file_path', '_function', '_functions', '_line_number',
+                     '_line_offset')
+
+        def __new__(cls,
+                    *functions: _t.Callable[_Params, _Result],
+                    file_path: str = __file__,
+                    line_number: int = 0,
+                    line_offset: int = 0) -> 'Cleavage[_Params, _Result]':
+            self = super().__new__(cls)
+            self._functions = functions
+            self._file_path = file_path
+            self._line_number = line_number
+            self._line_offset = line_offset
+            self._function = _cleave(*functions,
+                                     function_name='cleavage',
+                                     file_path=file_path,
+                                     line_number=line_number,
+                                     line_offset=line_offset)
+            return self
+
+        def __call__(self,
+                     *args: _Params.args,
+                     **kwargs: _Params.kwargs) -> _t.Tuple[_Result, ...]:
+            return self._function(*args, **kwargs)
+
+        def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
+                                                _t.Dict[str, _t.Any]]:
+            return self._functions, {'file_path': self._file_path,
+                                     'line_number': self._line_number,
+                                     'line_offset': self._line_offset}
+
+        def __getstate__(self) -> None:
+            return None
+
+        def __setstate__(self, _state: None) -> None:
+            pass
+
+        __repr__ = generate_repr(__new__,
+                                 field_seeker=seekers.complex_)
 
 
 def _cleave(
