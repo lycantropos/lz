@@ -140,7 +140,8 @@ def flip(_function: _t.Callable[..., _T2]) -> _t.Callable[..., _T2]:
     >>> flipped_power(2, 4)
     16
     """
-    return _functional.Flip.from_function(_function)
+    return _t.cast(_t.Callable[..., _T2],
+                   _functional.Flip.from_function(_function))
 
 
 def flatmap(_function: _t.Callable[[_T1], _t.Iterable[_T2]],
