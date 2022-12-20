@@ -14,5 +14,5 @@ def test_round_trip(combination_call: CombinationCall) -> None:
 
     result = round_trip_pickle(combination)
 
-    assert are_iterables_similar(result(arguments),
-                                 combination(arguments))
+    assert are_iterables_similar(result(*arguments),
+                                 combination(*arguments))

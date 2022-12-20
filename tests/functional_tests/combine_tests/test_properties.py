@@ -15,7 +15,7 @@ def test_currying(combination_call: CombinationCall) -> None:
     combination = combine(*maps)
     curried_combination = curry(combination)
 
-    result = curried_combination(arguments)
+    result = curried_combination(*arguments)
 
     assert isinstance(result, abc.Iterable)
-    assert are_iterables_similar(result, combination(arguments))
+    assert are_iterables_similar(result, combination(*arguments))
