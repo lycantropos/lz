@@ -132,6 +132,26 @@ def to_constant(_value: _T1) -> _t.Callable[..., _T1]:
     return _functional.Constant(_value)
 
 
+def flip(_function: _t.Callable[..., _T2]) -> _t.Callable[..., _T2]:
+    """
+    Returns function with positional arguments flipped.
+
+    >>> flipped_power = flip(pow)
+    >>> flipped_power(2, 4)
+    16
+    """
+    return _functools.partial(call_flipped, _function)
+
+
+def call_flipped(_function: _t.Callable[..., _T2],
+                 *args: _T1,
+                 **kwargs: _T1) -> _T2:
+    """
+    Calls given function with positional arguments flipped.
+    """
+    return _function(*args[::-1], **kwargs)
+
+
 def flatmap(_function: _t.Callable[[_T1], _t.Iterable[_T2]],
             *iterables: _t.Iterable[_T1]) -> _t.Iterable[_T2]:
     """
