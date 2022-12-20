@@ -224,10 +224,10 @@ _Params = ParamSpec('_Params')
 
 
 @final
-class Cleavage(_t.Generic[_Params, _Result]):
+class Cleavage(_t.Generic[_Result]):
     _file_path: str
-    _function: _t.Callable[_Params, _t.Tuple[_Result, ...]]
-    _functions: _t.Tuple[_t.Callable[_Params, _Result], ...]
+    _function: _t.Callable[..., _t.Tuple[_Result, ...]]
+    _functions: _t.Tuple[_t.Callable[..., _Result], ...]
     _line_number: int
     _line_offset: int
 
@@ -238,7 +238,7 @@ class Cleavage(_t.Generic[_Params, _Result]):
                 *functions: _t.Callable[_Params, _Result],
                 file_path: str = __file__,
                 line_number: int = 0,
-                line_offset: int = 0) -> 'Cleavage[_Params, _Result]':
+                line_offset: int = 0) -> 'Cleavage[_Result]':
         self = super().__new__(cls)
         self._functions = functions
         self._file_path = file_path
