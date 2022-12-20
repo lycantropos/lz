@@ -25,6 +25,26 @@ def identity(_value: _T1) -> _T1:
     return _value
 
 
+def cleave(
+        *functions: _t.Callable[..., _T1]
+) -> _t.Callable[..., _t.Iterable[_T1]]:
+    """
+    Returns function that separately applies
+    given functions to the same arguments.
+
+    >>> to_min_and_max = cleave(min, max)
+    >>> list(to_min_and_max(range(10)))
+    [0, 9]
+    >>> list(to_min_and_max(range(0), default=None))
+    [None, None]
+    """
+    caller_frame_info = _inspect.stack()[1]
+    return _functional.Cleavage(*functions,
+                                file_path=caller_frame_info.filename,
+                                line_number=caller_frame_info.lineno,
+                                line_offset=0)
+
+
 def combine(
         *maps: _t.Callable[[_T1], _T2]
 ) -> _t.Callable[..., _t.Tuple[_T2, ...]]:
@@ -130,22 +150,6 @@ def call_flipped(_function: _t.Callable[..., _T2],
     Calls given function with positional arguments flipped.
     """
     return _function(*args[::-1], **kwargs)
-
-
-def cleave(
-        *functions: _t.Callable[..., _T1]
-) -> _t.Callable[..., _t.Iterable[_T1]]:
-    """
-    Returns function that separately applies
-    given functions to the same arguments.
-
-    >>> to_min_and_max = cleave(min, max)
-    >>> list(to_min_and_max(range(10)))
-    [0, 9]
-    >>> list(to_min_and_max(range(0), default=None))
-    [None, None]
-    """
-    return _functional.Cleavage(*functions)
 
 
 def flatmap(_function: _t.Callable[[_T1], _t.Iterable[_T2]],

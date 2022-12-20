@@ -224,24 +224,115 @@ _Params = ParamSpec('_Params')
 
 
 @final
-class Cleavage(_t.Generic[_Result]):
-    def __init__(self, *functions: _t.Callable[_Params, _Result]) -> None:
-        self.functions = functions
+class Cleavage(_t.Generic[_Params, _Result]):
+    _file_path: str
+    _function: _t.Callable[_Params, _t.Tuple[_Result, ...]]
+    _functions: _t.Tuple[_t.Callable[_Params, _Result], ...]
+    _line_number: int
+    _line_offset: int
+
+    __slots__ = ('_file_path', '_function', '_functions', '_line_number',
+                 '_line_offset')
+
+    def __new__(cls,
+                *functions: _t.Callable[_Params, _Result],
+                file_path: str = __file__,
+                line_number: int = 0,
+                line_offset: int = 0) -> 'Cleavage[_Params, _Result]':
+        self = super().__new__(cls)
+        self._functions = functions
+        self._file_path = file_path
+        self._line_number = line_number
+        self._line_offset = line_offset
+        self._function = _cleave(*functions,
+                                 function_name='cleavage',
+                                 file_path=file_path,
+                                 line_number=line_number,
+                                 line_offset=line_offset)
+        return self
 
     def __call__(self,
                  *args: _Params.args,
                  **kwargs: _Params.kwargs) -> _t.Tuple[_Result, ...]:
-        return tuple(function(*args, **kwargs) for function in self.functions)
+        return self._function(*args, **kwargs)
+
+    def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
+                                            _t.Dict[str, _t.Any]]:
+        return self._functions, {'file_path': self._file_path,
+                                 'line_number': self._line_number,
+                                 'line_offset': self._line_offset}
+
+    def __getstate__(self) -> None:
+        return None
+
+    def __setstate__(self, _state: None) -> None:
+        pass
+
+    __repr__ = generate_repr(__new__,
+                             field_seeker=seekers.complex_)
+
+
+def _cleave(
+        *functions: _t.Callable[_Params, _Result],
+        function_name: str,
+        file_path: str,
+        line_number: int,
+        line_offset: int,
+        args_name: str = 'args',
+        kwargs_name: str = 'kwargs'
+) -> _t.Callable[_Params, _t.Tuple[_Result, ...]]:
+    functions_names = [_function_to_unique_name(function)
+                       for function in functions]
+    result_node = ast.Tuple(
+            [
+                ast.Call(ast.Name(function_name, ast.Load(),
+                                  lineno=line_number,
+                                  col_offset=line_offset),
+                         [ast.Starred(ast.Name(args_name, ast.Load(),
+                                               lineno=line_number,
+                                               col_offset=line_offset),
+                                      ast.Load(),
+                                      lineno=line_number,
+                                      col_offset=line_offset)],
+                         [ast.keyword(None, ast.Name(kwargs_name, ast.Load(),
+                                                     lineno=line_number,
+                                                     col_offset=line_offset),
+                                      lineno=line_number,
+                                      col_offset=line_offset)],
+                         lineno=line_number,
+                         col_offset=line_offset)
+                for function_name in functions_names
+            ],
+            ast.Load(),
+            lineno=line_number,
+            col_offset=line_offset
+    )
+    function_definition_node = ast.FunctionDef(
+            function_name,
+            _to_signature_node(
+                    variadic_positional_parameter=ast.arg(
+                            args_name, None,
+                            lineno=line_number,
+                            col_offset=line_offset
+                    ),
+                    variadic_keyword_parameter=ast.arg(kwargs_name, None,
+                                                       lineno=line_number,
+                                                       col_offset=line_offset)
+            ),
+            [ast.Return(result_node,
+                        lineno=line_number,
+                        col_offset=line_offset)],
+            [], None,
+            lineno=line_number,
+            col_offset=line_offset
+    )
+    return _compile_function(function_definition_node,
+                             file_path=file_path,
+                             namespace=dict(zip(functions_names, functions)))
 
 
 def _combine(*maps: _t.Callable[[_T], _Result],
              function_name: str,
-             arguments_factory: _t.Callable[..., ast.arguments] =
-             ast.arguments
-             if sys.version_info < (3, 8)
-             # Python3.8 adds positional-only arguments
-             else _t.cast(_t.Callable[..., ast.arguments],
-                          functools.partial(ast.arguments, [])),
              file_path: str,
              line_number: int,
              line_offset: int) -> _t.Callable[..., _t.Tuple[_Result, ...]]:
@@ -249,11 +340,10 @@ def _combine(*maps: _t.Callable[[_T], _Result],
     args_names = [f'_arg{index}' for index in range(len(maps))]
     function_definition_node = ast.FunctionDef(
             function_name,
-            arguments_factory([ast.arg(arg_name, None,
-                                       lineno=line_number,
-                                       col_offset=line_offset)
-                               for arg_name in args_names],
-                              None, [], [], None, []),
+            _to_signature_node([ast.arg(arg_name, None,
+                                        lineno=line_number,
+                                        col_offset=line_offset)
+                                for arg_name in args_names]),
             [ast.Return(ast.Tuple([ast.Call(ast.Name(map_name, ast.Load(),
                                                      lineno=line_number,
                                                      col_offset=line_offset),
@@ -279,21 +369,13 @@ def _combine(*maps: _t.Callable[[_T], _Result],
                              namespace=dict(zip(maps_names, maps)))
 
 
-def _compose(
-        *functions: _t.Callable[..., _t.Any],
-        function_name: str,
-        file_path: str,
-        line_number: int,
-        line_offset: int,
-        arguments_factory: _t.Callable[..., ast.arguments] =
-        ast.arguments
-        if sys.version_info < (3, 8)
-        # Python3.8 adds positional-only arguments
-        else _t.cast(_t.Callable[..., ast.arguments],
-                     functools.partial(ast.arguments, [])),
-        variadic_positionals_name: str = 'args',
-        variadic_keywords_name: str = 'kwargs'
-) -> _t.Callable[..., _Result]:
+def _compose(*functions: _t.Callable[..., _t.Any],
+             function_name: str,
+             file_path: str,
+             line_number: int,
+             line_offset: int,
+             args_name: str = 'args',
+             kwargs_name: str = 'kwargs') -> _t.Callable[..., _Result]:
     functions_names = [_function_to_unique_name(function)
                        for function in functions]
 
@@ -311,34 +393,30 @@ def _compose(
                         col_offset=line_offset)
 
     reversed_functions_names = reversed(functions_names)
-    calls_node = ast.Call(
-            to_name_node(next(reversed_functions_names)),
-            [ast.Starred(to_name_node(variadic_positionals_name),
-                         ast.Load(),
-                         lineno=line_number,
-                         col_offset=line_offset)],
-            [ast.keyword(None, to_name_node(variadic_keywords_name),
-                         lineno=line_number,
-                         col_offset=line_offset)],
-            lineno=line_number,
-            col_offset=line_offset
-    )
+    calls_node = ast.Call(to_name_node(next(reversed_functions_names)),
+                          [ast.Starred(to_name_node(args_name), ast.Load(),
+                                       lineno=line_number,
+                                       col_offset=line_offset)],
+                          [ast.keyword(None, to_name_node(kwargs_name),
+                                       lineno=line_number,
+                                       col_offset=line_offset)],
+                          lineno=line_number,
+                          col_offset=line_offset)
     calls_node = functools.reduce(to_next_call_node,
                                   reversed_functions_names,
                                   calls_node)
     function_definition_node = ast.FunctionDef(
             function_name,
-            arguments_factory(
-                    [],
-                    ast.arg(variadic_positionals_name, None,
+            _to_signature_node(
+                    variadic_positional_parameter=ast.arg(
+                            args_name, None,
                             lineno=line_number,
-                            col_offset=line_offset),
-                    [],
-                    [],
-                    ast.arg(variadic_keywords_name, None,
-                            lineno=line_number,
-                            col_offset=line_offset),
-                    []),
+                            col_offset=line_offset
+                    ),
+                    variadic_keyword_parameter=ast.arg(kwargs_name, None,
+                                                       lineno=line_number,
+                                                       col_offset=line_offset)
+            ),
             [ast.Return(calls_node,
                         lineno=line_number,
                         col_offset=line_offset)],
@@ -371,6 +449,46 @@ def _compile_function(
     return namespace[function_definition_node.name]
 
 
+if sys.version_info < (3, 8):
+    def _to_signature_node(
+            positional_only_parameters: _t.Optional[_t.List[ast.arg]] = None,
+            positional_or_keyword_parameters: _t.Optional[_t.List[ast.arg]]
+            = None,
+            variadic_positional_parameter: _t.Optional[ast.arg] = None,
+            keyword_only_parameters: _t.Optional[_t.List[ast.arg]] = None,
+            variadic_keyword_parameter: _t.Optional[ast.arg] = None,
+            positionals_defaults: _t.Optional[_t.List[ast.expr]] = None,
+            keywords_defaults: _t.Optional[_t.List[_t.Optional[ast.expr]]]
+            = None
+    ) -> ast.arguments:
+        return ast.arguments((positional_only_parameters or [])
+                             + (positional_or_keyword_parameters or []),
+                             variadic_positional_parameter,
+                             keyword_only_parameters or [],
+                             keywords_defaults or [],
+                             variadic_keyword_parameter,
+                             positionals_defaults or [])
+else:
+    def _to_signature_node(
+            positional_only_parameters: _t.Optional[_t.List[ast.arg]] = None,
+            positional_or_keyword_parameters: _t.Optional[_t.List[ast.arg]]
+            = None,
+            variadic_positional_parameter: _t.Optional[ast.arg] = None,
+            keyword_only_parameters: _t.Optional[_t.List[ast.arg]] = None,
+            variadic_keyword_parameter: _t.Optional[ast.arg] = None,
+            positionals_defaults: _t.Optional[_t.List[ast.expr]] = None,
+            keywords_defaults: _t.Optional[_t.List[_t.Optional[ast.expr]]]
+            = None
+    ) -> ast.arguments:
+        return ast.arguments(positional_only_parameters or [],
+                             positional_or_keyword_parameters or [],
+                             variadic_positional_parameter,
+                             keyword_only_parameters or [],
+                             keywords_defaults or [],
+                             variadic_keyword_parameter,
+                             positionals_defaults or [])
+
+
 def _function_to_unique_name(function: _t.Callable[..., _t.Any]) -> str:
     # we are not using `__name__`/`__qualname__` attributes
     # due to their potential non-uniqueness
@@ -379,7 +497,7 @@ def _function_to_unique_name(function: _t.Callable[..., _t.Any]) -> str:
 
 @to_signature.register(Cleavage)
 def _(_value: Cleavage) -> Signature:
-    return to_signature(_value.functions[0])
+    return to_signature(_value._functions[0])
 
 
 @to_signature.register(Combination)
