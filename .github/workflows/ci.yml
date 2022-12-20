@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     strategy:
       matrix:
-        python_version: ['3.7', '3.8', '3.9', '3.10']
+        python_version: ['3.7', '3.8', '3.9', '3.10', '3.11']
         platform: [
           {
             os: 'macos-latest',
@@ -119,7 +119,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        python_version: ['3.7', '3.8', '3.9', '3.10']
+        python_version: ['3.7', '3.8', '3.9', '3.10', '3.11']
         platform: [
           {
             os: 'macos-latest',
@@ -139,11 +139,17 @@ jobs:
           },
         ]
         include:
-          - python_version: 'pypy-3.7'
+          - python_version: 'pypy-3.8'
             platform: { os: 'macos-latest', python_architecture: 'x64' }
-          - python_version: 'pypy-3.7'
+          - python_version: 'pypy-3.8'
             platform: { os: 'ubuntu-latest', python_architecture: 'x64' }
-          - python_version: 'pypy-3.7'
+          - python_version: 'pypy-3.8'
+            platform: { os: 'windows-latest', python_architecture: 'x64' }
+          - python_version: 'pypy-3.9'
+            platform: { os: 'macos-latest', python_architecture: 'x64' }
+          - python_version: 'pypy-3.9'
+            platform: { os: 'ubuntu-latest', python_architecture: 'x64' }
+          - python_version: 'pypy-3.9'
             platform: { os: 'windows-latest', python_architecture: 'x64' }
     steps:
       - name: 'Setup Python'
