@@ -244,7 +244,7 @@ def partition_call(call: FunctionCall) -> Strategy[PartitionedFunctionCall]:
 
     args_partitions = strategies.integers(0, len(args)).map(partition_args)
     kwargs_partitions = (strategies.integers(0, len(kwargs))
-                         .map(partial(random.sample, kwargs.keys()))
+                         .map(partial(random.sample, list(kwargs.keys())))
                          .map(partition_kwargs))
     return strategies.tuples(strategies.just(function),
                              args_partitions, kwargs_partitions)
