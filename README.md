@@ -67,16 +67,7 @@ Usage
 
     ```
 
-3. flipping positional parameters order
-    ```python
-    >>> from lz.functional import flip
-    >>> flipped_power = flip(pow)
-    >>> flipped_power(2, 4)
-    16
-
-    ```
-
-4. packing function's arguments
+3. packing function's arguments
     ```python
     >>> from lz.functional import pack
     >>> packed_int = pack(int)
@@ -87,7 +78,7 @@ Usage
 
     ```
 
-5. left [partial application](https://en.wikipedia.org/wiki/Partial_application)
+4. left [partial application](https://en.wikipedia.org/wiki/Partial_application)
     ```python
     >>> from lz import left
     >>> count_from_zero_to = left.applier(range, 0)
@@ -96,7 +87,7 @@ Usage
 
     ```
 
-6. right [partial application](https://en.wikipedia.org/wiki/Partial_application)
+5. right [partial application](https://en.wikipedia.org/wiki/Partial_application)
     ```python
     >>> from lz import right
     >>> square = right.applier(pow, 2)
@@ -105,7 +96,7 @@ Usage
 
     ```
 
-7. [negating](https://en.wikipedia.org/wiki/Negation) predicate
+6. [negating](https://en.wikipedia.org/wiki/Negation) predicate
     ```python
     >>> from lz.logical import negate
     >>> false_like = negate(bool)
@@ -116,7 +107,7 @@ Usage
 
     ```
 
-8. [conjoining](https://en.wikipedia.org/wiki/Logical_conjunction) predicates
+7. [conjoining](https://en.wikipedia.org/wiki/Logical_conjunction) predicates
     ```python
     >>> from lz.logical import conjoin
     >>> is_valid_constant_identifier = conjoin(str.isupper, str.isidentifier)
@@ -127,7 +118,7 @@ Usage
 
     ```
 
-9. [disjoining](https://en.wikipedia.org/wiki/Logical_disjunction) predicates
+8. [disjoining](https://en.wikipedia.org/wiki/Logical_disjunction) predicates
     ```python
     >>> from lz.logical import disjoin
     >>> alphabetic_or_numeric = disjoin(str.isalpha, str.isnumeric)
@@ -140,7 +131,7 @@ Usage
 
     ```
 
-10. [exclusive disjoining](https://en.wikipedia.org/wiki/Exclusive_or) predicates
+9. [exclusive disjoining](https://en.wikipedia.org/wiki/Exclusive_or) predicates
     ```python
     >>> from lz.logical import exclusive_disjoin
     >>> from keyword import iskeyword
@@ -156,7 +147,7 @@ Usage
 
     ```
 
-11. reversing sequences and any string streams
+10. reversing sequences and any string streams
     ```python
     >>> from lz.reversal import reverse
     >>> list(reverse(range(10)))
@@ -167,7 +158,7 @@ Usage
 
     ```
 
-12. chunking iterable
+11. chunking iterable
     ```python
     >>> from lz.iterating import chopper
     >>> to_triplets = chopper(3)
@@ -176,7 +167,7 @@ Usage
 
     ```
 
-13. sliding over iterable
+12. sliding over iterable
     ```python
     >>> from lz.iterating import slider
     >>> slide_pairwise = slider(2)
@@ -185,7 +176,7 @@ Usage
  
     ```
 
-14. [interleaving](https://en.wikipedia.org/wiki/Interleave_sequence) iterables
+13. [interleaving](https://en.wikipedia.org/wiki/Interleave_sequence) iterables
     ```python
     >>> from lz.iterating import interleave
     >>> list(interleave([range(10), range(10, 20)]))
@@ -193,7 +184,7 @@ Usage
   
     ```
 
-15. iterable [transposition](https://en.wikipedia.org/wiki/Transpose)
+14. iterable [transposition](https://en.wikipedia.org/wiki/Transpose)
     ```python
     >>> from lz.transposition import transpose
     >>> list(map(tuple, transpose(zip(range(10), range(10, 20)))))
@@ -201,7 +192,7 @@ Usage
  
     ```
 
-16. iterable duplication
+15. iterable duplication
     ```python
     >>> from lz.replication import duplicate
     >>> list(map(tuple, duplicate(range(10))))
