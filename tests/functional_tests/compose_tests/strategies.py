@@ -21,4 +21,5 @@ three_or_more_maps_calls = strategies.tuples(three_or_more_suitable_maps,
                                              maps_arguments)
 maps_triplets_calls = strategies.tuples(
         extend_suitable_maps(extend_suitable_maps(strategies.tuples(maps))),
-        maps_arguments)
+        maps_arguments
+)

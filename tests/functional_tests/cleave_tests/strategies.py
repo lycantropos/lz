@@ -14,4 +14,5 @@ cleavage_calls = strategies.tuples(to_homogeneous_sequences(maps,
 non_empty_cleavage_calls = strategies.tuples(
         to_homogeneous_sequences(maps,
                                  min_size=1),
-        maps_arguments)
+        maps_arguments
+)
