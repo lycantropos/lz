@@ -140,16 +140,7 @@ def flip(_function: _t.Callable[..., _T2]) -> _t.Callable[..., _T2]:
     >>> flipped_power(2, 4)
     16
     """
-    return _functools.partial(call_flipped, _function)
-
-
-def call_flipped(_function: _t.Callable[..., _T2],
-                 *args: _T1,
-                 **kwargs: _T1) -> _T2:
-    """
-    Calls given function with positional arguments flipped.
-    """
-    return _function(*args[::-1], **kwargs)
+    return _functional.Flip.from_function(_function)
 
 
 def flatmap(_function: _t.Callable[[_T1], _t.Iterable[_T2]],

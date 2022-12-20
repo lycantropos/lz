@@ -320,6 +320,53 @@ else:
                                  field_seeker=seekers.complex_)
 
 
+@final
+class Flip(_t.Generic[_Result]):
+    @classmethod
+    def from_function(
+            cls, _function: _t.Union[Cleavage, Composition, Constant,
+                                     'Flip[_Result]',
+                                     _t.Callable[_Params, _Result]]
+    ) -> _t.Union[Cleavage, Composition, Constant, 'Flip[_Result]',
+                  _t.Callable[_Params, _Result]]:
+        return (_function._function
+                if isinstance(_function, cls)
+                else (Composition(*_function._functions[:-1],
+                                  cls.from_function(_function._functions[-1]),
+                                  file_path=_function._file_path,
+                                  line_number=_function._line_number,
+                                  line_offset=_function._line_offset)
+                      if isinstance(_function, Composition)
+                      else (Cleavage(*[cls.from_function(function)
+                                       for function in _function._functions],
+                                     file_path=_function._file_path,
+                                     line_number=_function._line_number,
+                                     line_offset=_function._line_offset)
+                            if isinstance(_function, Cleavage)
+                            else (_function
+                                  if isinstance(_function, Constant)
+                                  else cls(_function)))))
+
+    _function: _t.Callable[..., _Result]
+
+    __slots__ = '_function',
+
+    def __new__(cls, _function: _t.Callable[..., _Result]) -> 'Flip[_Result]':
+        if isinstance(_function, cls):
+            raise ValueError('Repeated flip should return original function.')
+        self = super().__new__(cls)
+        self._function = _function
+        return self
+
+    def __call__(self, *args: _Arg, **kwargs: _KwArg) -> _Result:
+        return self._function(*args[::-1], **kwargs)
+
+    def __getnewargs__(self) -> _t.Tuple[_t.Any, ...]:
+        return (self._function,)
+
+    __repr__ = generate_repr(__new__)
+
+
 def _cleave(
         *functions: _t.Callable[_Params, _Result],
         function_name: str,
@@ -589,3 +636,8 @@ def _(_value: Constant) -> Signature:
 @to_signature.register(Curry)
 def _(_value: Curry) -> Signature:
     return _value._signature
+
+
+@to_signature.register(Flip)
+def _(_value: Flip) -> Signature:
+    return to_signature(_value._function)
