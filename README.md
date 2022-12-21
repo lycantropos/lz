@@ -71,8 +71,8 @@ Usage
     ```python
     >>> from lz.functional import flip
     >>> flipped_power = flip(pow)
-    >>> flipped_power(2, 4)
-    16
+    >>> flipped_power(2, 3)
+    9
 
     ```
 
