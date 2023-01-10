@@ -1,5 +1,6 @@
 import functools
 import typing as _t
+from itertools import chain
 
 from paradigm.base import (OptionalParameter,
                            OverloadedSignature,
@@ -108,6 +109,13 @@ def _(signature: PlainSignature, args: _t.Tuple[_T, ...]) -> Signature:
             else OverloadedSignature(*sub_signatures))
 
 
+def flatten_signature(signature: Signature) -> _t.Iterable[PlainSignature]:
+    if isinstance(signature, OverloadedSignature):
+        yield from signature.signatures
+    else:
+        yield signature
+
+
 @_bind_positionals_to_applier.register(OverloadedSignature)
 def _(signature: OverloadedSignature, args: _t.Tuple[_T, ...]) -> Signature:
     sub_signatures = [_bind_positionals_to_applier(sub_signature, args)
@@ -115,6 +123,8 @@ def _(signature: OverloadedSignature, args: _t.Tuple[_T, ...]) -> Signature:
                       if sub_signature.expects(*args)]
     if not sub_signatures:
         raise TypeError('No corresponding signature found.')
-    return (sub_signatures[0]
-            if len(sub_signatures) == 1
-            else OverloadedSignature(*sub_signatures))
+    flattened_sub_signatures = list(chain.from_iterable(map(flatten_signature,
+                                                            sub_signatures)))
+    return (flattened_sub_signatures[0]
+            if len(flattened_sub_signatures) == 1
+            else OverloadedSignature(*flattened_sub_signatures))

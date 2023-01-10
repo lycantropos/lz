@@ -617,13 +617,16 @@ def _replace_returns(signature: Signature, returns: _t.Any) -> Signature:
 
 
 @_replace_returns.register(OverloadedSignature)
-def _(signature: OverloadedSignature, returns: _t.Any) -> Signature:
-    return OverloadedSignature(*[_replace_returns(sub_signature, returns)
-                                 for sub_signature in signature.signatures])
+def _(signature: OverloadedSignature, returns: _t.Any) -> OverloadedSignature:
+    return OverloadedSignature(
+            *[_replace_returns_for_plain_signature(sub_signature, returns)
+              for sub_signature in signature.signatures]
+    )
 
 
 @_replace_returns.register(PlainSignature)
-def _(signature: PlainSignature, returns: _t.Any) -> Signature:
+def _replace_returns_for_plain_signature(signature: PlainSignature,
+                                         returns: _t.Any) -> PlainSignature:
     return PlainSignature(*signature.parameters,
                           returns=returns)
 
