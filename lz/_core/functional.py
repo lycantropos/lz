@@ -76,8 +76,9 @@ class Composition(_t.Generic[_Arg, _KwArg, _Result]):
                 owner: _t.Type[_T]) -> _t.Callable[..., _Result]:
         return MethodType(self, instance)
 
-    def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
-                                            _t.Dict[str, _t.Any]]:
+    def __getnewargs_ex__(self) -> _t.Tuple[
+        _t.Tuple[_t.Any, ...], _t.Dict[str, _t.Any]
+    ]:
         return self._functions, {'file_path': self._file_path,
                                  'line_number': self._line_number,
                                  'line_offset': self._line_offset}
@@ -123,8 +124,9 @@ class Combination(_t.Generic[_Arg, _Result]):
     def __call__(self, *args: _Arg) -> _t.Tuple[_Result, ...]:
         return self._function(*args)
 
-    def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
-                                            _t.Dict[str, _t.Any]]:
+    def __getnewargs_ex__(self) -> _t.Tuple[
+        _t.Tuple[_t.Any, ...], _t.Dict[str, _t.Any]
+    ]:
         return self._maps, {'file_path': self._file_path,
                             'line_number': self._line_number,
                             'line_offset': self._line_offset}
@@ -193,15 +195,16 @@ class Curry(ApplierBase[_Arg, _KwArg, _Result]):
             return type(self)(self.function, self._signature, *total_args,
                               **total_kwargs)
 
-    def __getstate__(self) -> _t.Tuple[_t.Callable[..., _Result],
-                                       _t.Tuple[_Arg, ...],
-                                       _t.Dict[str, _KwArg]]:
+    def __getstate__(self) -> _t.Tuple[
+        _t.Callable[..., _Result], _t.Tuple[_Arg, ...], _t.Dict[str, _KwArg]
+    ]:
         return self.function, self.args, self.kwargs
 
     def __setstate__(self,
-                     state: _t.Tuple[_t.Callable[..., _Result],
-                                     _t.Tuple[_Arg, ...],
-                                     _t.Dict[str, _KwArg]]) -> None:
+                     state: _t.Tuple[
+                         _t.Callable[..., _Result], _t.Tuple[_Arg, ...],
+                         _t.Dict[str, _KwArg]
+                     ]) -> None:
         self._function, self._args, self._kwargs = state
         self._signature = to_signature(self._function)
 
@@ -256,8 +259,9 @@ if sys.version_info < (3, 10):
                      **kwargs: _Params.kwargs) -> _t.Tuple[_Result, ...]:
             return self._function(*args, **kwargs)
 
-        def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
-                                                _t.Dict[str, _t.Any]]:
+        def __getnewargs_ex__(self) -> _t.Tuple[
+            _t.Tuple[_t.Any, ...], _t.Dict[str, _t.Any]
+        ]:
             return self._functions, {'file_path': self._file_path,
                                      'line_number': self._line_number,
                                      'line_offset': self._line_offset}
@@ -304,8 +308,9 @@ else:
                      **kwargs: _Params.kwargs) -> _t.Tuple[_Result, ...]:
             return self._function(*args, **kwargs)
 
-        def __getnewargs_ex__(self) -> _t.Tuple[_t.Tuple[_t.Any, ...],
-                                                _t.Dict[str, _t.Any]]:
+        def __getnewargs_ex__(self) -> _t.Tuple[
+            _t.Tuple[_t.Any, ...], _t.Dict[str, _t.Any]
+        ]:
             return self._functions, {'file_path': self._file_path,
                                      'line_number': self._line_number,
                                      'line_offset': self._line_offset}
@@ -324,11 +329,14 @@ else:
 class Flip(_t.Generic[_Result]):
     @classmethod
     def from_function(
-            cls, _function: _t.Union[Cleavage, Composition, Constant,
-                                     'Flip[_Result]',
-                                     _t.Callable[_Params, _Result]]
-    ) -> _t.Union[Cleavage, Composition, Constant, 'Flip[_Result]',
-                  _t.Callable[_Params, _Result]]:
+            cls, _function: _t.Union[
+                Cleavage, Composition, Constant, 'Flip[_Result]',
+                _t.Callable[_Params, _Result]
+            ]
+    ) -> _t.Union[
+        Cleavage, Composition, Constant, 'Flip[_Result]',
+        _t.Callable[_Params, _Result]
+    ]:
         return (_function._function
                 if isinstance(_function, cls)
                 else (Composition(*_function._functions[:-1],
