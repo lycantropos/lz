@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 import functools
 import itertools
@@ -40,7 +42,7 @@ class Composition(_t.Generic[_Arg, _KwArg, _Result]):
                 *functions: _t.Callable[..., _t.Any],
                 file_path: str = __file__,
                 line_number: int = 0,
-                line_offset: int = 0) -> 'Composition':
+                line_offset: int = 0) -> Composition:
         if len(functions) < MIN_COMPOSABLE_FUNCTIONS_COUNT:
             raise ValueError('Composition is defined '
                              f'for {MIN_COMPOSABLE_FUNCTIONS_COUNT} '
@@ -108,7 +110,7 @@ class Combination(_t.Generic[_Arg, _Result]):
                 *_maps: _t.Callable[[_Arg], _Result],
                 file_path: str = __file__,
                 line_number: int = 0,
-                line_offset: int = 0) -> 'Combination[_Arg, _Result]':
+                line_offset: int = 0) -> Combination[_Arg, _Result]:
         self = super().__new__(cls)
         self._maps = _maps
         self._file_path = file_path
@@ -241,7 +243,7 @@ if sys.version_info < (3, 10):
                     *functions: _t.Callable[_Params, _Result],
                     file_path: str = __file__,
                     line_number: int = 0,
-                    line_offset: int = 0) -> 'Cleavage[_Result]':
+                    line_offset: int = 0) -> Cleavage[_Result]:
             self = super().__new__(cls)
             self._functions = functions
             self._file_path = file_path
@@ -290,7 +292,7 @@ else:
                     *functions: _t.Callable[_Params, _Result],
                     file_path: str = __file__,
                     line_number: int = 0,
-                    line_offset: int = 0) -> 'Cleavage[_Params, _Result]':
+                    line_offset: int = 0) -> Cleavage[_Params, _Result]:
             self = super().__new__(cls)
             self._functions = functions
             self._file_path = file_path
@@ -330,11 +332,11 @@ class Flip(_t.Generic[_Result]):
     @classmethod
     def from_function(
             cls, _function: _t.Union[
-                Cleavage, Composition, Constant, 'Flip[_Result]',
+                Cleavage, Composition, Constant, Flip[_Result],
                 _t.Callable[_Params, _Result]
             ]
     ) -> _t.Union[
-        Cleavage, Composition, Constant, 'Flip[_Result]',
+        Cleavage, Composition, Constant, Flip[_Result],
         _t.Callable[_Params, _Result]
     ]:
         return (_function._function
@@ -359,7 +361,7 @@ class Flip(_t.Generic[_Result]):
 
     __slots__ = '_function',
 
-    def __new__(cls, _function: _t.Callable[..., _Result]) -> 'Flip[_Result]':
+    def __new__(cls, _function: _t.Callable[..., _Result]) -> Flip[_Result]:
         if isinstance(_function, cls):
             raise ValueError('Repeated flip should return original function.')
         self = super().__new__(cls)
