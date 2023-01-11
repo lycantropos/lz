@@ -29,7 +29,7 @@ def is_supported(value: Any) -> bool:
     else:
         try:
             pickle.dumps(signature)
-        except pickle.PicklingError:
+        except (AttributeError, pickle.PicklingError):
             return False
         else:
             return True
