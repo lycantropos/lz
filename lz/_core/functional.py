@@ -4,6 +4,7 @@ import ast
 import functools
 import itertools
 import sys
+import types
 import typing as _t
 from abc import (ABC,
                  abstractmethod)
@@ -30,7 +31,7 @@ MIN_COMPOSABLE_FUNCTIONS_COUNT = 2
 @final
 class Composition(_t.Generic[_Arg, _KwArg, _Result]):
     _file_path: str
-    _function: _t.Callable[..., _t.Any]
+    _function: _t.Callable[..., _Result]
     _functions: _t.Tuple[_t.Callable[..., _t.Any], ...]
     _line_number: int
     _line_offset: int
@@ -42,7 +43,7 @@ class Composition(_t.Generic[_Arg, _KwArg, _Result]):
                 *functions: _t.Callable[..., _t.Any],
                 file_path: str = __file__,
                 line_number: int = 0,
-                line_offset: int = 0) -> Composition:
+                line_offset: int = 0) -> Composition[_Arg, _KwArg, _Result]:
         if len(functions) < MIN_COMPOSABLE_FUNCTIONS_COUNT:
             raise ValueError('Composition is defined '
                              f'for {MIN_COMPOSABLE_FUNCTIONS_COUNT} '
@@ -169,7 +170,7 @@ class ApplierBase(ABC, _t.Generic[_Arg, _KwArg, _Result]):
         return self._kwargs
 
     @abstractmethod
-    def __call__(self, *args: _Arg, **kwargs: _KwArg):
+    def __call__(self, *args: _Arg, **kwargs: _KwArg) -> _t.Any:
         pass
 
 
@@ -183,9 +184,9 @@ class Curry(ApplierBase[_Arg, _KwArg, _Result]):
         super().__init__(function, *args, **kwargs)
         self._signature = _signature
 
-    def __call__(self,
-                 *args: _Arg,
-                 **kwargs: _KwArg) -> _t.Union['Curry', _Result]:
+    def __call__(
+            self, *args: _Arg, **kwargs: _KwArg
+    ) -> _t.Union[Curry[_Arg, _KwArg, _Result], _Result]:
         total_args = self.args + args
         total_kwargs = {**self.kwargs, **kwargs}
         try:
@@ -330,15 +331,40 @@ else:
 @final
 class Flip(_t.Generic[_Result]):
     @classmethod
+    @_t.overload
     def from_function(
-            cls, _function: _t.Union[
-                Cleavage, Composition, Constant, Flip[_Result],
-                _t.Callable[_Params, _Result]
-            ]
-    ) -> _t.Union[
-        Cleavage, Composition, Constant, Flip[_Result],
-        _t.Callable[_Params, _Result]
-    ]:
+            cls, _function: 'Cleavage[_Params, _Result]'
+    ) -> 'Cleavage[_Params, _Result]':
+        ...
+
+    @classmethod
+    @_t.overload
+    def from_function(
+            cls, _function: Composition[_Arg, _KwArg, _Result]
+    ) -> Composition[_Arg, _KwArg, _Result]:
+        ...
+
+    @classmethod
+    @_t.overload
+    def from_function(cls, _function: Constant[_Result]) -> Constant[_Result]:
+        ...
+
+    @classmethod
+    @_t.overload
+    def from_function(
+            cls, _function: Flip[_Result]
+    ) -> _t.Callable[_Params, _Result]:
+        ...
+
+    @classmethod
+    @_t.overload
+    def from_function(
+            cls, _function: _t.Callable[_Params, _Result]
+    ) -> _t.Callable[_Params, _Result]:
+        ...
+
+    @classmethod
+    def from_function(cls, _function: _t.Any) -> _t.Any:
         return (_function._function
                 if isinstance(_function, cls)
                 else (Composition(*_function._functions[:-1],
@@ -551,7 +577,9 @@ def _compile_function(
     tree = module_factory([function_definition_node])
     code = compile(tree, file_path, 'exec')
     exec(code, namespace)
-    return namespace[function_definition_node.name]
+    result = namespace[function_definition_node.name]
+    assert isinstance(result, types.FunctionType)
+    return result
 
 
 if sys.version_info < (3, 8):
@@ -601,17 +629,17 @@ def _function_to_unique_name(function: _t.Callable[..., _t.Any]) -> str:
 
 
 @to_signature.register(Cleavage)
-def _(_value: Cleavage) -> Signature:
+def _(_value: 'Cleavage[_Params, _Result]') -> Signature:
     return to_signature(_value._functions[0])
 
 
 @to_signature.register(Combination)
-def _(_value: Combination) -> Signature:
+def _(_value: Combination[_Arg, _Result]) -> Signature:
     return to_signature(_value._function)
 
 
 @to_signature.register(Composition)
-def _(_value: Composition) -> Signature:
+def _(_value: Composition[_Arg, _KwArg, _Result]) -> Signature:
     last_signature = to_signature(_value._functions[0])
     returns = (_t.Union[tuple(signature.returns
                               for signature in last_signature.signatures
@@ -642,15 +670,15 @@ def _replace_returns_for_plain_signature(signature: PlainSignature,
 
 
 @to_signature.register(Constant)
-def _(_value: Constant) -> Signature:
+def _(_value: Constant[_T]) -> Signature:
     return to_signature(_value.__call__)
 
 
 @to_signature.register(Curry)
-def _(_value: Curry) -> Signature:
+def _(_value: Curry[_Arg, _KwArg, _Result]) -> Signature:
     return _value._signature
 
 
 @to_signature.register(Flip)
-def _(_value: Flip) -> Signature:
+def _(_value: Flip[_Result]) -> Signature:
     return to_signature(_value._function)

@@ -39,7 +39,7 @@ class Applier(ApplierBase[_Arg, _KwArg, _Result]):
 
 
 @to_signature.register(Applier)
-def _(value: Applier) -> Signature:
+def _(value: Applier[_Arg, _KwArg, _Result]) -> Signature:
     return _bind_positionals_to_applier(
             to_signature(value.function).bind(**value.kwargs), value.args
     )

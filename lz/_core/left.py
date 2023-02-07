@@ -25,5 +25,5 @@ class Applier(ApplierBase[_Arg, _KwArg, _Result]):
 
 
 @to_signature.register(Applier)
-def _(_value: Applier) -> Signature:
+def _(_value: Applier[_Arg, _KwArg, _Result]) -> Signature:
     return to_signature(_value.function).bind(*_value.args, **_value.kwargs)

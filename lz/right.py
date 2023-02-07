@@ -100,7 +100,8 @@ def folder(_function: _t.Callable[[_T1, _T2], _T2],
     '(1 + (2 + (3 + (4 + (5 + (6 + (7 + (8 + (9 + 0)))))))))'
     """
     left_folder = _left.folder(_flip(_function), _initial)
-    return _compose(left_folder, _reverse)
+    return _t.cast(_t.Callable[[_t.Iterable[_T1]], _T2],
+                   _compose(left_folder, _reverse))
 
 
 def fold(_function: _t.Callable[[_T2, _T1], _T2],

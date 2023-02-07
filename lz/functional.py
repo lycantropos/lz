@@ -9,13 +9,16 @@ import typing_extensions as _te
 from ._core import functional as _functional
 from ._core.signatures import to_signature as _to_signature
 
+_Arg = _t.TypeVar('_Arg')
+_KwArg = _t.TypeVar('_KwArg')
 _Params = _te.ParamSpec('_Params')
-_T3 = _t.TypeVar('_T3')
-_T1 = _t.TypeVar('_T1')
+_Result = _t.TypeVar('_Result')
+_T = _t.TypeVar('_T')
 _T2 = _t.TypeVar('_T2')
+_T3 = _t.TypeVar('_T3')
 
 
-def identity(_value: _T1) -> _T1:
+def identity(_value: _T) -> _T:
     """
     Returns object itself.
 
@@ -26,8 +29,8 @@ def identity(_value: _T1) -> _T1:
 
 
 def cleave(
-        *functions: _t.Callable[..., _T1]
-) -> _t.Callable[..., _t.Iterable[_T1]]:
+        *functions: _t.Callable[..., _T]
+) -> _t.Callable[..., _t.Iterable[_T]]:
     """
     Returns function that separately applies
     given functions to the same arguments.
@@ -46,7 +49,7 @@ def cleave(
 
 
 def combine(
-        *maps: _t.Callable[[_T1], _T2]
+        *maps: _t.Callable[[_T], _T2]
 ) -> _t.Callable[..., _t.Tuple[_T2, ...]]:
     """
     Returns function that applies each map to corresponding argument.
@@ -75,14 +78,19 @@ def compose(
     45
     """
     caller_frame_info = _inspect.stack()[1]
-    return _functional.Composition(_last_function, _penult_function,
-                                   *_rest_functions,
-                                   file_path=caller_frame_info.filename,
-                                   line_number=caller_frame_info.lineno,
-                                   line_offset=0)
+    return _t.cast(
+            _t.Callable[_Params, _T3],
+            _functional.Composition(_last_function, _penult_function,
+                                    *_rest_functions,
+                                    file_path=caller_frame_info.filename,
+                                    line_number=caller_frame_info.lineno,
+                                    line_offset=0)
+    )
 
 
-def curry(_function: _t.Callable[..., _T2]) -> _functional.Curry:
+def curry(
+        _function: _t.Callable[..., _T2]
+) -> _functional.Curry[_Arg, _KwArg, _T2]:
     """
     Returns curried version of given function.
 
@@ -94,7 +102,7 @@ def curry(_function: _t.Callable[..., _T2]) -> _functional.Curry:
     return _functional.Curry(_function, _to_signature(_function))
 
 
-def pack(_function: _t.Callable[_Params, _T2]) -> _t.Callable[[_T1, _T2], _T2]:
+def pack(_function: _t.Callable[_Params, _T2]) -> _t.Callable[[_T, _T2], _T2]:
     """
     Returns function that works with single iterable parameter
     by unpacking elements to given function.
@@ -117,7 +125,7 @@ def call(_function: _t.Callable[_Params, _T2],
     return _function(*_args, **_kwargs)
 
 
-def to_constant(_value: _T1) -> _t.Callable[..., _T1]:
+def to_constant(_value: _T) -> _t.Callable[..., _T]:
     """
     Returns function that always returns given value.
 
@@ -144,8 +152,8 @@ def flip(_function: _t.Callable[..., _T2]) -> _t.Callable[..., _T2]:
                    _functional.Flip.from_function(_function))
 
 
-def flatmap(_function: _t.Callable[[_T1], _t.Iterable[_T2]],
-            *iterables: _t.Iterable[_T1]) -> _t.Iterable[_T2]:
+def flatmap(_function: _t.Callable[[_T], _t.Iterable[_T2]],
+            *iterables: _t.Iterable[_T]) -> _t.Iterable[_T2]:
     """
     Applies given function to the arguments aggregated from given iterables
     and concatenates results into plain iterable.

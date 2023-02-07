@@ -6,7 +6,7 @@ from operator import is_not as _is_not
 
 from .functional import flatmap as _flatmap
 
-_T1 = _t.TypeVar('_T1')
+_T = _t.TypeVar('_T')
 _T2 = _t.TypeVar('_T2')
 
 
@@ -41,7 +41,7 @@ def _(_iterable: _t.Sized) -> int:
     return len(_iterable)
 
 
-def first(_iterable: _t.Iterable[_T1]) -> _T1:
+def first(_iterable: _t.Iterable[_T]) -> _T:
     """
     Returns first element of iterable.
 
@@ -54,7 +54,7 @@ def first(_iterable: _t.Iterable[_T1]) -> _T1:
         raise ValueError('Argument supposed to be non-empty.') from error
 
 
-def last(_iterable: _t.Iterable[_T1]) -> _T1:
+def last(_iterable: _t.Iterable[_T]) -> _T:
     """
     Returns last element of iterable.
 
@@ -68,9 +68,9 @@ def last(_iterable: _t.Iterable[_T1]) -> _T1:
         raise ValueError('Argument supposed to be non-empty.') from error
 
 
-def cut(_iterable: _t.Iterable[_T1],
+def cut(_iterable: _t.Iterable[_T],
         *,
-        slice_: slice) -> _t.Iterable[_T1]:
+        slice_: slice) -> _t.Iterable[_T]:
     """
     Selects elements from iterable based on given slice.
 
@@ -83,7 +83,7 @@ def cut(_iterable: _t.Iterable[_T1],
                                  slice_.start, slice_.stop, slice_.step)
 
 
-def cutter(_slice: slice) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
+def cutter(_slice: slice) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from iterable based on given slice.
 
@@ -128,7 +128,7 @@ def _slice_to_description(_slice: slice) -> str:
 
 def chopper(
         _size: int
-) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_t.Sequence[_T1]]]:
+) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_t.Sequence[_T]]]:
     """
     Returns function that splits iterable into chunks of given size.
 
@@ -141,9 +141,9 @@ def chopper(
 
 
 @_functools.singledispatch
-def chop(_iterable: _t.Iterable[_T1],
+def chop(_iterable: _t.Iterable[_T],
          *,
-         size: int) -> _t.Iterable[_t.Sequence[_T1]]:
+         size: int) -> _t.Iterable[_t.Sequence[_T]]:
     """
     Splits iterable into chunks of given size.
     """
@@ -152,9 +152,9 @@ def chop(_iterable: _t.Iterable[_T1],
 
 
 @chop.register(_collections.abc.Sequence)
-def _(_iterable: _t.Sequence[_T1],
+def _(_iterable: _t.Sequence[_T],
       *,
-      size: int) -> _t.Iterable[_t.Sequence[_T1]]:
+      size: int) -> _t.Iterable[_t.Sequence[_T]]:
     """
     Splits sequence into chunks of given size.
     """
@@ -172,27 +172,27 @@ in_three = chopper(3)
 in_four = chopper(4)
 
 
-def slide(_iterable: _t.Iterable[_T1],
+def slide(_iterable: _t.Iterable[_T],
           *,
-          size: int) -> _t.Iterable[_t.Tuple[_T1, ...]]:
+          size: int) -> _t.Iterable[_t.Tuple[_T, ...]]:
     """
     Slides over iterable with window of given size.
     """
     iterator = iter(_iterable)
     initial = tuple(_itertools.islice(iterator, size))
 
-    def shift(previous: _t.Tuple[_T1, ...],
-              element: _T1) -> _t.Tuple[_T1, ...]:
+    def shift(previous: _t.Tuple[_T, ...],
+              element: _T) -> _t.Tuple[_T, ...]:
         return previous[1:] + (element,)
 
     yield from _itertools.accumulate(
             _itertools.chain([initial], iterator),
-            _t.cast(_t.Callable[[_t.Any, _t.Any], _t.Tuple[_T1, ...]], shift)
+            _t.cast(_t.Callable[[_t.Any, _t.Any], _t.Tuple[_T, ...]], shift)
     )
 
 
-def slider(_size: int) -> _t.Callable[[_t.Iterable[_T1]],
-                                      _t.Iterable[_t.Tuple[_T1, ...]]]:
+def slider(_size: int) -> _t.Callable[[_t.Iterable[_T]],
+_t.Iterable[_t.Tuple[_T, ...]]]:
     """
     Returns function that slides over iterable with window of given size.
 
@@ -209,7 +209,7 @@ triplewise = slider(3)
 quadruplewise = slider(4)
 
 
-def header(_size: int) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
+def header(_size: int) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from the beginning of iterable.
     Resulted iterable will have size not greater than given one.
@@ -222,9 +222,9 @@ def header(_size: int) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
 
 
 @_functools.singledispatch
-def trail(_iterable: _t.Iterable[_T1],
+def trail(_iterable: _t.Iterable[_T],
           *,
-          size: int) -> _t.Iterable[_T1]:
+          size: int) -> _t.Iterable[_T]:
     """
     Selects elements from the end of iterable.
     Resulted iterable will have size not greater than given one.
@@ -234,9 +234,9 @@ def trail(_iterable: _t.Iterable[_T1],
 
 
 @trail.register(_collections.abc.Sequence)
-def _(iterable: _t.Sequence[_T1],
+def _(iterable: _t.Sequence[_T],
       *,
-      size: int) -> _t.Sequence[_T1]:
+      size: int) -> _t.Sequence[_T]:
     """
     Selects elements from the end of sequence.
     Resulted sequence will have size not greater than given one.
@@ -248,7 +248,7 @@ def _(iterable: _t.Sequence[_T1],
 trail.register(_collections.deque, trail.registry[object])
 
 
-def trailer(_size: int) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
+def trailer(_size: int) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T]]:
     """
     Returns function that selects elements from the end of iterable.
     Resulted iterable will have size not greater than given one.
@@ -262,8 +262,8 @@ def trailer(_size: int) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T1]]:
 
 
 def mapper(
-        _map: _t.Callable[[_T1], _T2]
-) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]]:
+        _map: _t.Callable[[_T], _T2]
+) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T2]]:
     """
     Returns function that applies given map to the each element of iterable.
 
@@ -271,13 +271,13 @@ def mapper(
     >>> list(to_str(range(10)))
     ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     """
-    return _t.cast(_t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]],
+    return _t.cast(_t.Callable[[_t.Iterable[_T]], _t.Iterable[_T2]],
                    _functools.partial(map, _map))
 
 
 def flatmapper(
-        _map: _t.Callable[[_T1], _t.Iterable[_T2]]
-) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[_T2]]:
+        _map: _t.Callable[[_T], _t.Iterable[_T2]]
+) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[_T2]]:
     """
     Returns function that applies map to the each element of iterable
     and flattens results.
@@ -289,27 +289,24 @@ def flatmapper(
     return _functools.partial(_flatmap, _map)
 
 
-Group = _t.Tuple[_t.Hashable, _t.Iterable[_T1]]
+Group = _t.Tuple[_t.Hashable, _t.Iterable[_T]]
 
 
-def group_by(_iterable: _t.Iterable[_T1],
+def group_by(_iterable: _t.Iterable[_T],
              *,
-             key: _t.Callable[[_T1], _t.Hashable],
-             mapping_cls: _t.Type[_t.MutableMapping]) -> _t.Iterable[Group]:
+             key: _t.Callable[[_T], _t.Hashable]) -> _t.Iterable[Group[_T]]:
     """
     Groups iterable elements based on given key.
     """
-    groups = mapping_cls()
+    groups: _t.Dict[_t.Hashable, _t.List[_T]] = {}
     for element in _iterable:
         groups.setdefault(key(element), []).append(element)
     yield from groups.items()
 
 
 def grouper(
-        _key: _t.Callable[[_T1], _t.Hashable],
-        *,
-        mapping_cls: _t.Type[_t.MutableMapping] = _collections.OrderedDict
-) -> _t.Callable[[_t.Iterable[_T1]], _t.Iterable[Group]]:
+        _key: _t.Callable[[_T], _t.Hashable]
+) -> _t.Callable[[_t.Iterable[_T]], _t.Iterable[Group[_T]]]:
     """
     Returns function that groups iterable elements based on given key.
 
@@ -324,11 +321,10 @@ def grouper(
     [(0, [0, 2, 4, 6, 8]), (1, [1, 3, 5, 7, 9])]
     """
     return _functools.partial(group_by,
-                              key=_key,
-                              mapping_cls=mapping_cls)
+                              key=_key)
 
 
-def expand(_value: _T1) -> _t.Iterable[_T1]:
+def expand(_value: _T) -> _t.Iterable[_T]:
     """
     Wraps value into iterable.
 
@@ -338,7 +334,7 @@ def expand(_value: _T1) -> _t.Iterable[_T1]:
     yield _value
 
 
-def flatten(_iterable: _t.Iterable[_t.Iterable[_T1]]) -> _t.Iterable[_T1]:
+def flatten(_iterable: _t.Iterable[_t.Iterable[_T]]) -> _t.Iterable[_T]:
     """
     Returns plain iterable from iterable of iterables.
 
@@ -348,14 +344,14 @@ def flatten(_iterable: _t.Iterable[_t.Iterable[_T1]]) -> _t.Iterable[_T1]:
     yield from _itertools.chain.from_iterable(_iterable)
 
 
-def interleave(_iterable: _t.Iterable[_t.Iterable[_T1]]) -> _t.Iterable[_T1]:
+def interleave(_iterable: _t.Iterable[_t.Iterable[_T]]) -> _t.Iterable[_T]:
     """
     Interleaves elements from given iterable of iterables.
 
     >>> list(interleave([range(5), range(10, 20)]))
     [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 15, 16, 17, 18, 19]
     """
-    iterators = _itertools.cycle(_t.cast(_t.Iterable[_t.Iterator[_T1]],
+    iterators = _itertools.cycle(_t.cast(_t.Iterable[_t.Iterator[_T]],
                                          map(iter, _iterable)))
     while True:
         try:
