@@ -64,7 +64,7 @@ jobs:
       - name: 'Install type checker'
         run: python -m pip install -U mypy
       - name: 'Run type checker'
-        run: python -m mypy ${{ github.event.repository.name }}
+        run: python -m mypy --strict ${{ github.event.repository.name }}
       - name: 'Install coverage dependencies'
         run: python -m pip install -U coverage
       - name: 'Install tests dependencies'
