@@ -10,12 +10,11 @@ from abc import (ABC,
                  abstractmethod)
 from types import MethodType
 
+import typing_extensions as _te
 from paradigm.base import (OverloadedSignature,
                            PlainSignature)
 from reprit import seekers
 from reprit.base import generate_repr
-from typing_extensions import (ParamSpec,
-                               final)
 
 from lz._core.signatures import (Signature,
                                  to_signature)
@@ -28,7 +27,7 @@ _T = _t.TypeVar('_T')
 MIN_COMPOSABLE_FUNCTIONS_COUNT = 2
 
 
-@final
+@_te.final
 class Composition(_t.Generic[_Arg, _KwArg, _Result]):
     _file_path: str
     _function: _t.Callable[..., _Result]
@@ -96,7 +95,7 @@ class Composition(_t.Generic[_Arg, _KwArg, _Result]):
                              field_seeker=seekers.complex_)
 
 
-@final
+@_te.final
 class Combination(_t.Generic[_Arg, _Result]):
     _file_path: str
     _function: _t.Callable[..., _t.Tuple[_Result, ...]]
@@ -174,7 +173,7 @@ class ApplierBase(ABC, _t.Generic[_Arg, _KwArg, _Result]):
         pass
 
 
-@final
+@_te.final
 class Curry(ApplierBase[_Arg, _KwArg, _Result]):
     def __init__(self,
                  function: _t.Callable[..., _Result],
@@ -215,7 +214,7 @@ class Curry(ApplierBase[_Arg, _KwArg, _Result]):
                              field_seeker=seekers.complex_)
 
 
-@final
+@_te.final
 class Constant(_t.Generic[_T]):
     def __init__(self, _value: _T) -> None:
         self._value = _value
@@ -226,10 +225,10 @@ class Constant(_t.Generic[_T]):
     __repr__ = generate_repr(__init__)
 
 
-_Params = ParamSpec('_Params')
+_Params = _te.ParamSpec('_Params')
 
 if sys.version_info < (3, 10):
-    @final
+    @_te.final
     class Cleavage(_t.Generic[_Result]):
         _file_path: str
         _function: _t.Callable[..., _t.Tuple[_Result, ...]]
@@ -244,7 +243,7 @@ if sys.version_info < (3, 10):
                     *functions: _t.Callable[_Params, _Result],
                     file_path: str = __file__,
                     line_number: int = 0,
-                    line_offset: int = 0) -> Cleavage[_Result]:
+                    line_offset: int = 0) -> _te.Self:
             self = super().__new__(cls)
             self._functions = functions
             self._file_path = file_path
@@ -278,7 +277,7 @@ if sys.version_info < (3, 10):
         __repr__ = generate_repr(__new__,
                                  field_seeker=seekers.complex_)
 else:
-    @final
+    @_te.final
     class Cleavage(_t.Generic[_Params, _Result]):
         _file_path: str
         _function: _t.Callable[_Params, _t.Tuple[_Result, ...]]
@@ -293,7 +292,7 @@ else:
                     *functions: _t.Callable[_Params, _Result],
                     file_path: str = __file__,
                     line_number: int = 0,
-                    line_offset: int = 0) -> Cleavage[_Params, _Result]:
+                    line_offset: int = 0) -> _te.Self:
             self = super().__new__(cls)
             self._functions = functions
             self._file_path = file_path
@@ -328,14 +327,22 @@ else:
                                  field_seeker=seekers.complex_)
 
 
-@final
+@_te.final
 class Flip(_t.Generic[_Result]):
-    @classmethod
-    @_t.overload
-    def from_function(
-            cls, _function: 'Cleavage[_Params, _Result]'
-    ) -> 'Cleavage[_Params, _Result]':
-        ...
+    if sys.version_info < (3, 10):
+        @classmethod
+        @_t.overload
+        def from_function(
+                cls, _function: Cleavage[_Result]
+        ) -> Cleavage[_Result]:
+            ...
+    else:
+        @classmethod
+        @_t.overload
+        def from_function(
+                cls, _function: Cleavage[_Params, _Result]
+        ) -> Cleavage[_Params, _Result]:
+            ...
 
     @classmethod
     @_t.overload
@@ -628,11 +635,6 @@ def _function_to_unique_name(function: _t.Callable[..., _t.Any]) -> str:
     return '_' + str(id(function)).replace('-', '_')
 
 
-@to_signature.register(Cleavage)
-def _(_value: 'Cleavage[_Params, _Result]') -> Signature:
-    return to_signature(_value._functions[0])
-
-
 @to_signature.register(Combination)
 def _(_value: Combination[_Arg, _Result]) -> Signature:
     return to_signature(_value._function)
@@ -647,6 +649,16 @@ def _(_value: Composition[_Arg, _KwArg, _Result]) -> Signature:
                if isinstance(last_signature, OverloadedSignature)
                else last_signature.returns)
     return _replace_returns(to_signature(_value._functions[-1]), returns)
+
+
+if sys.version_info < (3, 10):
+    @to_signature.register(Cleavage)
+    def _(_value: Cleavage[_Result]) -> Signature:
+        return to_signature(_value._functions[0])
+else:
+    @to_signature.register(Cleavage)
+    def _(_value: Cleavage[_Params, _Result]) -> Signature:
+        return to_signature(_value._functions[0])
 
 
 @functools.singledispatch
