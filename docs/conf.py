@@ -11,6 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
+from datetime import date
 
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -18,8 +19,8 @@ sys.path.insert(0, os.path.abspath('..'))
 import lz
 
 project = lz.__name__
-copyright = '2019, Azat Ibrakov'
 author = 'Azat Ibrakov'
+copyright = f'{date.today().year}, {author}'
 
 # The full version, including alpha/beta/rc tags
 release = lz.__version__
